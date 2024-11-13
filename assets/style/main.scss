@@ -1,0 +1,31 @@
+@use '_mixins.scss';
+
+$blue: #171e42;
+
+@include mixins.font-face('Montserrat', '/fonts/Montserrat', normal, normal);
+@include mixins.font-face('Montserrat', '/fonts/Montserrat-Bold', bold, normal);
+@include mixins.font-face('Open Sans', '/fonts/OpenSans', normal, normal);
+@include mixins.font-face('Open Sans', '/fonts/OpenSans-SemiBold', 600, normal);
+
+.fade {
+    &-enter-active,
+    &-leave-active {
+        transition: opacity 0.15s;
+    }
+    &-enter-from,
+    &-leave-to {
+        opacity: 0;
+    }
+}
+.translate {
+    &-up {
+        &-enter-active,
+        &-leave-active {
+            transition: transform 0.15s;
+        }
+        &-enter-from,
+        &-leave-to {
+            transform: translateY(100%);
+        }
+    }
+}
