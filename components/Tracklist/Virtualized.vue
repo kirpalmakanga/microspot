@@ -34,8 +34,6 @@ function toggleSaveTrack(trackId: string) {
 function handleScrollEnd({ currentTarget }: ElementEvent<HTMLDivElement>) {
     const { scrollTop, scrollHeight, offsetHeight } = currentTarget;
 
-    console.log(scrollTop, scrollHeight, offsetHeight);
-
     if (
         scrollTop >=
         scrollHeight -
