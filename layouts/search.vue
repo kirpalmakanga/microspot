@@ -82,7 +82,7 @@ const stopWatchingQuery = watch(
     { immediate: true }
 );
 
-const stopWatchingTab = watch(tab, loadTabData, { immediate: true });
+const stopWatchingTab = watch(tab, loadTabData);
 
 onBeforeMount(() => {
     const {
