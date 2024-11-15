@@ -1,5 +1,5 @@
 export default defineNuxtConfig({
-    ssr: false,
+    ssr: true,
     modules: ['@nuxt/ui', '@pinia/nuxt', '@pinia-plugin-persistedstate/nuxt'],
     imports: {
         dirs: ['composables/**']
