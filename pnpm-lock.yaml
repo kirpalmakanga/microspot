@@ -17,6 +17,12 @@ importers:
       '@nuxt/ui':
         specifier: 3.0.0-alpha.8
         version: 3.0.0-alpha.8(@babel/parser@7.26.2)(axios@1.7.7)(change-case@5.4.4)(embla-carousel@8.3.1)(ioredis@5.4.1)(magicast@0.3.5)(rollup@4.26.0)(typescript@5.6.3)(vite@5.4.11(@types/node@22.9.0)(lightningcss@1.28.1)(sass@1.81.0)(terser@5.36.0))(vue@3.5.12(typescript@5.6.3))
+      '@pinia-plugin-persistedstate/nuxt':
+        specifier: ^1.2.1
+        version: 1.2.1(@pinia/nuxt@0.7.0(magicast@0.3.5)(rollup@4.26.0)(typescript@5.6.3)(vue@3.5.12(typescript@5.6.3)))(magicast@0.3.5)(pinia@2.2.6(typescript@5.6.3)(vue@3.5.12(typescript@5.6.3)))(rollup@4.26.0)
+      '@pinia/nuxt':
+        specifier: ^0.7.0
+        version: 0.7.0(magicast@0.3.5)(rollup@4.26.0)(typescript@5.6.3)(vue@3.5.12(typescript@5.6.3))
       '@vueuse/core':
         specifier: ^11.2.0
         version: 11.2.0(vue@3.5.12(typescript@5.6.3))
@@ -26,22 +32,22 @@ importers:
       mitt:
         specifier: ^3.0.1
         version: 3.0.1
+      nuxt:
+        specifier: ^3.14.159
+        version: 3.14.159(@parcel/watcher@2.5.0)(@types/node@22.9.0)(ioredis@5.4.1)(lightningcss@1.28.1)(magicast@0.3.5)(rollup@4.26.0)(sass@1.81.0)(terser@5.36.0)(typescript@5.6.3)(vite@5.4.11(@types/node@22.9.0)(lightningcss@1.28.1)(sass@1.81.0)(terser@5.36.0))
       pinia:
         specifier: ^2.2.5
         version: 2.2.6(typescript@5.6.3)(vue@3.5.12(typescript@5.6.3))
+      vue:
+        specifier: ^3.5.12
+        version: 3.5.12(typescript@5.6.3)
+      vue-router:
+        specifier: ^4.4.5
+        version: 4.4.5(vue@3.5.12(typescript@5.6.3))
       vue-virtual-scroller:
         specifier: 2.0.0-beta.8
         version: 2.0.0-beta.8(vue@3.5.12(typescript@5.6.3))
     devDependencies:
-      '@pinia-plugin-persistedstate/nuxt':
-        specifier: ^1.2.1
-        version: 1.2.1(@pinia/nuxt@0.7.0(magicast@0.3.5)(rollup@4.26.0)(typescript@5.6.3)(vue@3.5.12(typescript@5.6.3)))(magicast@0.3.5)(pinia@2.2.6(typescript@5.6.3)(vue@3.5.12(typescript@5.6.3)))(rollup@4.26.0)
-      '@pinia/nuxt':
-        specifier: ^0.7.0
-        version: 0.7.0(magicast@0.3.5)(rollup@4.26.0)(typescript@5.6.3)(vue@3.5.12(typescript@5.6.3))
-      nuxt:
-        specifier: ^3.14.159
-        version: 3.14.159(@parcel/watcher@2.5.0)(@types/node@22.9.0)(ioredis@5.4.1)(lightningcss@1.28.1)(magicast@0.3.5)(rollup@4.26.0)(sass@1.81.0)(terser@5.36.0)(typescript@5.6.3)(vite@5.4.11(@types/node@22.9.0)(lightningcss@1.28.1)(sass@1.81.0)(terser@5.36.0))
       sass:
         specifier: ^1.80.5
         version: 1.81.0
@@ -3261,8 +3267,8 @@ packages:
     resolution: {integrity: sha512-t0rzBq87m3fVcduHDUFhKmyyX+9eo6WQjZvf51Ea/M0Q7+T374Jp1aUiyUl0GKxp8M/OETVHSDvmkyPgvX+X2w==}
     engines: {node: '>=10'}
 
-  type-fest@4.26.1:
-    resolution: {integrity: sha512-yOGpmOAL7CkKe/91I5O3gPICmJNLJ1G4zFYVAsRHg7M64biSnPtRj0WNQt++bRkjYOqjWXrhnUw1utzmVErAdg==}
+  type-fest@4.27.0:
+    resolution: {integrity: sha512-3IMSWgP7C5KSQqmo1wjhKrwsvXAtF33jO3QY+Uy++ia7hqvgSK6iXbbg5PbDBc1P2ZbNEDgejOrN4YooXvhwCw==}
     engines: {node: '>=16'}
 
   type-level-regexp@0.1.17:
@@ -5593,7 +5599,7 @@ snapshots:
 
   dot-prop@9.0.0:
     dependencies:
-      type-fest: 4.26.1
+      type-fest: 4.27.0
 
   dotenv@16.4.5: {}
 
@@ -6681,7 +6687,7 @@ snapshots:
     dependencies:
       '@babel/code-frame': 7.26.2
       index-to-position: 0.1.2
-      type-fest: 4.26.1
+      type-fest: 4.27.0
 
   parse-path@7.0.0:
     dependencies:
@@ -7312,7 +7318,7 @@ snapshots:
 
   type-fest@0.21.3: {}
 
-  type-fest@4.26.1: {}
+  type-fest@4.27.0: {}
 
   type-level-regexp@0.1.17: {}
 
