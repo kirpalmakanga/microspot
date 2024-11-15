@@ -120,7 +120,14 @@ onBeforeUnmount(destroy);
 
 <template>
     <div ref="playerWrapper" class="relative flex flex-col">
-        <div v-if="isFullscreen" class="grow bg-zinc-800"></div>
+        <PlayerFullscreenOverlay
+            v-if="isFullscreen"
+            class="grow flex justify-center items-center bg-zinc-800"
+            :cover="currentTrack.cover"
+            :title="currentTrack.name"
+            :artists="currentTrack.artists"
+            @click="togglePlay"
+        />
 
         <div class="relative flex h-20 shadow">
             <div class="flex">
