@@ -30,55 +30,7 @@ const {
     toggleSaveCurrentTrack
 } = useSpotifyPlayer();
 
-const iconsByDeviceType: Record<string, string> = {
-    computer: 'i-mi-computer',
-    smartphone: 'i-mi-mobile',
-    speaker: 'i-mi-speakers'
-};
-
-const isLoadingDevices = ref<boolean>(false);
-
-const deviceMenuOptions = computed(() => {
-    if (isLoadingDevices.value && !availableDevices.value.length) {
-        return [
-            {
-                icon: 'svg-spinners-90-ring-with-bg',
-                type: 'label'
-            }
-        ];
-    }
-
-    const [currentItem] = availableDevices.value
-        .filter(({ isActive }) => isActive)
-        .map(({ name: label, type }) => ({
-            icon: iconsByDeviceType[type],
-            type: 'label',
-            label
-        }));
-    const availableItems = availableDevices.value
-        .filter(({ isActive }) => !isActive)
-        .map(({ id, name: label, type }) => ({
-            icon: iconsByDeviceType[type],
-            label,
-            class: 'cursor-pointer',
-            onSelect: () => {
-                setActiveDevice(id);
-            }
-        }));
-
-    return [
-        ...(currentItem
-            ? [{ type: 'label', label: 'Current device' }, currentItem]
-            : []),
-        ...(availableItems.length
-            ? [
-                  ...(currentItem ? [{ type: 'separator' }] : []),
-                  { type: 'label', label: 'Available devices' },
-                  ...availableItems
-              ]
-            : [])
-    ];
-});
+const isDeviceSelectorVisible = ref<boolean>(false);
 
 const contextUri = computed(() => {
     const {
@@ -100,12 +52,10 @@ function togglePlay() {
     isPlaying.value ? pause() : play();
 }
 
-async function loadDevices() {
-    isLoadingDevices.value = true;
-
+async function openDeviceSelector() {
     await getDevices();
 
-    isLoadingDevices.value = false;
+    isDeviceSelectorVisible.value = true;
 }
 
 onMounted(async () => {
@@ -214,9 +164,10 @@ onBeforeUnmount(destroy);
             </div>
 
             <div class="flex">
-                <UDropdownMenu :items="deviceMenuOptions">
-                    <PlayerControl icon="i-mi-speakers" @click="loadDevices" />
-                </UDropdownMenu>
+                <PlayerControl
+                    icon="i-mi-speakers"
+                    @click="openDeviceSelector"
+                />
 
                 <PlayerControl
                     :icon="isFullscreen ? 'i-mi-minimize' : 'i-mi-expand'"
@@ -225,4 +176,18 @@ onBeforeUnmount(destroy);
             </div>
         </div>
     </div>
+
+    <USlideover
+        v-model:open="isDeviceSelectorVisible"
+        title="Connect to a device"
+        :close="{
+            color: 'primary',
+            variant: 'soft',
+            class: 'cursor-pointer'
+        }"
+    >
+        <template #body>
+            <PlayerDeviceSelector :items="availableDevices" />
+        </template>
+    </USlideover>
 </template>
