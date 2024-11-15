@@ -5,8 +5,6 @@ import { useFullscreen } from '@vueuse/core';
 const playerStore = usePlayerStore();
 const { context } = storeToRefs(playerStore);
 
-const isDevicesSelectorOpen = ref<boolean>(false);
-
 const playerWrapper = useTemplateRef('playerWrapper');
 
 const { isFullscreen, toggle: toggleFullscreen } = useFullscreen(playerWrapper);
@@ -40,8 +38,8 @@ const iconsByDeviceType: Record<string, string> = {
 
 const isLoadingDevices = ref<boolean>(false);
 
-const deviceMenuOptions = computed<DropdownMenuItem[]>(() => {
-    if (isLoadingDevices.value) {
+const deviceMenuOptions = computed(() => {
+    if (isLoadingDevices.value && !availableDevices.value.length) {
         return [
             {
                 icon: 'svg-spinners-90-ring-with-bg',
@@ -52,7 +50,7 @@ const deviceMenuOptions = computed<DropdownMenuItem[]>(() => {
 
     const [currentItem] = availableDevices.value
         .filter(({ isActive }) => isActive)
-        .map(({ id, name: label, type }) => ({
+        .map(({ name: label, type }) => ({
             icon: iconsByDeviceType[type],
             type: 'label',
             label
@@ -74,7 +72,7 @@ const deviceMenuOptions = computed<DropdownMenuItem[]>(() => {
             : []),
         ...(availableItems.length
             ? [
-                  { type: 'separator' },
+                  ...(currentItem ? [{ type: 'separator' }] : []),
                   { type: 'label', label: 'Available devices' },
                   ...availableItems
               ]
@@ -210,11 +208,7 @@ onBeforeUnmount(destroy);
 
             <div class="flex">
                 <UDropdownMenu :items="deviceMenuOptions">
-                    <PlayerControl
-                        icon="i-mi-speakers"
-                        :disabled="!availableDevices.length"
-                        @click="loadDevices"
-                    />
+                    <PlayerControl icon="i-mi-speakers" @click="loadDevices" />
                 </UDropdownMenu>
 
                 <PlayerControl
