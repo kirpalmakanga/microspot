@@ -116,14 +116,17 @@ export const useSpotifyPlayer = () => {
         const cannotSkipToNext =
             disallowSkippingNext || nextTracks.length === 0;
 
-        if (cannotSkipToPrevious !== state.cannotSkipToPrevious)
+        if (cannotSkipToPrevious !== state.cannotSkipToPrevious) {
             state.cannotSkipToPrevious = cannotSkipToPrevious;
+        }
 
-        if (cannotSkipToNext !== state.cannotSkipToNext)
+        if (cannotSkipToNext !== state.cannotSkipToNext) {
             state.cannotSkipToNext = cannotSkipToNext;
+        }
 
-        if (currentTrackPosition !== state.currentTrackPosition)
+        if (currentTrackPosition !== state.currentTrackPosition) {
             state.currentTrackPosition = currentTrackPosition;
+        }
 
         playerStore.isPlaying = !paused;
         state.isPlaying = !paused;
