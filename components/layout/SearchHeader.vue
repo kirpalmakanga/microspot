@@ -11,14 +11,14 @@ const { clearSearch } = searchStore;
         </template>
 
         <UInput
-            class="grow"
+            class="grow pr-2.5"
             variant="soft"
             placeholder="Search"
             v-model="query"
         >
             <template v-if="query" #trailing>
                 <UButton
-                    class="rounded-none rounded-r-md -me-2.5 cursor-pointer"
+                    class="rounded-l-none rounded-r-md cursor-pointer"
                     icon="i-mi-close"
                     variant="soft"
                     color="neutral"
