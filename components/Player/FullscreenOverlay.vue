@@ -14,7 +14,6 @@ defineProps<{ cover: string; title: string; artists: Artist[] }>();
 
                 <p class="opacity-60">
                     <template
-                        :class="class"
                         v-for="({ id, name }, index) of artists"
                         :key="id"
                     >

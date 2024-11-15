@@ -4,11 +4,7 @@ defineProps<{ items: Artist[] }>();
 
 <template>
     <span>
-        <template
-            :class="class"
-            v-for="({ id, name }, index) of items"
-            :key="id"
-        >
+        <template v-for="({ id, name }, index) of items" :key="id">
             <template v-if="index > 0">
                 {{ ', ' }}
             </template>
