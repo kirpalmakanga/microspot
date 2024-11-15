@@ -56,10 +56,10 @@ onMounted(loadData);
 
 <template>
     <section class="flex flex-col grow">
-        <LayoutDefaultHeader />
+        <Transition name="fade" mode="out-in">
+            <Loader v-if="state.isLoading" />
 
-        <div class="relative flex flex-col grow">
-            <template v-if="!state.isLoading">
+            <div v-else class="relative flex flex-col grow">
                 <LayoutPageHeader type="Artist" :cover="cover" :title="name">
                     <template #subtitles>
                         <p class="text-sm opacity-60">
@@ -103,11 +103,7 @@ onMounted(loadData);
                 >
                     <AlbumGrid :items="albums" />
                 </ScrollContainer>
-            </template>
-
-            <Transition name="fade">
-                <Loader v-if="state.isLoading" />
-            </Transition>
-        </div>
+            </div>
+        </Transition>
     </section>
 </template>

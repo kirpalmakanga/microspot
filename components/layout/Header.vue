@@ -41,24 +41,16 @@ const menuOptions: DropdownMenuItem[] = [
 
 <template>
     <header class="flex items-center justify-between h-12 bg-zinc-900 shadow">
-        <slot name="nav-left"></slot>
+        <NuxtLink
+            class="flex items-center justify-center h-12 w-12 cursor-pointer"
+            to="/"
+        >
+            <UIcon class="size-6" name="i-mi-home" />
+        </NuxtLink>
 
-        <div class="flex items-center grow">
-            <h1
-                v-if="title"
-                class="px-4 text-xl font-secondary overflow-hidden"
-            >
-                <span
-                    class="overflow-ellipsis overflow-hidden whitespace-nowrap"
-                >
-                    {{ title }}
-                </span>
-            </h1>
-
-            <slot></slot>
-        </div>
-
-        <slot name="nav-right"></slot>
+        <template v-if="isLoggedIn">
+            <SearchForm />
+        </template>
 
         <div v-if="isLoggedIn" class="relative flex mx-2">
             <UDropdownMenu

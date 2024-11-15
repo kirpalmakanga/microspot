@@ -1,5 +1,4 @@
 <script setup lang="ts">
-const router = useRouter();
 const route = useRoute();
 const searchStore = useSearchStore();
 const { query, isLoading } = storeToRefs(searchStore);
@@ -42,20 +41,9 @@ const tabs = computed<{ title: string; href: string }[]>(() => {
     ];
 });
 
-function updateRoute() {
-    router.replace({
-        name: 'search-query-tab',
-        ...(query.value && {
-            params: {
-                query: query.value,
-                ...(tab.value && { tab: tab.value })
-            }
-        })
-    });
-}
-
 async function loadTabData() {
-    if (query.value) {
+    console.log('load ?', !isLoading.value);
+    if (query.value && !isLoading.value) {
         isLoading.value = true;
 
         switch (tab.value) {
@@ -89,23 +77,12 @@ const stopWatchingQuery = watch(
     debounce(() => {
         clearSearchResults();
 
-        updateRoute();
-
         loadTabData();
-    }, 500)
+    }, 500),
+    { immediate: true }
 );
 
-const stopWatchingTab = watch(tab, loadTabData);
-
-onMounted(() => {
-    const {
-        params: { query: routeQuery }
-    } = route;
-
-    if (routeQuery) {
-        query.value = routeQuery as string;
-    }
-});
+const stopWatchingTab = watch(tab, loadTabData, { immediate: true });
 
 onBeforeMount(() => {
     const {
@@ -127,8 +104,6 @@ onUnmounted(() => {
 
 <template>
     <section class="flex flex-col grow">
-        <LayoutSearchHeader />
-
         <ul v-if="query" class="flex gap-2 p-4">
             <li v-for="{ title, href } of tabs">
                 <UButton color="neutral" :to="href" active-class="opacity-50">

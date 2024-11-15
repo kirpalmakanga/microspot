@@ -78,8 +78,6 @@ onUnmounted(clearAlbumData);
 
 <template>
     <section class="flex flex-col grow">
-        <LayoutDefaultHeader />
-
         <Transition name="fade" mode="out-in">
             <Loader v-if="state.isLoading" />
 

@@ -1,7 +1,5 @@
 <template>
     <section class="flex flex-col grow">
-        <LayoutHomeHeader />
-
         <div class="relative flex flex-col grow">
             <h2 class="p-4">Recent playlists</h2>
 

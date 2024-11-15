@@ -32,35 +32,37 @@ onUnmounted(() => clearPlaylists(route.params.userId as string));
 
 <template>
     <section class="flex flex-col grow">
-        <LayoutDefaultHeader />
-
-        <div v-if="!isLoading" class="flex flex-col grow">
-            <LayoutPageHeader type="User" :cover="profilePicture" :title="name">
-                <template #subtitles>
-                    <p class="text-sm opacity-60">
-                        {{
-                            `${userPlaylists.length} playlist${
-                                userPlaylists.length === 1 ? '' : 's'
-                            }`
-                        }}
-                    </p>
-                </template>
-            </LayoutPageHeader>
-
-            <ScrollContainer class="bg-zinc-700">
-                <div class="p-4">
-                    <h2 class="mb-4">Recent playlists</h2>
-
-                    <PlaylistGrid
-                        :items="userPlaylists"
-                        :is-user-name-visible="false"
-                    />
-                </div>
-            </ScrollContainer>
-        </div>
-
-        <Transition name="fade">
+        <Transition name="fade" mode="out-in">
             <Loader v-if="isLoading" />
+
+            <div v-else class="flex flex-col grow">
+                <LayoutPageHeader
+                    type="User"
+                    :cover="profilePicture"
+                    :title="name"
+                >
+                    <template #subtitles>
+                        <p class="text-sm opacity-60">
+                            {{
+                                `${userPlaylists.length} playlist${
+                                    userPlaylists.length === 1 ? '' : 's'
+                                }`
+                            }}
+                        </p>
+                    </template>
+                </LayoutPageHeader>
+
+                <ScrollContainer class="bg-zinc-700">
+                    <div class="p-4">
+                        <h2 class="mb-4">Recent playlists</h2>
+
+                        <PlaylistGrid
+                            :items="userPlaylists"
+                            :is-user-name-visible="false"
+                        />
+                    </div>
+                </ScrollContainer>
+            </div>
         </Transition>
     </section>
 </template>
