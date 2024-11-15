@@ -123,7 +123,7 @@ onBeforeUnmount(destroy);
         <PlayerFullscreenOverlay
             v-if="isFullscreen"
             class="grow flex justify-center items-center bg-zinc-800"
-            :cover="currentTrack.cover"
+            :cover="currentTrack.images.large"
             :title="currentTrack.name"
             :artists="currentTrack.artists"
             @click="togglePlay"
@@ -152,9 +152,9 @@ onBeforeUnmount(destroy);
 
             <div class="flex grow overflow-hidden bg-zinc-700">
                 <Img
-                    v-if="currentTrack.cover"
+                    v-if="currentTrack.id"
                     class="bg-zinc-400 flex-shrink-0 inline-flex w-16 h-16 rounded-md ml-2 my-2"
-                    :src="currentTrack.cover"
+                    :src="currentTrack.images.small"
                 />
 
                 <div class="flex flex-col grow p-2">

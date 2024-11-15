@@ -22,7 +22,7 @@ interface State {
         id: string;
         name: string;
         artists: Artist[];
-        cover: string;
+        images: Images;
         duration: number;
         uri: string;
         isSaved: boolean;
@@ -41,7 +41,7 @@ const getDefaultState = () => ({
         id: '',
         name: '',
         artists: [],
-        cover: '',
+        images: { small: '', medium: '', large: '' },
         duration: 0,
         uri: '',
         isSaved: false
@@ -67,7 +67,11 @@ export const useSpotifyPlayer = () => {
             name,
             duration_ms,
             album: {
-                images: [{ url: cover }]
+                images: [
+                    { url: large = '' },
+                    { url: medium = '' },
+                    { url: small = '' }
+                ] = []
             },
             artists
         }: Spotify.Track,
@@ -84,7 +88,7 @@ export const useSpotifyPlayer = () => {
                     uri,
                     images: { small: '', medium: '', large: '' }
                 })),
-                cover,
+                images: { large, medium, small },
                 duration: duration_ms,
                 isSaved: await isTrackSaved(id)
             };

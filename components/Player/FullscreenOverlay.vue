@@ -4,11 +4,11 @@ defineProps<{ cover: string; title: string; artists: Artist[] }>();
 
 <template>
     <div class="grow flex justify-center items-center bg-zinc-800">
-        <div class="flex gap-8 items-end">
-            <Img class="size-96" :src="cover" />
+        <div class="flex gap-4 items-end">
+            <Img class="size-96 rounded-md" :src="cover" />
 
             <div>
-                <p class="text-32">
+                <p class="text-xl">
                     {{ title }}
                 </p>
 
