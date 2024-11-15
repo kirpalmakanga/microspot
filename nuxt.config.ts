@@ -6,7 +6,7 @@ export default defineNuxtConfig({
     },
     css: ['~/assets/style/main.scss'],
     hooks: {
-        // TODO: remove after next upxate
+        // TODO: remove after next update
         'vite:extend'({ config }) {
             if (config.server && config.server.hmr) {
                 //@ts-ignore
