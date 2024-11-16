@@ -106,7 +106,13 @@ onUnmounted(() => {
     <section class="flex flex-col grow">
         <ul v-if="query" class="flex gap-2 p-4">
             <li v-for="{ title, href } of tabs">
-                <UButton color="neutral" :to="href" active-class="opacity-50">
+                <UButton
+                    color="neutral"
+                    :to="href"
+                    :class="{
+                        'opacity-50': href === route.fullPath
+                    }"
+                >
                     {{ title }}
                 </UButton>
             </li>
