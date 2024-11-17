@@ -134,3 +134,7 @@ export function getDataUrl(file: File): Promise<string> {
 export function capitalize(str: string) {
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
+
+export function nextFrame() {
+    return new Promise((resolve) => requestAnimationFrame(resolve));
+}

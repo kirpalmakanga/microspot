@@ -1,40 +1,55 @@
 <script setup lang="ts">
-defineProps<{ position: number; duration: number }>();
+const props = defineProps<{ position: number; duration: number }>();
 
-const emit = defineEmits<{ change: [position: number] }>();
+const emit = defineEmits<{ update: [position: number] }>();
 
-const isSeeking = ref<boolean>(false);
+const container = useTemplateRef('container');
+
 const seekingPosition = ref<number>(0);
 
-function handleInput({ currentTarget }: Event) {
-    if (currentTarget instanceof HTMLInputElement) {
-        seekingPosition.value = parseInt(currentTarget.value);
+const progress = computed(() => props.position / props.duration);
+
+async function handleMouseMove({ pageX }: MouseEvent) {
+    if (container.value) {
+        const { left } = container.value.getBoundingClientRect();
+
+        await nextFrame();
+
+        seekingPosition.value = (pageX - left) / container.value.offsetWidth;
     }
 }
 
-function handleStartSeeking() {
-    isSeeking.value = true;
-}
-
-function handleStopSeeking() {
-    emit('change', seekingPosition.value);
+async function handleMouseLeave() {
+    await nextFrame();
 
     seekingPosition.value = 0;
-    isSeeking.value = false;
+}
+
+function handleMouseUp() {
+    emit('update', seekingPosition.value * props.duration);
 }
 </script>
 
 <template>
-    <input
-        class="w-full"
-        :class="{ 'cursor-pointer': !!duration }"
-        :value="isSeeking ? seekingPosition : position"
-        type="range"
-        :min="0"
-        :max="duration"
-        :disabled="!duration"
-        @mousedown="handleStartSeeking"
-        @mouseup="handleStopSeeking"
-        @input="handleInput"
-    />
+    <div
+        ref="container"
+        class="relative w-full bg-zinc-100 h-1.5 rounded-full overflow-hidden"
+        @mousemove="handleMouseMove"
+        @mouseleave="handleMouseLeave"
+        @mouseup="handleMouseUp"
+    >
+        <span
+            class="absolute inset-0 bg-zinc-500"
+            :style="{
+                transform: `translateX(${100 * seekingPosition - 100}%)`
+            }"
+        />
+
+        <span
+            class="absolute inset-0 bg-indigo-400"
+            :style="{
+                transform: `translateX(${100 * progress - 100}%) `
+            }"
+        />
+    </div>
 </template>

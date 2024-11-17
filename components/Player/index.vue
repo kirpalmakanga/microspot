@@ -153,7 +153,7 @@ onBeforeUnmount(destroy);
                         <PlayerSeekbar
                             :position="currentTrackPosition"
                             :duration="currentTrack.duration"
-                            @change="seek"
+                            @update="seek"
                         />
 
                         <span class="text-sm">
