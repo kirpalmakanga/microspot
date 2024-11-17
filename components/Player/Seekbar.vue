@@ -40,16 +40,12 @@ function handleMouseUp() {
     >
         <span
             class="absolute inset-0 bg-zinc-500"
-            :style="{
-                transform: `translateX(${100 * seekingPosition - 100}%)`
-            }"
+            :style="`transform: translateX(${100 * seekingPosition - 100}%)`"
         />
 
         <span
             class="absolute inset-0 bg-indigo-400"
-            :style="{
-                transform: `translateX(${100 * progress - 100}%) `
-            }"
+            :style="`transform: translateX(${100 * progress - 100}%)`"
         />
     </div>
 </template>
