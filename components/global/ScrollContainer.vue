@@ -24,8 +24,6 @@ watch(
         }
     }
 );
-
-onBeforeUnmount(stop);
 </script>
 
 <template>
