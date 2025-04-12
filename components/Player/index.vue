@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { DropdownMenuItem } from '@nuxt/ui';
 import { useFullscreen } from '@vueuse/core';
 
 const playerStore = usePlayerStore();
@@ -187,7 +186,10 @@ onBeforeUnmount(destroy);
         }"
     >
         <template #body>
-            <PlayerDeviceSelector :items="availableDevices" />
+            <PlayerDeviceSelector
+                :items="availableDevices"
+                @select="setActiveDevice"
+            />
         </template>
     </USlideover>
 </template>
