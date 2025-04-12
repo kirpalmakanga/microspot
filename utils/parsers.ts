@@ -56,7 +56,7 @@ export const parseTrackData = ({
     discNumber,
     duration,
     isExplicit,
-    isAvailable: !!preview_url,
+    isAvailable: true /** TODO: trouver la bonne façon de set cette clé */,
     isSaved: false
 });
 
@@ -109,7 +109,7 @@ export const parsePlaylistTrackData = ({
     releaseDate,
     duration,
     type,
-    isAvailable: !!preview_url,
+    isAvailable: true /** TODO: trouver la bonne façon de set cette clé */,
     isSaved: false
 });
 
