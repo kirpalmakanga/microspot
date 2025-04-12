@@ -52,6 +52,8 @@ const menuOptions: DropdownMenuItem[] = [
             <SearchForm />
         </template>
 
+        <div v-else class="px-2 font-bold">MicroSpot</div>
+
         <div v-if="isLoggedIn" class="relative flex mx-2">
             <UDropdownMenu
                 class="w-48"
