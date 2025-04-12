@@ -62,7 +62,7 @@ const menuOptions: ContextMenuItem[] = [
 </script>
 
 <template>
-    <UContextMenu :items="menuOptions" class="w-48">
+    <UContextMenu :items="menuOptions">
         <article
             class="flex items-center hover:bg-indigo-400 transition-colors not-last:border-b-1 border-primary-700 overflow-hidden group"
             :class="{
