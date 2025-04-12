@@ -9,6 +9,11 @@ const authStore = useAuthStore();
 const { isLoggedIn, userId, profilePicture } = storeToRefs(authStore);
 const { logOut } = authStore;
 
+const menuConfig = {
+    align: 'end',
+    side: 'bottom'
+};
+
 const menuOptions: DropdownMenuItem[] = [
     {
         icon: 'i-mi-user',
@@ -55,15 +60,7 @@ const menuOptions: DropdownMenuItem[] = [
         <div v-else class="px-2 font-bold">MicroSpot</div>
 
         <div v-if="isLoggedIn" class="relative flex mx-2">
-            <UDropdownMenu
-                class="w-48"
-                :items="menuOptions"
-                :content="{
-                    align: 'end',
-                    side: 'bottom',
-                    sideOffset: 8
-                }"
-            >
+            <UDropdownMenu :content="menuConfig" :items="menuOptions">
                 <button
                     class="hover:scale-110 hover:active:scale-90 transition-transform cursor-pointer"
                 >
