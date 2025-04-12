@@ -34,7 +34,7 @@ export interface SpotifyTrack {
     disc_number: number;
     duration_ms: number;
     explicit: boolean;
-    preview_url: string | null;
+    is_playable: boolean;
 }
 
 export const parseTrackData = ({
@@ -46,7 +46,7 @@ export const parseTrackData = ({
     disc_number: discNumber,
     duration_ms: duration,
     explicit: isExplicit,
-    preview_url
+    is_playable: isPlayable
 }: SpotifyTrack): Track => ({
     id,
     uri,
@@ -56,7 +56,7 @@ export const parseTrackData = ({
     discNumber,
     duration,
     isExplicit,
-    isAvailable: true /** TODO: trouver la bonne façon de set cette clé */,
+    isPlayable,
     isSaved: false
 });
 
@@ -74,7 +74,7 @@ export interface SpotifyPlaylistTrack {
         uri: string;
         name: string;
         type: string;
-        preview_url: string | null;
+        is_playable: boolean;
     };
 }
 
@@ -96,7 +96,7 @@ export const parsePlaylistTrackData = ({
         uri,
         name,
         type,
-        preview_url
+        is_playable: isPlayable
     }
 }: SpotifyPlaylistTrack): PlaylistTrack => ({
     id,
@@ -109,7 +109,7 @@ export const parsePlaylistTrackData = ({
     releaseDate,
     duration,
     type,
-    isAvailable: true /** TODO: trouver la bonne façon de set cette clé */,
+    isPlayable,
     isSaved: false
 });
 
@@ -122,6 +122,7 @@ interface SpotifyAlbum {
     total_tracks: number;
     album_type: string;
     uri: string;
+    is_playable: boolean;
 }
 
 export const parseAlbumData = ({
@@ -136,7 +137,8 @@ export const parseAlbumData = ({
     release_date: releaseDate,
     total_tracks: itemCount,
     album_type: albumType,
-    uri
+    uri,
+    is_playable: isPlayable
 }: SpotifyAlbum): Album => ({
     id,
     name,
@@ -146,6 +148,7 @@ export const parseAlbumData = ({
     itemCount,
     albumType: capitalize(albumType),
     uri,
+    isPlayable,
     isSaved: false
 });
 

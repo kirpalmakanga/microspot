@@ -13,16 +13,20 @@ const props = withDefaults(
         duration: number;
         isCurrent: boolean;
         isPlaying: boolean;
-        isAvailable: boolean;
+        isPlayable: boolean;
         isSaved: boolean;
         isPlaylistItem: boolean;
     }>(),
     {
-        isAvailable: true
+        isPlayable: true
     }
 );
 
-const emit = defineEmits<{ save: [e: void]; delete: [e: void] }>();
+const emit = defineEmits<{
+    togglePlay: [e: void];
+    save: [e: void];
+    delete: [e: void];
+}>();
 
 const copy = useCopy();
 
@@ -64,12 +68,12 @@ const menuOptions: ContextMenuItem[] = [
             :class="{
                 'bg-indigo-500': isCurrent,
                 'bg-zinc-600': !isCurrent,
-                'opacity-50 pointer-events-none': !isAvailable
+                'opacity-50': !isPlayable
             }"
         >
             <button
                 class="flex items-center justify-center size-10 p-2 hover:opacity-80 cursor-pointer"
-                @click="$emit('togglePlay')"
+                @click="emit('togglePlay')"
             >
                 <UIcon
                     v-if="isCurrent && isPlaying"
@@ -120,7 +124,7 @@ const menuOptions: ContextMenuItem[] = [
 
             <button
                 class="flex items-center justify-center p-2 transition-transform transform hover:scale-110 hover:active:scale-90 cursor-pointer"
-                @click="$emit('save', id)"
+                @click="emit('save')"
             >
                 <UIcon
                     class="size-6"

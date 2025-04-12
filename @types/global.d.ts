@@ -35,6 +35,7 @@ declare global {
         itemCount: number;
         albumType: string;
         uri: string;
+        isPlayable: boolean;
         isSaved: boolean;
     }
 
@@ -47,7 +48,7 @@ declare global {
         discNumber: number;
         duration: number;
         isExplicit: boolean;
-        isAvailable: boolean;
+        isPlayable: boolean;
         isSaved: boolean;
     }
 
@@ -74,7 +75,7 @@ declare global {
         artists: Artist[];
         duration: number;
         type: string;
-        isAvailable: boolean;
+        isPlayable: boolean;
         isSaved: boolean;
     }
 

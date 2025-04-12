@@ -98,7 +98,7 @@ export const useSpotifyApi = () => {
             const {
                 data: { items }
             } = await axios.get(`/albums/${albumId}/tracks`, {
-                params: { limit: 50, offset }
+                params: { market: 'FR', limit: 50, offset }
             });
 
             if (items.length) {
@@ -152,7 +152,7 @@ export const useSpotifyApi = () => {
             const {
                 data: { items }
             } = await axios.get(`/playlists/${playlistId}/tracks`, {
-                params: { limit: 50, offset }
+                params: { market: 'FR', limit: 50, offset }
             });
 
             if (items.length) {

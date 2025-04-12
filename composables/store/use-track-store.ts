@@ -17,7 +17,7 @@ const getDefaultState = (): State => ({
     artists: [],
     duration: 0,
     type: '',
-    isAvailable: true,
+    isPlayable: true,
     isSaved: false
 });
 

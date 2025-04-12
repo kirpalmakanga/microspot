@@ -22,6 +22,7 @@ const {
     albumType,
     releaseDate,
     uri,
+    isPlayable,
     isSaved,
     hasLoadedAllTracks
 } = storeToRefs(albumStore);
@@ -53,25 +54,15 @@ const menuOptions: DropdownMenuItem[] = [
     }
 ];
 
-async function loadUserData() {
+async function loadAlbumData() {
     await getAlbum(albumId as string);
 
     state.isLoading = false;
 }
 
-async function loadTracks() {}
-
-function openMenu() {
-    state.isMenuVisible = true;
-}
-
-function closeMenu() {
-    state.isMenuVisible = false;
-}
-
 useAppTitle(name);
 
-onMounted(loadUserData);
+onMounted(loadAlbumData);
 
 onUnmounted(clearAlbumData);
 </script>
@@ -122,6 +113,7 @@ onUnmounted(clearAlbumData);
 
                 <div class="flex items-center gap-4 p-4">
                     <PlayButton
+                        :disabled="!isPlayable"
                         :is-playing="isCurrentContext(uri) && isPlaying"
                         @click="togglePlay({ contextUri: uri })"
                     />

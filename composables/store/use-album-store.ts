@@ -12,6 +12,7 @@ const getDefaultState = (): State => ({
     releaseDate: '',
     albumType: '',
     uri: '',
+    isPlayable: true,
     isSaved: false
 });
 
