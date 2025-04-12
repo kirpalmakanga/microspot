@@ -90,7 +90,9 @@ export const useSpotifyApi = () => {
             return !isSaved;
         },
         async getAlbum(albumId: string) {
-            const { data } = await axios.get(`/albums/${albumId}`);
+            const { data } = await axios.get(`/albums/${albumId}`, {
+                params: { market: 'FR' }
+            });
 
             return parseAlbumData(data);
         },
