@@ -38,6 +38,11 @@ const modalTitle = computed(() => {
     return `${artists.map(({ name }) => name).join(', ')} -> ${name}`;
 });
 
+const menuConfig = {
+    align: 'end',
+    side: 'bottom'
+};
+
 const menuOptions: ContextMenuItem[] = [
     {
         icon: 'i-mi-add',
@@ -132,15 +137,7 @@ const menuOptions: ContextMenuItem[] = [
                 />
             </button>
 
-            <UDropdownMenu
-                class="w-48"
-                :items="menuOptions"
-                :content="{
-                    align: 'end',
-                    side: 'bottom',
-                    sideOffset: 8
-                }"
-            >
+            <UDropdownMenu :items="menuOptions" :content="menuConfig">
                 <button
                     class="flex items-center justify-center p-2 transition-transform transform hover:scale-110 hover:active:scale-90 cursor-pointer"
                 >
