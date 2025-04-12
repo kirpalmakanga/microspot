@@ -130,23 +130,7 @@ onUnmounted(clearAlbumData);
                         />
                     </button>
 
-                    <UDropdownMenu
-                        class="w-48"
-                        :items="menuOptions"
-                        :content="{
-                            align: 'start',
-                            side: 'bottom'
-                        }"
-                    >
-                        <button
-                            class="hover:scale-110 hover:active:scale-90 transition-transform transform cursor-pointer"
-                        >
-                            <UIcon
-                                class="size-8"
-                                name="i-mi-options-horizontal"
-                            />
-                        </button>
-                    </UDropdownMenu>
+                    <MenuButton :menu-options="menuOptions" />
                 </div>
                 <ScrollContainer
                     class="bg-zinc-700"

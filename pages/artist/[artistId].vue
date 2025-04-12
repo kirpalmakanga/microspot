@@ -73,23 +73,7 @@ onMounted(loadData);
                 </LayoutPageHeader>
 
                 <div class="flex items-center gap-4 p-4">
-                    <UDropdownMenu
-                        class="w-48"
-                        :items="menuOptions"
-                        :content="{
-                            align: 'start',
-                            side: 'bottom'
-                        }"
-                    >
-                        <button
-                            class="hover:scale-110 hover:active:scale-90 transition-transform transform cursor-pointer"
-                        >
-                            <UIcon
-                                class="size-8"
-                                name="i-mi-options-horizontal"
-                            />
-                        </button>
-                    </UDropdownMenu>
+                    <MenuButton :menu-options="menuOptions" />
                 </div>
 
                 <ScrollContainer

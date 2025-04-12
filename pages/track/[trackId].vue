@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { DropdownMenuItem } from '@nuxt/ui';
 import { useDateFormat } from '@vueuse/core';
+import MenuButton from '~/components/global/MenuButton.vue';
 
 interface State {
     isLoading: boolean;
@@ -133,23 +134,7 @@ onUnmounted(clearTrackData);
                         />
                     </button>
 
-                    <UDropdownMenu
-                        class="w-48"
-                        :items="menuOptions"
-                        :content="{
-                            align: 'start',
-                            side: 'bottom'
-                        }"
-                    >
-                        <button
-                            class="hover:scale-110 hover:active:scale-90 transition-transform transform cursor-pointer"
-                        >
-                            <UIcon
-                                class="size-8"
-                                name="i-mi-options-horizontal"
-                            />
-                        </button>
-                    </UDropdownMenu>
+                    <MenuButton :menu-options="menuOptions" />
                 </div>
             </div>
         </Transition>
