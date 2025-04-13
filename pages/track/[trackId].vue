@@ -30,7 +30,7 @@ const state = reactive<State>({
     isPlaylistMenuOpen: false
 });
 
-const modalTitle = computed(
+const playlistMenuTitle = computed(
     () => `${artists.value.map(({ name }) => name).join(', ')} - ${name.value}`
 );
 
@@ -142,7 +142,7 @@ onUnmounted(clearTrackData);
         <PlaylistMenu
             v-model:is-open="state.isPlaylistMenuOpen"
             :track-id="(trackId as string)"
-            :title="modalTitle"
+            :title="playlistMenuTitle"
             @close="closePLaylistMenu"
         />
     </section>
