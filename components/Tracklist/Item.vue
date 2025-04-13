@@ -82,7 +82,7 @@ const menuOptions: ContextMenuItem[] = [
             >
                 <UIcon
                     v-if="isCurrent && isPlaying"
-                    class="group-hover:hidden size-6"
+                    class="group-hover:hidden size-5"
                     name="i-mi-volume-up"
                 />
 
