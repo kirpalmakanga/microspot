@@ -43,7 +43,7 @@ export const useAuthStore = defineStore(
 
                 state.accessToken = accessToken;
 
-                return accessToken;
+                return accessToken as string;
             },
             async getUserData() {
                 const {
