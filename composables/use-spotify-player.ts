@@ -179,7 +179,7 @@ export const useSpotifyPlayer = () => {
         device_id: localDeviceId
     }: Spotify.WebPlaybackInstance) {
         const {
-            context: { uri, currentTrack, currentTrackPosition }
+            context: { currentTrack, currentTrackPosition }
         } = playerStore;
 
         Object.assign(state, {
@@ -187,14 +187,6 @@ export const useSpotifyPlayer = () => {
             localDeviceId,
             currentTrackPosition
         });
-
-        if (uri || currentTrack.uri) {
-            await setCurrentTrack({
-                contextUri: uri,
-                trackUri: currentTrack.uri,
-                position: currentTrackPosition
-            });
-        }
 
         playerInstance.value?.addListener(
             'player_state_changed',
@@ -265,11 +257,28 @@ export const useSpotifyPlayer = () => {
             }
         },
         async play() {
-            if (playerInstance.value) {
-                await playerInstance.value.resume();
-
-                state.isPlaying = true;
+            if (!playerInstance.value) {
+                return;
             }
+
+            const {
+                context: { uri, currentTrack, currentTrackPosition }
+            } = playerStore;
+
+            if (
+                (uri || currentTrack.uri) &&
+                !(await playerInstance.value.getCurrentState())
+            ) {
+                await setCurrentTrack({
+                    contextUri: uri,
+                    trackUri: currentTrack.uri,
+                    position: currentTrackPosition
+                });
+            } else {
+                await playerInstance.value.resume();
+            }
+
+            state.isPlaying = true;
         },
         async pause() {
             if (playerInstance.value) {
