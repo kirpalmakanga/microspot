@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { watchDebounced } from '@vueuse/core';
+
 const route = useRoute();
 const searchStore = useSearchStore();
 const { query, isLoading } = storeToRefs(searchStore);
@@ -71,14 +73,14 @@ async function loadTabData() {
     }
 }
 
-const stopWatchingQuery = watch(
+const stopWatchingQuery = watchDebounced(
     query,
-    debounce(() => {
+    () => {
         clearSearchResults();
 
         loadTabData();
-    }, 500),
-    { immediate: true }
+    },
+    { immediate: true, debounce: 500 }
 );
 
 const stopWatchingTab = watch(tab, loadTabData);
