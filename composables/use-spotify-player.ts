@@ -60,23 +60,20 @@ export const useSpotifyPlayer = () => {
     const playerInstance = ref<Spotify.Player>();
     const timeWatcher = ref<ReturnType<typeof setInterval>>();
 
-    const parseCurrentTrackData = async (
-        {
-            id,
-            uri,
-            name,
-            duration_ms,
-            album: {
-                images: [
-                    { url: large = '' },
-                    { url: medium = '' },
-                    { url: small = '' }
-                ] = []
-            },
-            artists
-        }: Spotify.Track,
-        contextUri: string | null
-    ) => {
+    async function parseCurrentTrackData({
+        id,
+        uri,
+        name,
+        duration_ms,
+        album: {
+            images: [
+                { url: large = '' },
+                { url: medium = '' },
+                { url: small = '' }
+            ] = []
+        },
+        artists
+    }: Spotify.Track) {
         if (id !== state.currentTrack.id) {
             state.currentTrack = {
                 id,
@@ -93,9 +90,9 @@ export const useSpotifyPlayer = () => {
                 isSaved: await isTrackSaved(id)
             };
         }
-    };
+    }
 
-    const parseCurrentState = async ({
+    async function parseCurrentState({
         position: currentTrackPosition,
         paused,
         disallows: {
@@ -108,7 +105,7 @@ export const useSpotifyPlayer = () => {
             next_tracks: nextTracks
         },
         context: { uri }
-    }: Spotify.PlaybackState) => {
+    }: Spotify.PlaybackState) {
         if (!trackData) return;
 
         const cannotSkipToPrevious =
@@ -131,16 +128,16 @@ export const useSpotifyPlayer = () => {
         playerStore.isPlaying = !paused;
         state.isPlaying = !paused;
 
-        await parseCurrentTrackData(trackData, uri);
+        await parseCurrentTrackData(trackData);
 
         Object.assign(playerStore.context, {
             uri,
             currentTrack: state.currentTrack,
             currentTrackPosition: state.currentTrackPosition
         });
-    };
+    }
 
-    const setCurrentTrack = async ({
+    async function setCurrentTrack({
         contextUri,
         trackUri,
         position = 0
@@ -148,7 +145,7 @@ export const useSpotifyPlayer = () => {
         contextUri: string;
         trackUri?: string;
         position?: number;
-    }) => {
+    }) {
         const { localDeviceId } = state;
 
         await axios.put(
@@ -176,60 +173,11 @@ export const useSpotifyPlayer = () => {
                 }
             }
         );
-    };
+    }
 
-    const setActiveDevice = (id: string) => {
-        axios.put('/me/player', {
-            device_ids: [id],
-            play: state.isPlaying
-        });
-
-        for (const device of state.availableDevices) {
-            device.isActive = device.id === id;
-        }
-    };
-
-    const getDevices = async () => {
-        const {
-            data: { devices }
-        } = await axios('/me/player/devices');
-
-        state.availableDevices = devices.map(parseDeviceData);
-    };
-
-    const play = async () => {
-        if (playerInstance.value) {
-            await playerInstance.value.resume();
-
-            state.isPlaying = true;
-        }
-    };
-
-    const pause = async () => {
-        if (playerInstance.value) {
-            await playerInstance.value.pause();
-
-            state.isPlaying = false;
-        }
-    };
-
-    const seek = (position: number) => {
-        playerInstance.value?.seek(position);
-
-        state.currentTrackPosition = position;
-    };
-
-    const goToPreviousTrack = () => {
-        playerInstance.value?.previousTrack();
-    };
-
-    const goToNextTrack = () => {
-        playerInstance.value?.nextTrack();
-    };
-
-    const onPlayerReady = async ({
+    async function onPlayerReady({
         device_id: localDeviceId
-    }: Spotify.WebPlaybackInstance) => {
+    }: Spotify.WebPlaybackInstance) {
         const {
             context: { uri, currentTrack, currentTrackPosition }
         } = playerStore;
@@ -256,41 +204,11 @@ export const useSpotifyPlayer = () => {
         );
 
         state.isReady = true;
-    };
+    }
 
-    const onPlayerNotReady = () => (state.isReady = false);
-
-    const init = async () => {
-        await loadPlayerAPI();
-
-        playerInstance.value = new window.Spotify.Player({
-            name: 'MicroSpot',
-            getOAuthToken: async (callback) => {
-                const accessToken = await refreshAccessToken();
-
-                callback(accessToken);
-            }
-        });
-
-        playerInstance.value?.addListener('ready', onPlayerReady);
-        playerInstance.value?.addListener('not_ready', onPlayerNotReady);
-
-        await playerInstance.value?.connect();
-
-        await getDevices();
-    };
-
-    const destroy = () => {
-        if (playerInstance.value) {
-            playerInstance.value.removeListener('ready');
-            playerInstance.value.removeListener('not_ready');
-            playerInstance.value.removeListener('player_state_changed');
-
-            playerInstance.value.disconnect();
-
-            Object.assign(state, getDefaultState());
-        }
-    };
+    function onPlayerNotReady() {
+        state.isReady = false;
+    }
 
     watch(
         () => state.isPlaying,
@@ -318,16 +236,77 @@ export const useSpotifyPlayer = () => {
 
     return {
         ...toRefs(state),
-        init,
-        destroy,
-        play,
-        pause,
-        seek,
-        goToPreviousTrack,
-        goToNextTrack,
+        async init() {
+            await loadPlayerAPI();
+
+            playerInstance.value = new window.Spotify.Player({
+                name: 'MicroSpot',
+                getOAuthToken: async (callback) => {
+                    const accessToken = await refreshAccessToken();
+
+                    callback(accessToken);
+                }
+            });
+
+            playerInstance.value?.addListener('ready', onPlayerReady);
+            playerInstance.value?.addListener('not_ready', onPlayerNotReady);
+
+            await playerInstance.value?.connect();
+        },
+        destroy() {
+            if (playerInstance.value) {
+                playerInstance.value.removeListener('ready');
+                playerInstance.value.removeListener('not_ready');
+                playerInstance.value.removeListener('player_state_changed');
+
+                playerInstance.value.disconnect();
+
+                Object.assign(state, getDefaultState());
+            }
+        },
+        async play() {
+            if (playerInstance.value) {
+                await playerInstance.value.resume();
+
+                state.isPlaying = true;
+            }
+        },
+        async pause() {
+            if (playerInstance.value) {
+                await playerInstance.value.pause();
+
+                state.isPlaying = false;
+            }
+        },
+        seek(position: number) {
+            playerInstance.value?.seek(position);
+
+            state.currentTrackPosition = position;
+        },
+        goToPreviousTrack() {
+            playerInstance.value?.previousTrack();
+        },
+        goToNextTrack() {
+            playerInstance.value?.nextTrack();
+        },
         setCurrentTrack,
-        getDevices,
-        setActiveDevice,
+        async getDevices() {
+            const {
+                data: { devices }
+            } = await axios('/me/player/devices');
+
+            state.availableDevices = devices.map(parseDeviceData);
+        },
+        setActiveDevice(id: string) {
+            axios.put('/me/player', {
+                device_ids: [id],
+                play: state.isPlaying
+            });
+
+            for (const device of state.availableDevices) {
+                device.isActive = device.id === id;
+            }
+        },
         async toggleSaveCurrentTrack() {
             const {
                 currentTrack: { id }
