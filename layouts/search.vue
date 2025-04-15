@@ -42,7 +42,6 @@ const tabs = computed<{ title: string; href: string }[]>(() => {
 });
 
 async function loadTabData() {
-    console.log('load ?', !isLoading.value);
     if (query.value && !isLoading.value) {
         isLoading.value = true;
 
