@@ -21,7 +21,7 @@ defineEmits<{ togglePlay: [e: void] }>();
             <PlayButton
                 class="absolute top-1/2 left-1/2 opacity-0 scale-50 group-hover:opacity-100 group-hover:scale-100 transition transform -translate-x-1/2 -translate-y-1/2"
                 :is-playing="isPlaying"
-                @click="$emit('togglePlay')"
+                @click.stop="$emit('togglePlay')"
             />
         </div>
 
