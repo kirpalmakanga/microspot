@@ -230,7 +230,7 @@ export const useSpotifyApi = () => {
                 artists: artists.map(parseArtistData),
                 albums: albums.map(parseAlbumData),
                 tracks: tracks.map(parseTrackData),
-                playlists: playlists.map(parsePlaylistData)
+                playlists: playlists.filter(Boolean).map(parsePlaylistData)
             };
         },
         async searchArtists(query: string, offset: number = 0) {
