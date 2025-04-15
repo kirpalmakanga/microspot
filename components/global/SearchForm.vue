@@ -1,27 +1,32 @@
 <script setup lang="ts">
+import { watchDebounced } from '@vueuse/core';
+
 const router = useRouter();
 const route = useRoute();
 const searchStore = useSearchStore();
 const { query } = storeToRefs(searchStore);
 const { clearSearch } = searchStore;
 
-watch(
+watchDebounced(
     query,
-    debounce(() => {
+    (query) => {
         const {
             params: { tab = '' }
         } = route;
 
-        router.replace({
-            name: 'search-query-tab',
-            ...(query.value && {
-                params: {
-                    query: query.value,
-                    ...(tab && { tab })
-                }
-            })
-        });
-    }, 500)
+        if (query && route.name !== 'search-query-tab') {
+            router.replace({
+                name: 'search-query-tab',
+                ...(query && {
+                    params: {
+                        query,
+                        ...(tab && { tab })
+                    }
+                })
+            });
+        }
+    },
+    { debounce: 500 }
 );
 </script>
 
