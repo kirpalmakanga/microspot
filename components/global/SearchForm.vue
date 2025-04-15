@@ -11,10 +11,13 @@ watchDebounced(
     query,
     (query) => {
         const {
-            params: { tab = '' }
+            params: { tab = '', query: routeQuery }
         } = route;
 
-        if (query && route.name !== 'search-query-tab') {
+        if (
+            (query && route.name !== 'search-query-tab') ||
+            (query && query !== routeQuery)
+        ) {
             router.replace({
                 name: 'search-query-tab',
                 ...(query && {
