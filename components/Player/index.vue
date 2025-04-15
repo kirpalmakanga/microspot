@@ -64,7 +64,12 @@ onMounted(async () => {
     emitter.on('togglePlay', togglePlay);
 });
 
-onBeforeUnmount(destroy);
+onBeforeUnmount(() => {
+    destroy();
+
+    emitter.off('launch', setCurrentTrack);
+    emitter.off('togglePlay', togglePlay);
+});
 </script>
 
 <template>
