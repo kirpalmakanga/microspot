@@ -1,16 +1,3 @@
-export const debounce = <A extends unknown[]>(
-    callback: (...args: A) => void,
-    delay: number
-) => {
-    let timer: ReturnType<typeof setTimeout>;
-
-    return (...args: A) => {
-        clearTimeout(timer);
-
-        timer = setTimeout(() => callback(...args), delay);
-    };
-};
-
 export const loadScript = (src: string): Promise<void> => {
     return new Promise((resolve, reject) => {
         try {
