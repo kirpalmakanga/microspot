@@ -24,7 +24,7 @@ const {
     goToPreviousTrack,
     goToNextTrack,
     setCurrentTrack,
-    getDevices,
+    fetchDevices,
     setActiveDevice,
     toggleSaveCurrentTrack
 } = useSpotifyPlayer();
@@ -52,7 +52,7 @@ function togglePlay() {
 }
 
 async function openDeviceSelector() {
-    await getDevices();
+    await fetchDevices();
 
     isDeviceSelectorVisible.value = true;
 }

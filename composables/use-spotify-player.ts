@@ -290,7 +290,7 @@ export const useSpotifyPlayer = () => {
             playerInstance.value?.nextTrack();
         },
         setCurrentTrack,
-        async getDevices() {
+        async fetchDevices() {
             const {
                 data: { devices }
             } = await axios('/me/player/devices');
