@@ -28,6 +28,12 @@ watchDebounced(
     },
     { debounce: 500 }
 );
+
+watch(route, ({ name, params: { query: routeQuery } }) => {
+    if (name === 'search-query-tab' && routeQuery) {
+        query.value = routeQuery as string;
+    }
+});
 </script>
 
 <template>
