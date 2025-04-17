@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { UseVirtualList } from '@vueuse/components';
+
 const props = withDefaults(
     defineProps<{
         type: 'playlist' | 'album';
@@ -43,31 +45,40 @@ function handleScrollEnd({ currentTarget }: ElementEvent<HTMLDivElement>) {
         emit('reached-bottom');
     }
 }
+
+const virtualListOptions = {
+    itemHeight: 60
+};
 </script>
 
 <template>
     <div class="relative grow overflow-hidden">
-        <RecycleScroller
-            class="!absolute inset-0"
-            :items="items"
-            :item-size="60"
-            :skip-hover="true"
-            key-field="id"
-            v-slot="{ item: { uri: trackUri, trackNumber, ...data }, index }"
+        <UseVirtualList
+            class="absolute inset-0"
+            height="100%"
+            :list="items"
+            :options="virtualListOptions"
             @scrollend="handleScrollEnd"
         >
-            <TracklistItem
-                v-bind="data"
-                :is-playlist-item="props.type === 'playlist'"
-                :index="trackNumber || index + 1"
-                :is-current="isCurrentContext(contextUri, trackUri)"
-                :is-playing="
-                    isCurrentContext(contextUri, trackUri) && isPlaying
-                "
-                @save="toggleSaveTrack(data.id)"
-                @delete="removePlaylistTrack(data.id)"
-                @toggle-play="togglePlay({ contextUri, trackUri })"
-            />
-        </RecycleScroller>
+            <template
+                #default="{
+                    data: { uri: trackUri, trackNumber, ...data },
+                    index
+                }"
+            >
+                <TracklistItem
+                    v-bind="data"
+                    :is-playlist-item="props.type === 'playlist'"
+                    :index="trackNumber || index + 1"
+                    :is-current="isCurrentContext(contextUri, trackUri)"
+                    :is-playing="
+                        isCurrentContext(contextUri, trackUri) && isPlaying
+                    "
+                    @save="toggleSaveTrack(data.id)"
+                    @delete="removePlaylistTrack(data.id)"
+                    @toggle-play="togglePlay({ contextUri, trackUri })"
+                />
+            </template>
+        </UseVirtualList>
     </div>
 </template>
