@@ -35,7 +35,7 @@ const isPlaylistMenuOpen = ref<boolean>(false);
 const modalTitle = computed(() => {
     const { name, artists } = props;
 
-    return `${artists.map(({ name }) => name).join(', ')} -> ${name}`;
+    return `${artists.map(({ name }) => name).join(', ')} - ${name}`;
 });
 
 const menuConfig = {
@@ -147,7 +147,7 @@ const menuOptions: ContextMenuItem[] = [
         </article>
 
         <PlaylistMenu
-            v-model="isPlaylistMenuOpen"
+            v-model:is-open="isPlaylistMenuOpen"
             :track-id="id"
             :title="modalTitle"
         />
