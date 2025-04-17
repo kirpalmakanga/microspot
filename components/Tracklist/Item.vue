@@ -41,7 +41,7 @@ const modalTitle = computed(() => {
 const menuConfig = {
     align: 'end',
     side: 'bottom'
-};
+} as const;
 
 const menuOptions: ContextMenuItem[] = [
     {
