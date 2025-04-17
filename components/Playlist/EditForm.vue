@@ -9,8 +9,6 @@ const { updatePlaylist } = usePlaylistStore();
 
 const isOpen = defineModel<boolean>('isOpen');
 
-const emit = defineEmits<{ close: [e: void]; submit: [e: void] }>();
-
 const formData = reactive<{ name: string; description: string; cover: string }>(
     {
         name: props.name,
@@ -39,7 +37,7 @@ function handleSubmit() {
 </script>
 
 <template>
-    <UModal v-model:open="isOpen" title="Edit details" @close="$emit('close')">
+    <UModal v-model:open="isOpen" title="Edit details">
         <template #body>
             <form class="flex flex-col gap-4" @submit.prevent="handleSubmit">
                 <div class="flex gap-4">
@@ -70,7 +68,7 @@ function handleSubmit() {
                         <UTextarea
                             variant="soft"
                             class="grow"
-                            :ui="{ base: ['h-full'] }"
+                            :ui="{ base: 'h-full' }"
                             type="textarea"
                             placeholder="Add a description"
                             v-model="formData.description"
