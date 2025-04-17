@@ -1,36 +1,34 @@
 <script setup lang="ts">
-import { watchDebounced } from '@vueuse/core';
-
 const router = useRouter();
 const route = useRoute();
 const searchStore = useSearchStore();
 const { query } = storeToRefs(searchStore);
 const { clearSearch } = searchStore;
 
-watchDebounced(
-    query,
-    (query) => {
-        const {
-            params: { tab = '', query: routeQuery }
-        } = route;
+const targetRouteName = 'search-query-tab';
 
-        if (
-            (query && route.name !== 'search-query-tab') ||
-            (query && query !== routeQuery)
-        ) {
-            router.replace({
-                name: 'search-query-tab',
-                ...(query && {
-                    params: {
-                        query,
-                        ...(tab && { tab })
-                    }
-                })
-            });
-        }
-    },
-    { debounce: 500 }
-);
+/** TODO: throttle ? */
+watch(query, (query) => {
+    const {
+        params: { tab = '', query: routeQuery }
+    } = route;
+
+    /** TODO: simplify */
+    if (
+        (query && (route.name !== targetRouteName || query !== routeQuery)) ||
+        (!query && route.name === targetRouteName)
+    ) {
+        router.replace({
+            name: targetRouteName,
+            ...(query && {
+                params: {
+                    query,
+                    ...(tab && { tab })
+                }
+            })
+        });
+    }
+});
 
 watch(route, ({ name, params: { query: routeQuery } }) => {
     if (name === 'search-query-tab' && routeQuery) {
