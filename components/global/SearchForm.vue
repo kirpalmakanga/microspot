@@ -14,10 +14,7 @@ watch(query, (query) => {
     } = route;
 
     /** TODO: simplify */
-    if (
-        (query && (route.name !== targetRouteName || query !== routeQuery)) ||
-        (!query && route.name === targetRouteName)
-    ) {
+    if (query && (route.name !== targetRouteName || query !== routeQuery)) {
         router.replace({
             name: targetRouteName,
             ...(query && {
