@@ -9,8 +9,8 @@ defineProps<{
 
 <template>
     <div class="flex items-end bg-zinc-500 p-4 gap-4">
-        <div class="group relative overflow-hidden rounded-md">
-            <Img class="size-48 flex-shrink-0 bg-zinc-700" :src="cover" />
+        <div class="group relative overflow-hidden rounded-md flex-shrink-0">
+            <Img class="size-48 bg-zinc-700" :src="cover" />
 
             <slot name="cover-overlay" />
         </div>
