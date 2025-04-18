@@ -21,12 +21,12 @@ const menuOptions: DropdownMenuItem[] = [
         class: 'cursor-pointer',
         href: `/user/${userId.value}`
     },
-    {
-        icon: 'i-mi-settings',
-        label: 'Settings',
-        class: 'cursor-pointer',
-        href: '/settings'
-    },
+    // {
+    //     icon: 'i-mi-settings',
+    //     label: 'Settings',
+    //     class: 'cursor-pointer',
+    //     href: '/settings'
+    // },
     {
         type: 'separator'
     },
