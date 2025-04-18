@@ -1,19 +1,15 @@
 interface State {
-    query: string;
     artists: Artist[];
     albums: Album[];
     playlists: Playlist[];
     tracks: Track[];
-    isLoading: boolean;
 }
 
 const getDefaultState = (): State => ({
-    query: '',
     artists: [],
     albums: [],
     playlists: [],
-    tracks: [],
-    isLoading: false
+    tracks: []
 });
 
 export const useSearchStore = defineStore('search', () => {
@@ -32,29 +28,26 @@ export const useSearchStore = defineStore('search', () => {
         clearSearch() {
             Object.assign(state, getDefaultState());
         },
-        clearSearchResults() {
-            Object.assign(state, omit(getDefaultState(), 'query'));
+        async searchAll(query: string) {
+            Object.assign(state, await searchAll(query));
         },
-        async searchAll() {
-            Object.assign(state, await searchAll(state.query));
-        },
-        async searchArtists() {
-            const { query, artists } = state;
+        async searchArtists(query: string) {
+            const { artists } = state;
 
             artists.push(...(await searchArtists(query, artists.length)));
         },
-        async searchTracks() {
-            const { query, tracks } = state;
+        async searchTracks(query: string) {
+            const { tracks } = state;
 
             tracks.push(...(await searchTracks(query, tracks.length)));
         },
-        async searchAlbums() {
-            const { query, albums } = state;
+        async searchAlbums(query: string) {
+            const { albums } = state;
 
             albums.push(...(await searchAlbums(query, albums.length)));
         },
-        async searchPlaylists() {
-            const { query, playlists } = state;
+        async searchPlaylists(query: string) {
+            const { playlists } = state;
 
             playlists.push(...(await searchPlaylists(query, playlists.length)));
         }

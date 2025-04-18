@@ -5,7 +5,8 @@ const { artists, albums, tracks, playlists } = storeToRefs(searchStore);
 const { searchArtists, searchAlbums, searchTracks, searchPlaylists } =
     searchStore;
 
-const tab = computed(() => route.params.tab || '');
+const query = computed(() => (route.params.query as string) || '');
+const tab = computed(() => (route.params.tab as string) || '');
 
 const selectedTracks = computed(() => tracks.value.slice(0, 6));
 const selectedArtists = computed(() => artists.value.slice(0, 6));
@@ -61,14 +62,14 @@ definePageMeta({
 
     <ScrollContainer
         v-else-if="tab === 'artists'"
-        @reached-bottom="searchArtists"
+        @reached-bottom="searchArtists(query)"
     >
         <ArtistGrid class="p-4" :items="artists" />
     </ScrollContainer>
 
     <ScrollContainer
         v-else-if="tab === 'albums'"
-        @reached-bottom="searchAlbums"
+        @reached-bottom="searchAlbums(query)"
     >
         <AlbumGrid class="p-4" :items="albums" />
     </ScrollContainer>
@@ -78,12 +79,12 @@ definePageMeta({
         :context-uri="''"
         type="album"
         :items="tracks"
-        @reached-bottom="searchTracks"
+        @reached-bottom="searchTracks(query)"
     />
 
     <ScrollContainer
         v-else-if="tab === 'playlists'"
-        @reached-bottom="searchPlaylists"
+        @reached-bottom="searchPlaylists(query)"
     >
         <PlaylistGrid class="p-4" :items="playlists" />
     </ScrollContainer>

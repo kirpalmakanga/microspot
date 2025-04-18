@@ -1,37 +1,46 @@
 <script setup lang="ts">
 const router = useRouter();
 const route = useRoute();
-const searchStore = useSearchStore();
-const { query } = storeToRefs(searchStore);
-const { clearSearch } = searchStore;
 
-const targetRouteName = 'search-query-tab';
+const query = ref<string>('');
 
-/** TODO: throttle ? */
-watch(query, (query) => {
+function updateSearchRoute() {
     const {
-        params: { tab = '', query: routeQuery }
+        params: { tab }
     } = route;
 
-    /** TODO: simplify */
-    if (query && (route.name !== targetRouteName || query !== routeQuery)) {
-        router.replace({
-            name: targetRouteName,
-            ...(query && {
-                params: {
-                    query,
-                    ...(tab && { tab })
-                }
-            })
-        });
+    router.replace({
+        name: 'search-query-tab',
+        ...(query.value && {
+            params: {
+                query: query.value,
+                ...(tab && { tab })
+            }
+        })
+    });
+}
+
+function clearQuery() {
+    query.value = '';
+
+    updateSearchRoute();
+}
+
+watch(query, () => {
+    if (query.value) {
+        updateSearchRoute();
     }
 });
 
-watch(route, ({ name, params: { query: routeQuery } }) => {
-    if (name === 'search-query-tab' && routeQuery) {
-        query.value = routeQuery as string;
-    }
-});
+watch(
+    route,
+    ({ params: { query: routeQuery } }) => {
+        if (routeQuery !== query.value) {
+            query.value = routeQuery as string;
+        }
+    },
+    { immediate: true }
+);
 </script>
 
 <template>
@@ -47,7 +56,7 @@ watch(route, ({ name, params: { query: routeQuery } }) => {
                 icon="i-mi-close"
                 variant="soft"
                 color="neutral"
-                @click="clearSearch"
+                @click="clearQuery"
             />
         </template>
     </UInput>

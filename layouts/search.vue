@@ -2,19 +2,20 @@
 import { watchDebounced } from '@vueuse/core';
 
 const route = useRoute();
-const searchStore = useSearchStore();
-const { query, isLoading } = storeToRefs(searchStore);
 const {
     searchAll,
     searchArtists,
     searchAlbums,
     searchTracks,
     searchPlaylists,
-    clearSearch,
-    clearSearchResults
-} = searchStore;
+    clearSearch
+} = useSearchStore();
 
-const tab = computed(() => route.params.tab || '');
+const isLoading = ref<boolean>(false);
+
+const query = computed(() => (route.params.query as string) || '');
+
+const tab = computed(() => (route.params.tab as string) || '');
 
 const tabs = computed<{ title: string; href: string }[]>(() => {
     const basePath = `/search/${query.value}`;
@@ -49,23 +50,23 @@ async function loadTabData() {
 
         switch (tab.value) {
             case 'artists':
-                await searchArtists();
+                await searchArtists(query.value);
                 break;
 
             case 'albums':
-                await searchAlbums();
+                await searchAlbums(query.value);
                 break;
 
             case 'tracks':
-                await searchTracks();
+                await searchTracks(query.value);
                 break;
 
             case 'playlists':
-                await searchPlaylists();
+                await searchPlaylists(query.value);
                 break;
 
             default:
-                await searchAll();
+                await searchAll(query.value);
                 break;
         }
 
@@ -76,7 +77,7 @@ async function loadTabData() {
 const stopWatchingQuery = watchDebounced(
     query,
     () => {
-        clearSearchResults();
+        clearSearch();
 
         loadTabData();
     },
@@ -84,16 +85,6 @@ const stopWatchingQuery = watchDebounced(
 );
 
 const stopWatchingTab = watch(tab, loadTabData);
-
-onBeforeMount(() => {
-    const {
-        params: { query: queryParam }
-    } = route;
-
-    if (queryParam) {
-        query.value = queryParam as string;
-    }
-});
 
 onUnmounted(() => {
     stopWatchingQuery();
