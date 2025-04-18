@@ -96,26 +96,28 @@ onUnmounted(() => {
 
 <template>
     <section class="flex flex-col grow">
-        <ul v-if="query" class="flex gap-2 p-4">
-            <li v-for="{ title, href } of tabs">
-                <UButton
-                    color="neutral"
-                    :to="href"
-                    :class="{
-                        'opacity-50': href === route.fullPath
-                    }"
-                >
-                    {{ title }}
-                </UButton>
-            </li>
-        </ul>
+        <template v-if="query">
+            <ul class="flex gap-2 p-4">
+                <li v-for="{ title, href } of tabs">
+                    <UButton
+                        color="neutral"
+                        :to="href"
+                        :class="{
+                            'opacity-50': href === route.fullPath
+                        }"
+                    >
+                        {{ title }}
+                    </UButton>
+                </li>
+            </ul>
 
-        <Transition name="fade" mode="out-in">
-            <Loader v-if="isLoading" />
+            <Transition name="fade" mode="out-in">
+                <Loader v-if="isLoading" />
 
-            <div v-else class="flex flex-col grow">
-                <NuxtPage />
-            </div>
-        </Transition>
+                <div v-else class="flex flex-col grow">
+                    <NuxtPage />
+                </div>
+            </Transition>
+        </template>
     </section>
 </template>
