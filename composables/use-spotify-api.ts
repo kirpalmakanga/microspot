@@ -295,7 +295,7 @@ export const useSpotifyApi = () => {
                 }
             });
 
-            return items.map(parsePlaylistData);
+            return items.filter(Boolean).map(parsePlaylistData);
         }
     };
 };
