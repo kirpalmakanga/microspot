@@ -4,13 +4,15 @@ const route = useRoute();
 
 const query = ref<string>('');
 
+const searchPageName = 'search-query-tab';
+
 function updateSearchRoute() {
     const {
         params: { tab }
     } = route;
 
     router.replace({
-        name: 'search-query-tab',
+        name: searchPageName,
         ...(query.value && {
             params: {
                 query: query.value,
@@ -26,16 +28,16 @@ function clearQuery() {
     updateSearchRoute();
 }
 
-watch(query, () => {
-    if (query.value) {
-        updateSearchRoute();
-    }
-});
+/** TODO: handle removing last character */
+
+watch(query, () => query.value && updateSearchRoute());
 
 watch(
     route,
-    ({ params: { query: routeQuery } }) => {
-        if (routeQuery !== query.value) {
+    ({ name, params: { query: routeQuery } }) => {
+        if (name !== searchPageName) {
+            query.value = '';
+        } else if (routeQuery && routeQuery !== query.value) {
             query.value = routeQuery as string;
         }
     },
