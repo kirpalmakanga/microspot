@@ -12,7 +12,7 @@ const { logOut } = authStore;
 const menuConfig = {
     align: 'end',
     side: 'bottom'
-};
+} as const;
 
 const menuOptions: DropdownMenuItem[] = [
     {
