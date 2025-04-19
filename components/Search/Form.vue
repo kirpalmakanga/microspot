@@ -1,10 +1,16 @@
 <script setup lang="ts">
+import { watchDebounced } from '@vueuse/core';
+
 const router = useRouter();
 const route = useRoute();
 
 const query = ref<string>('');
 
 const searchPageName = 'search-query-tab';
+
+function isSearchPage() {
+    return route.name === searchPageName;
+}
 
 function updateSearchRoute() {
     const {
@@ -24,18 +30,24 @@ function updateSearchRoute() {
 
 function clearQuery() {
     query.value = '';
-
-    updateSearchRoute();
 }
 
-/** TODO: handle removing last character */
-
-watch(query, () => query.value && updateSearchRoute());
+watchDebounced(
+    query,
+    (currentQuery, previousQuery) => {
+        if (currentQuery && (isSearchPage() || !previousQuery)) {
+            updateSearchRoute();
+        }
+    },
+    {
+        debounce: 400
+    }
+);
 
 watch(
     route,
-    ({ name, params: { query: routeQuery } }) => {
-        if (name !== searchPageName) {
+    ({ params: { query: routeQuery } }) => {
+        if (query.value && !isSearchPage()) {
             query.value = '';
         } else if (routeQuery && routeQuery !== query.value) {
             query.value = routeQuery as string;

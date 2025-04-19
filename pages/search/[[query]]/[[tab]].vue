@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { watchDebounced } from '@vueuse/core';
-
 const route = useRoute();
 const {
     searchAll,
@@ -46,14 +44,14 @@ async function loadTabData() {
     }
 }
 
-watchDebounced(
+watch(
     query,
     () => {
         clearSearch();
 
         loadTabData();
     },
-    { immediate: true, debounce: 500 }
+    { immediate: true }
 );
 
 watch(tab, loadTabData);
@@ -61,14 +59,10 @@ watch(tab, loadTabData);
 onUnmounted(clearSearch);
 
 definePageMeta({
-    key: 'tab'
+    key: 'search'
 });
 
 useAppTitle('Search');
-
-onMounted(() => {
-    console.log('mount', route.name);
-});
 </script>
 
 <template>
