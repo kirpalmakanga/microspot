@@ -8,6 +8,10 @@ const query = ref<string>('');
 
 const searchPageName = 'search-query-tab';
 
+function hasQuery() {
+    return !!query.value;
+}
+
 function isSearchPage() {
     return route.name === searchPageName;
 }
@@ -34,8 +38,8 @@ function clearQuery() {
 
 watchDebounced(
     query,
-    (currentQuery, previousQuery) => {
-        if (currentQuery && (isSearchPage() || !previousQuery)) {
+    () => {
+        if (hasQuery() || isSearchPage()) {
             updateSearchRoute();
         }
     },
@@ -47,7 +51,7 @@ watchDebounced(
 watch(
     route,
     ({ params: { query: routeQuery } }) => {
-        if (query.value && !isSearchPage()) {
+        if (hasQuery() && !isSearchPage()) {
             query.value = '';
         } else if (routeQuery && routeQuery !== query.value) {
             query.value = routeQuery as string;
