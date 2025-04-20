@@ -51,7 +51,7 @@ const getDefaultState = () => ({
     availableDevices: []
 });
 
-export const useSpotifyPlayer = () => {
+export function useSpotifyPlayer() {
     const { isTrackSaved, toggleSaveTrack } = useSpotifyApi();
     const { refreshAccessToken } = useAuthStore();
     const playerStore = usePlayerStore();
@@ -148,31 +148,35 @@ export const useSpotifyPlayer = () => {
     }) {
         const { localDeviceId } = state;
 
-        await axios.put(
-            '/me/player/play',
-            {
-                ...(contextUri === trackUri || !contextUri
-                    ? {
-                          uris: [trackUri]
-                      }
-                    : {
-                          context_uri: contextUri,
-                          ...(contextUri.includes('artist')
-                              ? {}
-                              : {
-                                    offset: trackUri
-                                        ? { uri: trackUri }
-                                        : { position: 0 }
-                                })
-                      }),
-                position_ms: position
-            },
-            {
+        let payload:
+            | ({ position_ms: number } & {
+                  context_uri: string;
+                  offset?: { uri: string } | { position: 0 };
+              })
+            | { uris: string[] }
+            | null = null;
+
+        if (contextUri) {
+            payload = {
+                context_uri: contextUri,
+                position_ms: position,
+                ...(!contextUri.includes('artist') && {
+                    offset: trackUri ? { uri: trackUri } : { position: 0 }
+                })
+            };
+        } else if (trackUri) {
+            payload = { uris: [trackUri], position_ms: position };
+        }
+
+        if (payload) {
+            await axios.put('/me/player/play', payload, {
                 params: {
                     device_id: localDeviceId
                 }
-            }
-        );
+            });
+        } else {
+            throw new Error('setCurrentTrack: no valid payload');
+        }
     }
 
     async function onPlayerReady({
@@ -324,4 +328,4 @@ export const useSpotifyPlayer = () => {
             state.currentTrack.isSaved = await toggleSaveTrack(id);
         }
     };
-};
+}
