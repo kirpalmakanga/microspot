@@ -54,7 +54,6 @@ watch(
             side: 'top'
         }"
         :text="tooltip"
-        :open="true"
         :disabled="!tooltip"
     >
         <span>
