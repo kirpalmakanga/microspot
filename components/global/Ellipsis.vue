@@ -48,18 +48,16 @@ watch(
 </script>
 
 <template>
-    <UTooltip
-        :ui="{ content: 'h-auto max-w-md', text: 'whitespace-normal' }"
-        :content="{
-            side: 'top'
-        }"
-        :text="tooltip"
-        :disabled="!tooltip"
-    >
-        <span>
-            <span ref="wrapper" class="block truncate">
-                <slot />
-            </span>
-        </span>
-    </UTooltip>
+    <span ref="wrapper" class="block truncate">
+        <UTooltip
+            :ui="{ content: 'h-auto max-w-md', text: 'whitespace-normal' }"
+            :content="{
+                side: 'top'
+            }"
+            :text="tooltip"
+            :disabled="!tooltip"
+        >
+            <slot />
+        </UTooltip>
+    </span>
 </template>
