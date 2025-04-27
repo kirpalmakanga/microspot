@@ -50,6 +50,13 @@ const menuOptions: ContextMenuItem[] = [
         onSelect: () => (isPlaylistMenuOpen.value = true)
     },
     {
+        icon: props.isSaved ? 'i-mi-circle-check' : 'i-mi-circle-add',
+        label: props.isSaved
+            ? 'Remove from liked tracks'
+            : 'Save to liked tracks',
+        onSelect: () => emit('save')
+    },
+    {
         icon: 'i-mi-share',
         label: 'Share',
         onSelect: () => copy(`${window.location.origin}/track/${props.id}`)
