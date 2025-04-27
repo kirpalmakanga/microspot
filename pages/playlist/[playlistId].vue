@@ -98,12 +98,9 @@ onUnmounted(clearPlaylistData);
                     </template>
 
                     <template #subtitles>
-                        <p class="opacity-80">
-                            <Ellipsis
-                                v-if="description"
-                                :tool-tip="description"
-                            >
-                                {{ description }}
+                        <p v-if="description" class="opacity-80">
+                            <Ellipsis has-tooltip>
+                                <span v-html="description"></span>
                             </Ellipsis>
                         </p>
 
