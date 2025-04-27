@@ -116,20 +116,22 @@ onBeforeUnmount(() => {
                         v-if="currentTrack.id"
                         class="flex gap-2 overflow-hidden"
                     >
-                        <Ellipsis class="flex flex-col grow">
-                            <NuxtLink
-                                v-if="currentTrack.name && contextUri"
-                                class="text-md no-underline hover:underline"
-                                :to="contextUri"
-                            >
-                                {{ currentTrack.name }}
-                            </NuxtLink>
+                        <Ellipsis class="grow">
+                            <span class="flex flex-col items-start">
+                                <NuxtLink
+                                    v-if="currentTrack.name && contextUri"
+                                    class="text-md no-underline hover:underline"
+                                    :to="contextUri"
+                                >
+                                    {{ currentTrack.name }}
+                                </NuxtLink>
 
-                            <Artists
-                                v-if="currentTrack.artists.length"
-                                class="text-sm"
-                                :items="currentTrack.artists"
-                            />
+                                <Artists
+                                    v-if="currentTrack.artists.length"
+                                    class="text-sm"
+                                    :items="currentTrack.artists"
+                                />
+                            </span>
                         </Ellipsis>
 
                         <button
