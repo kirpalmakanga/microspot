@@ -79,7 +79,7 @@ watch(isOpen, async (isOpen) => {
                 >
                     <UIcon class="size-6 mr-2" name="i-mi-add" />
 
-                    <Ellipsis>New playlist</Ellipsis>
+                    New playlist
                 </button>
 
                 <ScrollContainer class="grow">
