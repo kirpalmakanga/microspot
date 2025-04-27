@@ -125,10 +125,8 @@ const menuOptions: ContextMenuItem[] = [
                 </Ellipsis>
             </div>
 
-            <div class="text-sm">{{ formatTime(duration / 1000) }}</div>
-
             <button
-                class="flex items-center justify-center p-2 transition-transform transform hover:scale-110 hover:active:scale-90 cursor-pointer"
+                class="flex items-center justify-center p-2 transition-transform transform hover:scale-110 hover:active:scale-90 cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity"
                 @click="emit('save')"
             >
                 <UIcon
@@ -137,9 +135,11 @@ const menuOptions: ContextMenuItem[] = [
                 />
             </button>
 
+            <div class="text-sm">{{ formatTime(duration / 1000) }}</div>
+
             <UDropdownMenu :items="menuOptions" :content="menuConfig">
                 <button
-                    class="flex items-center justify-center p-2 transition-transform transform hover:scale-110 hover:active:scale-90 cursor-pointer"
+                    class="flex items-center justify-center p-2 transition-transform transform hover:scale-110 hover:active:scale-90 cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity"
                 >
                     <UIcon class="size-6" name="i-mi-options-horizontal" />
                 </button>
