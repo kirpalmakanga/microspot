@@ -103,13 +103,13 @@ const menuOptions: ContextMenuItem[] = [
             />
 
             <div class="grow overflow-hidden p-2">
-                <Ellipsis>
+                <Ellipsis has-tooltip>
                     <NuxtLink class="hover:underline" :to="`/track/${id}`">
                         {{ name }}
                     </NuxtLink>
                 </Ellipsis>
 
-                <Ellipsis class="text-sm">
+                <Ellipsis class="text-sm" has-tooltip>
                     <Artists :items="artists" />
 
                     <template v-if="albumName">
