@@ -86,7 +86,7 @@ watch(isOpen, async (isOpen) => {
                     <ul>
                         <li v-for="{ id, name, images } of currentItems">
                             <button
-                                class="flex items-center p-2 gap-2 rounded-md hover:bg-zinc-800 transition-colors w-full cursor-pointer overflow-hidden"
+                                class="flex items-center p-2 gap-2 rounded-md hover:bg-zinc-800 transition-colors w-full cursor-pointer overflow-hidden text-left"
                                 @click="handleSelectPlaylist(id)"
                             >
                                 <Img
@@ -99,8 +99,7 @@ watch(isOpen, async (isOpen) => {
                                 />
 
                                 <span class="truncate grow">
-                                    {{ name }} zefzef zf ze zef g rthrth ertj
-                                    erh erhzregezf erg
+                                    {{ name }}
                                 </span>
                             </button>
                         </li>
