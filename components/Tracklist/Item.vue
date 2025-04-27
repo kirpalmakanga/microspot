@@ -43,7 +43,7 @@ const menuConfig = {
     side: 'bottom'
 } as const;
 
-const menuOptions: ContextMenuItem[] = [
+const menuOptions = computed<ContextMenuItem[]>(() => [
     {
         icon: 'i-mi-add',
         label: 'Add to playlist',
@@ -70,7 +70,7 @@ const menuOptions: ContextMenuItem[] = [
               }
           ]
         : [])
-];
+]);
 </script>
 
 <template>
