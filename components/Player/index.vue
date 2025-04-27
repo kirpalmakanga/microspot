@@ -104,7 +104,7 @@ onBeforeUnmount(() => {
                 />
             </div>
 
-            <div class="flex grow overflow-hidden bg-zinc-700">
+            <div class="flex grow bg-zinc-700">
                 <Img
                     v-if="currentTrack.id"
                     class="bg-zinc-400 flex-shrink-0 inline-flex w-16 h-16 rounded-md ml-2 my-2"
@@ -116,26 +116,24 @@ onBeforeUnmount(() => {
                         v-if="currentTrack.id"
                         class="flex gap-2 overflow-hidden"
                     >
-                        <Ellipsis class="grow">
-                            <span class="flex flex-col items-start">
-                                <NuxtLink
-                                    v-if="currentTrack.name && contextUri"
-                                    class="text-md no-underline hover:underline"
-                                    :to="contextUri"
-                                >
-                                    {{ currentTrack.name }}
-                                </NuxtLink>
+                        <div class="flex flex-col grow overflow-hidden">
+                            <NuxtLink
+                                v-if="currentTrack.name && contextUri"
+                                class="inline-block text-md truncate no-underline hover:underline"
+                                :to="contextUri"
+                            >
+                                {{ currentTrack.name }}
+                            </NuxtLink>
 
-                                <Artists
-                                    v-if="currentTrack.artists.length"
-                                    class="text-sm"
-                                    :items="currentTrack.artists"
-                                />
-                            </span>
-                        </Ellipsis>
+                            <Artists
+                                v-if="currentTrack.artists.length"
+                                class="inline-block text-sm truncate"
+                                :items="currentTrack.artists"
+                            />
+                        </div>
 
                         <button
-                            class="transform transition-transform hover:scale-110 hover:active:scale-90"
+                            class="flex items-center transform transition-transform hover:scale-110 hover:active:scale-90"
                             @click="toggleSaveCurrentTrack"
                         >
                             <UIcon
