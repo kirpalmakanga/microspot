@@ -26,17 +26,11 @@ defineEmits<{ togglePlay: [e: void] }>();
         </div>
 
         <div class="flex flex-col grow justify-end overflow-hidden mt-4">
-            <NuxtLink
-                class="overflow-ellipsis whitespace-nowrap overflow-hidden"
-                :href="href"
-            >
+            <NuxtLink class="truncate" :href="href">
                 {{ title }}
             </NuxtLink>
 
-            <div
-                v-if="subtitle"
-                class="text-sm opacity-60 overflow-ellipsis whitespace-nowrap overflow-hidden"
-            >
+            <div v-if="subtitle" class="text-sm opacity-60 truncate">
                 {{ subtitle }}
             </div>
         </div>
