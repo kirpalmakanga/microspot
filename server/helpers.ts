@@ -13,3 +13,21 @@ export function createUrl(uri: string, params: Record<string, string> = {}) {
 
     return url.toString();
 }
+
+export function createBasicToken(clientId?: string, clientSecret?: string) {
+    if (!clientId) {
+        throw createError({
+            statusCode: 500,
+            statusMessage: 'Environment: CLIENT_ID is not defined'
+        });
+    }
+
+    if (!clientSecret) {
+        throw createError({
+            statusCode: 500,
+            statusMessage: 'Environment: CLIENT_SECRET is not defined'
+        });
+    }
+
+    return Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
+}

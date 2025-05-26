@@ -1,6 +1,10 @@
 import axios from 'axios';
-import { AUTH_API_URL, BASIC_TOKEN } from '~/server/config';
-import { createFormData } from '~/server/helpers';
+import { AUTH_API_URL } from '~/server/config';
+import { createBasicToken, createFormData } from '~/server/helpers';
+
+const {
+    env: { CLIENT_ID, CLIENT_SECRET }
+} = process;
 
 export default defineEventHandler(async (event) => {
     const refreshToken = getRouterParam(event, 'refreshToken');
@@ -8,7 +12,7 @@ export default defineEventHandler(async (event) => {
     if (!refreshToken) {
         throw createError({
             statusCode: 400,
-            statusMessage: 'Bad Request'
+            statusMessage: 'Invalid refresh token'
         });
     }
 
@@ -23,7 +27,10 @@ export default defineEventHandler(async (event) => {
         {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
-                Authorization: `Basic ${BASIC_TOKEN}`
+                Authorization: `Basic ${createBasicToken(
+                    CLIENT_ID,
+                    CLIENT_SECRET
+                )}`
             }
         }
     );

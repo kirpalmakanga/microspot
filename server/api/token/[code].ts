@@ -1,6 +1,10 @@
 import axios from 'axios';
-import { AUTH_API_URL, BASIC_TOKEN, REDIRECT_URL } from '~/server/config';
-import { createFormData } from '~/server/helpers';
+import { AUTH_API_URL } from '~/server/config';
+import { createBasicToken, createFormData } from '~/server/helpers';
+
+const {
+    env: { CLIENT_ID, CLIENT_SECRET, APP_REDIRECT_URL }
+} = process;
 
 export default defineEventHandler(async (event) => {
     const code = getRouterParam(event, 'code');
@@ -8,7 +12,14 @@ export default defineEventHandler(async (event) => {
     if (!code) {
         throw createError({
             statusCode: 400,
-            statusMessage: 'Bad Request'
+            statusMessage: 'Invalid auth code.'
+        });
+    }
+
+    if (!APP_REDIRECT_URL) {
+        throw createError({
+            statusCode: 500,
+            statusMessage: 'Environment: APP_REDIRECT_URL is not defined'
         });
     }
 
@@ -19,12 +30,15 @@ export default defineEventHandler(async (event) => {
         createFormData({
             code,
             grant_type: 'authorization_code',
-            redirect_uri: REDIRECT_URL
+            redirect_uri: APP_REDIRECT_URL
         }),
         {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
-                Authorization: `Basic ${BASIC_TOKEN}`
+                Authorization: `Basic ${createBasicToken(
+                    CLIENT_ID,
+                    CLIENT_SECRET
+                )}`
             }
         }
     );
