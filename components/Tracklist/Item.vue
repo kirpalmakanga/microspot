@@ -9,6 +9,7 @@ const props = withDefaults(
         images?: Images;
         albumId?: string;
         albumName?: string;
+        trackNumber?: number;
         artists: Artist[];
         duration: number;
         isCurrent: boolean;
@@ -94,7 +95,7 @@ const menuOptions = computed<ContextMenuItem[]>(() => [
                 />
 
                 <span v-else class="group-hover:hidden size-6">
-                    {{ index }}
+                    {{ trackNumber || index }}
                 </span>
 
                 <UIcon

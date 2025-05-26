@@ -26,11 +26,11 @@ function toggleSaveTrack(trackId: string) {
 
 <template>
     <ul class="relative grow">
-        <li v-for="({ uri: trackUri, trackNumber, ...data }, index) in items">
+        <li v-for="({ uri: trackUri, ...data }, index) in items">
             <TracklistItem
                 v-bind="data"
                 :is-playlist-item="props.type === 'playlist'"
-                :index="trackNumber || index + 1"
+                :index="index + 1"
                 :is-current="isCurrentContext(contextUri, trackUri)"
                 :is-playing="
                     isCurrentContext(contextUri, trackUri) && isPlaying
