@@ -95,7 +95,7 @@ const menuOptions = computed<ContextMenuItem[]>(() => [
                 />
 
                 <span v-else class="group-hover:hidden size-6">
-                    {{ trackNumber || index }}
+                    {{ isPlaylistItem ? index : trackNumber }}
                 </span>
 
                 <UIcon
