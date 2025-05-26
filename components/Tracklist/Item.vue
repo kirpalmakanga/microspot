@@ -33,7 +33,7 @@ const copy = useCopy();
 
 const isPlaylistMenuOpen = ref<boolean>(false);
 
-const modalTitle = computed(() => {
+const playlistMenuTitle = computed(() => {
     const { name, artists } = props;
 
     return `${artists.map(({ name }) => name).join(', ')} - ${name}`;
@@ -154,10 +154,10 @@ const menuOptions = computed<ContextMenuItem[]>(() => [
             </UDropdownMenu>
         </article>
 
-        <PlaylistMenu
-            v-model:is-open="isPlaylistMenuOpen"
-            :track-id="id"
-            :title="modalTitle"
-        />
+        <UModal v-model:open="isPlaylistMenuOpen" :title="playlistMenuTitle">
+            <template #body>
+                <PlaylistMenu :track-id="id" />
+            </template>
+        </UModal>
     </UContextMenu>
 </template>
