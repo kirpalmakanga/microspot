@@ -1,6 +1,8 @@
 import axios from 'axios';
 import type { SpotifyTrack } from '~/utils/parsers';
 
+const ITEMS_PER_REQUEST = 50;
+
 export const useSpotifyApi = () => {
     async function areTracksSaved(trackIds: string[]) {
         const { data } = await axios.get('/me/tracks/contains', {
@@ -100,7 +102,7 @@ export const useSpotifyApi = () => {
             const {
                 data: { items }
             } = await axios.get(`/albums/${albumId}/tracks`, {
-                params: { market: 'FR', limit: 50, offset }
+                params: { market: 'FR', limit: ITEMS_PER_REQUEST, offset }
             });
 
             if (items.length) {
@@ -120,7 +122,7 @@ export const useSpotifyApi = () => {
             const {
                 data: { items, total }
             } = await axios(`/artists/${artistId}/albums`, {
-                params: { limit: 50, offset }
+                params: { limit: ITEMS_PER_REQUEST, offset }
             });
 
             return {
@@ -154,7 +156,7 @@ export const useSpotifyApi = () => {
             const {
                 data: { items }
             } = await axios.get(`/playlists/${playlistId}/tracks`, {
-                params: { market: 'FR', limit: 50, offset }
+                params: { market: 'FR', limit: ITEMS_PER_REQUEST, offset }
             });
 
             if (items.length) {
@@ -175,7 +177,7 @@ export const useSpotifyApi = () => {
                 {
                     params: {
                         offset,
-                        limit: 50
+                        limit: ITEMS_PER_REQUEST
                     }
                 }
             );
@@ -206,7 +208,7 @@ export const useSpotifyApi = () => {
             const {
                 data: { items }
             } = await axios.get('/me/tracks', {
-                params: { limit: 50, offset }
+                params: { limit: ITEMS_PER_REQUEST, offset }
             });
 
             return items.map(parsePlaylistTrackData);
@@ -243,7 +245,7 @@ export const useSpotifyApi = () => {
                     q: query,
                     type: 'artist',
                     offset,
-                    limit: 50
+                    limit: ITEMS_PER_REQUEST
                 }
             });
 
@@ -259,7 +261,7 @@ export const useSpotifyApi = () => {
                     q: query,
                     type: 'album',
                     offset,
-                    limit: 50
+                    limit: ITEMS_PER_REQUEST
                 }
             });
 
@@ -275,7 +277,7 @@ export const useSpotifyApi = () => {
                     q: query,
                     type: 'track',
                     offset,
-                    limit: 50
+                    limit: ITEMS_PER_REQUEST
                 }
             });
 
@@ -291,7 +293,7 @@ export const useSpotifyApi = () => {
                     q: query,
                     type: 'playlist',
                     offset,
-                    limit: 50
+                    limit: ITEMS_PER_REQUEST
                 }
             });
 
