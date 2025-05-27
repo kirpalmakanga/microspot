@@ -14,7 +14,7 @@ import {
     updatePlaylistCover
 } from '~/services/spotify-api';
 
-export function useUserPlaylists(userId?: MaybeRef<string>) {
+export function useUserPlaylists(userId: MaybeRef<string>) {
     return useInfiniteQuery({
         queryKey: ['playlists', userId],
         queryFn: async ({ pageParam: offset }) =>
@@ -96,17 +96,17 @@ export function usePlaylistTracks(playlistId: MaybeRef<string>) {
 }
 
 export function useUpdatePlaylist(playlistId: MaybeRef<string>) {
+    const authStore = useAuthStore();
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async ({
-            cover,
-            ...playlistData
-        }: {
+        mutationFn: async (payload: {
             name: string;
             description: string;
             cover?: string;
         }) => {
+            const { cover, ...playlistData } = payload;
+
             await updatePlaylist(toValue(playlistId), playlistData);
 
             if (cover && cover.startsWith('data:image')) {
@@ -119,19 +119,61 @@ export function useUpdatePlaylist(playlistId: MaybeRef<string>) {
                     ));
             }
 
+            return payload;
+        },
+        onSuccess: ({ cover, ...playlistData }) => {
+            function updater(playlist: Playlist) {
+                return {
+                    ...playlist,
+                    ...playlistData,
+                    ...(cover && {
+                        images: { ...playlist.images, large: cover }
+                    })
+                };
+            }
+
+            queryClient.invalidateQueries({
+                queryKey: ['playlist', playlistId]
+            });
+            queryClient.setQueryData(['playlist', playlistId], updater);
+
+            queryClient.invalidateQueries({
+                queryKey: ['playlists', authStore.userId]
+            });
             queryClient.setQueryData(
-                ['playlist', playlistId],
-                (playlist: Playlist) => {
+                ['playlists', authStore.userId],
+                ({
+                    pages,
+                    ...data
+                }: {
+                    pages: { items: Playlist[]; totalItemCount: number }[];
+                }) => {
                     return {
-                        ...playlist,
-                        ...playlistData,
-                        ...(cover && {
-                            images: { ...playlist.images, large: cover }
+                        ...data,
+                        pages: pages.map((page) => {
+                            const { items } = page;
+
+                            const index = items.findIndex(
+                                ({ id }) => id === toValue(playlistId)
+                            );
+
+                            if (index > -1) {
+                                console.log('hey');
+
+                                return {
+                                    ...page,
+                                    items: items.with(
+                                        index,
+                                        updater(items[index])
+                                    )
+                                };
+                            }
+
+                            return page;
                         })
                     };
                 }
             );
-        },
-        onSuccess: () => {}
+        }
     });
 }

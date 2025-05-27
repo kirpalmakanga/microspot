@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const authStore = useAuthStore();
 const {
     data,
     isLoading,
@@ -7,7 +8,7 @@ const {
     hasNextPage,
     refetch,
     fetchNextPage
-} = useUserPlaylists(undefined);
+} = useUserPlaylists(computed(() => authStore.userId));
 
 const playlists = computed(() =>
     data.value?.pages.flatMap(({ items }) => items)
