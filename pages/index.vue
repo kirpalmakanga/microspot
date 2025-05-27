@@ -1,59 +1,52 @@
-<template>
-    <section class="flex flex-col grow">
-        <div class="relative flex flex-col grow">
-            <h2 class="p-4">Recent playlists</h2>
-
-            <ScrollContainer
-                v-if="!isLoading"
-                @reached-bottom="!hasLoadedAllPlaylists && loadMoreItems()"
-            >
-                <div class="flex flex-col grow px-4 pb-4">
-                    <PlaylistGrid
-                        v-if="currentUserPlaylists.length"
-                        :items="currentUserPlaylists"
-                    />
-
-                    <Placeholder
-                        v-else
-                        icon="i-mi-list"
-                        text="You have no playlists."
-                    />
-                </div>
-            </ScrollContainer>
-
-            <Transition name="fade" mode="out-in">
-                <Loader v-if="isLoading || isLoadingMore" />
-            </Transition>
-        </div>
-    </section>
-</template>
-
 <script setup lang="ts">
-const playlistsStore = usePlaylistsStore();
-const { hasLoadedAllPlaylists, currentUserPlaylists } =
-    storeToRefs(playlistsStore);
-const { getCurrentUserPlaylists } = playlistsStore;
+const {
+    data,
+    isLoading,
+    isFetching,
+    isError,
+    hasNextPage,
+    refetch,
+    fetchNextPage
+} = useUserPlaylists(undefined);
 
-const isLoading = ref<boolean>(true);
-const isLoadingMore = ref<boolean>(false);
-
-const loadItems = (loadingRef: Ref<boolean>) => async () => {
-    if (loadingRef === isLoadingMore && loadingRef.value) return;
-
-    loadingRef.value = true;
-
-    await getCurrentUserPlaylists();
-
-    loadingRef.value = false;
-};
-
-const loadMoreItems = loadItems(isLoadingMore);
+const playlists = computed(() =>
+    data.value?.pages.flatMap(({ items }) => items)
+);
 
 useAppTitle('Dashboard');
 
 definePageMeta({
     middleware: 'authenticated'
 });
-
-onMounted(loadItems(isLoading));
 </script>
+
+<template>
+    <section class="flex flex-col grow">
+        <div class="relative flex flex-col grow">
+            <h2 class="p-4">Recent playlists</h2>
+
+            <Loader v-if="isLoading" />
+
+            <Error v-else-if="isError" @action="refetch()" />
+
+            <ScrollContainer
+                v-else-if="playlists"
+                @reached-bottom="hasNextPage && fetchNextPage()"
+            >
+                <div class="flex flex-col grow px-4 pb-4">
+                    <PlaylistGrid v-if="playlists.length" :items="playlists" />
+
+                    <Placeholder
+                        v-else
+                        icon="i-mi-list"
+                        text="You haven't created playlists yet."
+                    />
+                </div>
+            </ScrollContainer>
+
+            <Transition v-if="hasNextPage" name="fade" mode="out-in">
+                <Loader v-if="isFetching && !isLoading" />
+            </Transition>
+        </div>
+    </section>
+</template>
