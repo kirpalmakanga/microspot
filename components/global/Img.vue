@@ -23,7 +23,7 @@
 
 <script setup lang="ts">
 const props = defineProps<{
-    src: string;
+    src?: string;
     imgClass?: string;
     altText?: string;
 }>();
