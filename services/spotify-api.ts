@@ -38,6 +38,7 @@ export async function isAlbumSaved(trackId: string): Promise<boolean> {
     return isSaved;
 }
 
+/** TODO: implémenter dans getPlaylist + implémenter sauvegarde de playlists tierces ? */
 export async function isPlaylistSaved(playlistId: string): Promise<boolean> {
     const {
         data: [isSaved]
@@ -71,11 +72,14 @@ export async function toggleSaveTrack(trackId: string) {
 }
 
 export async function getTrack(trackId: string) {
-    const { data: track } = await axios.get(`/tracks/${trackId}`);
+    const [{ data: track }, isSaved] = await Promise.all([
+        axios.get(`/tracks/${trackId}`),
+        isTrackSaved(trackId)
+    ]);
 
     return {
         ...parsePlaylistTrackData({ track }),
-        isSaved: await isTrackSaved(trackId)
+        isSaved
     };
 }
 
@@ -92,11 +96,14 @@ export async function toggleSaveAlbum(albumId: string) {
 }
 
 export async function getAlbum(albumId: string) {
-    const { data } = await axios.get(`/albums/${albumId}`, {
-        params: { market: 'FR' }
-    });
+    const [{ data }, isSaved] = await Promise.all([
+        axios.get(`/albums/${albumId}`, {
+            params: { market: 'FR' }
+        }),
+        isAlbumSaved(albumId)
+    ]);
 
-    return parseAlbumData(data);
+    return { ...parseAlbumData(data), isSaved };
 }
 
 export async function getAlbumTracks(albumId: string, offset: number = 0) {
