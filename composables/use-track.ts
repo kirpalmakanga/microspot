@@ -12,7 +12,6 @@ export function useToggleSaveTrack(trackId: MaybeRef<string>) {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationKey: ['track', trackId],
         mutationFn: async (trackId: string) =>
             toggleSaveTrack(toValue(trackId)),
         onSuccess: () => {
