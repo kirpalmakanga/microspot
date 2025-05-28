@@ -1,4 +1,6 @@
-export function useAppTitle(title?: string | Ref<string>) {
+export function useAppTitle(
+    title?: MaybeRef<string> | undefined | ComputedRef<string | undefined>
+) {
     useHead({
         title: computed(() => {
             const unwrapped = toValue(title);

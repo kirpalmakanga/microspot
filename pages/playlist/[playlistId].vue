@@ -50,9 +50,7 @@ const menuOptions: DropdownMenuItem[] = [
     }
 ];
 
-useAppTitle(
-    computed( () => playlist.value?.name)
-});
+useAppTitle(computed(() => playlist.value?.name));
 </script>
 
 <template>
