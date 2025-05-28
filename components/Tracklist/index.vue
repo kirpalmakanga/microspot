@@ -10,7 +10,7 @@ const { isCurrentContext, togglePlay } = playerStore;
 const { isPlaying } = storeToRefs(playerStore);
 
 const { toggleSavePlaylistTrack, removePlaylistTrack } = usePlaylistStore();
-const { toggleSaveAlbumTrack } = useAlbumStore();
+// const { toggleSaveAlbumTrack } = useAlbumStore();
 
 function toggleSaveTrack(trackId: string) {
     switch (props.type) {
@@ -18,7 +18,7 @@ function toggleSaveTrack(trackId: string) {
             toggleSavePlaylistTrack(trackId);
             break;
         case 'album':
-            toggleSaveAlbumTrack(trackId);
+            // toggleSaveAlbumTrack(trackId);
             break;
     }
 }

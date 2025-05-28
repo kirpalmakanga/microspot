@@ -2,48 +2,47 @@
 import type { DropdownMenuItem } from '@nuxt/ui';
 import { useDateFormat } from '@vueuse/core';
 
-interface State {
-    isLoading: boolean;
-    isLoadingTracks: boolean;
-    isMenuVisible: boolean;
-}
-
 const {
     params: { albumId }
 } = useRoute();
 
-const albumStore = useAlbumStore();
 const {
-    name,
-    images,
-    artists,
-    itemCount,
-    tracks,
-    albumType,
-    releaseDate,
-    uri,
-    isPlayable,
-    isSaved,
-    hasLoadedAllTracks
-} = storeToRefs(albumStore);
-const { getAlbum, getAlbumTracks, toggleSaveAlbum, clearAlbumData } =
-    albumStore;
+    data: album,
+    isLoading: isLoadingAlbum,
+    isError: hasAlbumError,
+    refetch: refetchAlbum
+} = useAlbum(albumId as string);
+
+const cover = computed(
+    () => album.value?.images.medium || album.value?.images.large
+);
+
+const formattedReleaseDate = useDateFormat(
+    computed(() => album.value?.releaseDate),
+    'YYYY'
+);
+
+const {
+    data: albumTracks,
+    isLoading: isLoadingTracks,
+    isError: hasTracksError,
+    hasNextPage,
+    fetchNextPage
+} = useAlbumTracks(albumId as string);
+
+const tracks = computed(() => albumTracks.value?.pages.flat());
+
+const { mutate: toggleSaveAlbum } = useToggleSaveAlbum(albumId as string);
+
+const { mutate: toggleSaveAlbumTrack } = useToggleSaveAlbumTrack(
+    albumId as string
+);
 
 const playerStore = usePlayerStore();
 const { isCurrentContext, togglePlay } = playerStore;
 const { isPlaying } = storeToRefs(playerStore);
 
-const formattedReleaseDate = useDateFormat(releaseDate, 'YYYY');
-
 const copy = useCopy();
-
-const state = reactive<State>({
-    isLoading: true,
-    isLoadingTracks: false,
-    isMenuVisible: false
-});
-
-const cover = computed(() => images.value.medium || images.value.large);
 
 const menuOptions: DropdownMenuItem[] = [
     {
@@ -54,33 +53,27 @@ const menuOptions: DropdownMenuItem[] = [
     }
 ];
 
-async function loadAlbumData() {
-    await getAlbum(albumId as string);
-
-    state.isLoading = false;
-}
-
-useAppTitle(name);
-
-onMounted(loadAlbumData);
-
-onUnmounted(clearAlbumData);
+useAppTitle(computed(() => album.value?.name));
 </script>
 
 <template>
     <section class="flex flex-col grow">
         <Transition name="fade" mode="out-in">
-            <Loader v-if="state.isLoading" />
+            <Loader v-if="isLoadingAlbum" />
 
-            <div v-else class="relative flex flex-col grow">
+            <Error v-else-if="hasAlbumError" @action="refetchAlbum()" />
+
+            <div v-else-if="album" class="relative flex flex-col grow">
                 <LayoutPageHeader
-                    :type="albumType"
+                    :type="album.albumType"
                     :cover="cover"
-                    :title="name"
+                    :title="album.name"
                 >
                     <template #subtitles>
                         <p class="flex gap-1">
-                            <template v-for="({ id, name }, index) of artists">
+                            <template
+                                v-for="({ id, name }, index) of album.artists"
+                            >
                                 <span v-if="index > 0">,</span>
 
                                 <span v-if="id === '0LyfQWJT6nXafLPZqxe9Of'">
@@ -100,8 +93,8 @@ onUnmounted(clearAlbumData);
                         <p class="opacity-60">
                             <span>
                                 {{
-                                    `${itemCount} track${
-                                        itemCount === 1 ? '' : 's'
+                                    `${album.itemCount} track${
+                                        album.itemCount === 1 ? '' : 's'
                                     }`
                                 }}
                             </span>
@@ -113,39 +106,41 @@ onUnmounted(clearAlbumData);
 
                 <div class="flex items-center gap-4 p-4">
                     <PlayButton
-                        :disabled="!isPlayable"
-                        :is-playing="isCurrentContext(uri) && isPlaying"
-                        @click="togglePlay({ contextUri: uri })"
+                        :disabled="!album.isPlayable"
+                        :is-playing="isCurrentContext(album.uri) && isPlaying"
+                        @click="togglePlay({ contextUri: album.uri })"
                     />
 
                     <button
                         class="transition-transform transform hover:scale-110 hover:active:scale-90 cursor-pointer"
-                        @click="toggleSaveAlbum(albumId as string)"
+                        @click="toggleSaveAlbum()"
                     >
                         <UIcon
                             class="size-8"
                             :name="
-                                isSaved ? 'i-mi-crcle-check' : 'i-mi-circle-add'
+                                album.isSaved
+                                    ? 'i-mi-circle-check'
+                                    : 'i-mi-circle-add'
                             "
                         />
                     </button>
 
                     <MenuButton :menu-options="menuOptions" />
                 </div>
-                <ScrollContainer
+
+                <Loader v-if="isLoadingTracks" />
+
+                <Error v-else-if="hasTracksError" @action="refetchAlbum()" />
+
+                <TracklistVirtualized
+                    v-else-if="tracks"
                     class="bg-zinc-700"
-                    @reached-bottom="
-                        !state.isLoadingTracks &&
-                            !hasLoadedAllTracks &&
-                            getAlbumTracks()
-                    "
-                >
-                    <Tracklist
-                        type="album"
-                        :context-uri="uri"
-                        :items="tracks"
-                    />
-                </ScrollContainer>
+                    type="album"
+                    :context-uri="album.uri"
+                    :items="tracks"
+                    @toggle-save-track="toggleSaveAlbumTrack"
+                    @reached-bottom="hasNextPage && fetchNextPage()"
+                />
             </div>
         </Transition>
     </section>

@@ -21,9 +21,6 @@ const playerStore = usePlayerStore();
 const { isCurrentContext, togglePlay } = playerStore;
 const { isPlaying } = storeToRefs(playerStore);
 
-/** TODO: move to pages/album */
-// const { toggleSaveAlbumTrack } = useAlbumStore();
-
 function handleScrollEnd({ currentTarget }: ElementEvent<HTMLDivElement>) {
     const { scrollTop, scrollHeight, offsetHeight } = currentTarget;
 
