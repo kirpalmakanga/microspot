@@ -51,16 +51,11 @@ const virtualListOptions = {
             :options="virtualListOptions"
             @scrollend="handleScrollEnd"
         >
-            <template
-                #default="{
-                    data: { uri: trackUri, trackNumber, ...data },
-                    index
-                }"
-            >
+            <template #default="{ data: { uri: trackUri, ...data }, index }">
                 <TracklistItem
                     v-bind="data"
                     :is-playlist-item="props.type === 'playlist'"
-                    :index="trackNumber || index + 1"
+                    :index="index + 1"
                     :is-current="isCurrentContext(contextUri, trackUri)"
                     :is-playing="
                         isCurrentContext(contextUri, trackUri) && isPlaying
