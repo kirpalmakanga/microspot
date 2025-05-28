@@ -20,6 +20,13 @@ const {
     fetchNextPage
 } = usePlaylistTracks(playlistId as string);
 
+const { mutate: toggleSavePlaylistTrack } = useToggleSavePlaylistTrack(
+    playlistId as string
+);
+const { mutate: removePlaylistTrack } = useRemovePlaylistTrack(
+    playlistId as string
+);
+
 const tracks = computed(() => playlistTracks.value?.pages.flat());
 
 const playerStore = usePlayerStore();
@@ -106,6 +113,8 @@ useHead({
                     type="playlist"
                     :context-uri="playlist.uri"
                     :items="tracks"
+                    @toggle-save-track="toggleSavePlaylistTrack"
+                    @delete-track="removePlaylistTrack"
                     @reached-bottom="hasNextPage && fetchNextPage()"
                 />
 

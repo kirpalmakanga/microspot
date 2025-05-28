@@ -12,26 +12,16 @@ const props = withDefaults(
 );
 
 const emit = defineEmits<{
-    'reached-bottom': [e: void];
+    toggleSaveTrack: [trackId: string];
+    deleteTrack: [trackId: string];
+    reachedBottom: [e: void];
 }>();
 
 const playerStore = usePlayerStore();
 const { isCurrentContext, togglePlay } = playerStore;
 const { isPlaying } = storeToRefs(playerStore);
 
-const { toggleSavePlaylistTrack, removePlaylistTrack } = usePlaylistStore();
-const { toggleSaveAlbumTrack } = useAlbumStore();
-
-function toggleSaveTrack(trackId: string) {
-    switch (props.type) {
-        case 'playlist':
-            toggleSavePlaylistTrack(trackId);
-            break;
-        case 'album':
-            toggleSaveAlbumTrack(trackId);
-            break;
-    }
-}
+// const { toggleSaveAlbumTrack } = useAlbumStore();
 
 function handleScrollEnd({ currentTarget }: ElementEvent<HTMLDivElement>) {
     const { scrollTop, scrollHeight, offsetHeight } = currentTarget;
@@ -42,7 +32,7 @@ function handleScrollEnd({ currentTarget }: ElementEvent<HTMLDivElement>) {
             offsetHeight -
             (props.scrollOffsetPercent / 100) * scrollHeight
     ) {
-        emit('reached-bottom');
+        emit('reachedBottom');
     }
 }
 
@@ -74,8 +64,8 @@ const virtualListOptions = {
                     :is-playing="
                         isCurrentContext(contextUri, trackUri) && isPlaying
                     "
-                    @save="toggleSaveTrack(data.id)"
-                    @delete="removePlaylistTrack(data.id)"
+                    @save="emit('toggleSaveTrack', data.id)"
+                    @delete="emit('deleteTrack', data.id)"
                     @toggle-play="togglePlay({ contextUri, trackUri })"
                 />
             </template>

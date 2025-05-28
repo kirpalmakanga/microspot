@@ -10,6 +10,8 @@ import {
     getPlaylist,
     getPlaylistTracks,
     getUserPlaylists,
+    removePlaylistTrack,
+    toggleSaveTrack,
     updatePlaylist,
     updatePlaylistCover
 } from '~/services/spotify-api';
@@ -68,30 +70,6 @@ export function usePlaylist(playlistId: MaybeRef<string>) {
     return useQuery({
         queryKey: ['playlist', playlistId],
         queryFn: () => getPlaylist(toValue(playlistId))
-    });
-}
-
-export function usePlaylistTracks(playlistId: MaybeRef<string>) {
-    const { data: playlist } = usePlaylist(playlistId);
-
-    /** TODO: load saved tracks (playlistId === 'saved') */
-
-    return useInfiniteQuery({
-        queryKey: ['playlistTracks', playlistId],
-        queryFn: async ({ pageParam: offset }) =>
-            getPlaylistTracks(toValue(playlistId), offset),
-        initialPageParam: 0,
-        getNextPageParam: (_, pages) => {
-            const { totalItemCount } = playlist?.value || {};
-
-            if (!totalItemCount) {
-                return 0;
-            }
-
-            const currentItemCount = pages.flat().length;
-
-            return currentItemCount < totalItemCount ? currentItemCount : null;
-        }
     });
 }
 
@@ -172,6 +150,88 @@ export function useUpdatePlaylist(playlistId: MaybeRef<string>) {
                             return page;
                         })
                     };
+                }
+            );
+        }
+    });
+}
+
+export function usePlaylistTracks(playlistId: MaybeRef<string>) {
+    const { data: playlist } = usePlaylist(playlistId);
+
+    /** TODO: load saved tracks (playlistId === 'saved') */
+
+    return useInfiniteQuery({
+        queryKey: ['playlistTracks', playlistId],
+        queryFn: async ({ pageParam: offset }) =>
+            getPlaylistTracks(toValue(playlistId), offset),
+        initialPageParam: 0,
+        getNextPageParam: (_, pages) => {
+            const { totalItemCount } = playlist?.value || {};
+
+            if (!totalItemCount) {
+                return 0;
+            }
+
+            const currentItemCount = pages.flat().length;
+
+            return currentItemCount < totalItemCount ? currentItemCount : null;
+        }
+    });
+}
+
+export function useToggleSavePlaylistTrack(playlistId: MaybeRef<string>) {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async (trackId: string) => {
+            const isSaved = await toggleSaveTrack(trackId);
+
+            return {
+                trackId,
+                isSaved
+            };
+        },
+        onSuccess: ({ trackId, isSaved }) => {
+            queryClient.invalidateQueries({
+                queryKey: ['playlistTracks', playlistId]
+            });
+            queryClient.setQueryData(
+                ['playlistTracks', playlistId],
+                (tracks: PlaylistTrack[]) => {
+                    const index = tracks.findIndex(({ id }) => id === trackId);
+
+                    if (index > -1) {
+                        return tracks.with(index, {
+                            ...tracks[index],
+                            isSaved
+                        });
+                    }
+
+                    return tracks;
+                }
+            );
+        }
+    });
+}
+
+export function useRemovePlaylistTrack(playlistId: MaybeRef<string>) {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async (trackId: string) => {
+            await removePlaylistTrack(toValue(playlistId), trackId);
+
+            return trackId;
+        },
+        onSuccess: (trackId) => {
+            queryClient.invalidateQueries({
+                queryKey: ['playlistTracks', playlistId]
+            });
+            queryClient.setQueryData(
+                ['playlistTracks', playlistId],
+                (tracks: PlaylistTrack[]) => {
+                    return tracks.filter(({ id }) => id !== trackId);
                 }
             );
         }
