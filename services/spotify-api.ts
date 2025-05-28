@@ -180,6 +180,22 @@ export async function getPlaylistTracks(
     return [];
 }
 
+export async function getUser(userId: string) {
+    const {
+        data: {
+            id,
+            display_name: name,
+            images: [{ url: profilePicture = '' } = {}]
+        }
+    } = await axios(`/users/${userId}`);
+
+    return {
+        id,
+        name,
+        profilePicture
+    } satisfies User;
+}
+
 export async function getUserPlaylists(userId?: string, offset: number = 0) {
     const {
         data: { items, total }

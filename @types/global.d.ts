@@ -88,6 +88,12 @@ declare global {
         isActive?: boolean;
     }
 
+    interface User {
+        id: string;
+        name: string;
+        profilePicture: string;
+    }
+
     declare namespace Spotify {
         interface Entity {
             name: string;
