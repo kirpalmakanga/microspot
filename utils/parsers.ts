@@ -30,7 +30,7 @@ export interface SpotifyTrack {
     uri: string;
     name: string;
     artists: SpotifyArtist[];
-    number: number;
+    track_number: number;
     disc_number: number;
     duration_ms: number;
     explicit: boolean;
@@ -42,7 +42,7 @@ export const parseTrackData = ({
     uri,
     name,
     artists,
-    number: trackNumber,
+    track_number: trackNumber,
     disc_number: discNumber,
     duration_ms: duration,
     explicit: isExplicit,
