@@ -26,8 +26,6 @@ async function openFilePicker() {
     formData.cover = await getDataUrl(file);
 }
 
-/** TODO: ajouter loader et verrouiller formulaire ? */
-
 async function handleSubmit() {
     if (!isEqual(formData, pick(props, 'name', 'description', 'cover'))) {
         mutate(formData);
