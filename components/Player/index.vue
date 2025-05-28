@@ -223,7 +223,10 @@ onBeforeUnmount(() => {
 
     <UModal v-model:open="isPlaylistMenuOpen" :title="playlistMenuTitle">
         <template #body>
-            <PlaylistMenu :track-id="currentTrack.id" />
+            <PlaylistMenu
+                :track-id="currentTrack.id"
+                @saved="isPlaylistMenuOpen = false"
+            />
         </template>
     </UModal>
 

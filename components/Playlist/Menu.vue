@@ -1,38 +1,38 @@
 <script setup lang="ts">
-const router = useRouter();
-const props = defineProps<{ trackId: string }>();
+const { trackId } = defineProps<{ trackId: string }>();
 
-const playlistsStore = usePlaylistsStore();
-const { items } = storeToRefs(playlistsStore);
-const { getCurrentUserPlaylists, createPlaylist, addPlaylistTrack } =
-    playlistsStore;
+const emit = defineEmits<{ saved: [e: void] }>();
 
-const isLoading = ref<boolean>(true);
+const authStore = useAuthStore();
+
+/** TODO, handle next pages and error */
+const {
+    data,
+    isLoading,
+    isFetching,
+    isError,
+    hasNextPage,
+    refetch,
+    fetchNextPage
+} = useUserPlaylists(authStore.userId);
+
+const { mutate: addPlaylistTrack } = useAddPlaylistTrack();
+
 const query = ref<string>('');
 
 const currentItems = computed(() => {
-    return items.value.filter(({ name }) =>
-        name.toLowerCase().includes(query.value.toLowerCase())
-    );
+    return (data.value?.pages || [])
+        .flatMap(({ items }) => items)
+        .filter(({ name }) =>
+            name.toLowerCase().includes(query.value.toLowerCase())
+        );
 });
 
-async function handleSelectPlaylist(playlistId?: string) {
-    let id = playlistId;
+function handleSelectPlaylist(playlistId?: string) {
+    addPlaylistTrack({ playlistId, trackId });
 
-    if (!playlistId) {
-        id = await createPlaylist('New playlist');
-
-        await addPlaylistTrack(id, props.trackId);
-
-        router.push(`/playlist/${id}`);
-    }
+    emit('saved');
 }
-
-onMounted(async () => {
-    await getCurrentUserPlaylists();
-
-    isLoading.value = false;
-});
 </script>
 
 <template>

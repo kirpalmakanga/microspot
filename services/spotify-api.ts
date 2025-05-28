@@ -18,7 +18,7 @@ async function areTracksSaved(trackIds: string[]) {
     );
 }
 
-export async function isTrackSaved(trackId: string) {
+export async function isTrackSaved(trackId: string): Promise<boolean> {
     const {
         data: [isSaved]
     } = await axios.get('/me/tracks/contains', {
@@ -28,7 +28,7 @@ export async function isTrackSaved(trackId: string) {
     return isSaved;
 }
 
-export async function isAlbumSaved(trackId: string) {
+export async function isAlbumSaved(trackId: string): Promise<boolean> {
     const {
         data: [isSaved]
     } = await axios.get('/me/albums/contains', {
@@ -38,7 +38,7 @@ export async function isAlbumSaved(trackId: string) {
     return isSaved;
 }
 
-export async function isPlaylistSaved(playlistId: string) {
+export async function isPlaylistSaved(playlistId: string): Promise<boolean> {
     const {
         data: [isSaved]
     } = await axios.get('/me/playlists/contains', {
@@ -73,7 +73,10 @@ export async function toggleSaveTrack(trackId: string) {
 export async function getTrack(trackId: string) {
     const { data: track } = await axios.get(`/tracks/${trackId}`);
 
-    return parsePlaylistTrackData({ track });
+    return {
+        ...parsePlaylistTrackData({ track }),
+        isSaved: await isTrackSaved(trackId)
+    };
 }
 
 export async function toggleSaveAlbum(albumId: string) {

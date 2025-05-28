@@ -3,43 +3,48 @@ import type { DropdownMenuItem } from '@nuxt/ui';
 import { useDateFormat } from '@vueuse/core';
 import MenuButton from '~/components/global/MenuButton.vue';
 
-interface State {
-    isLoading: boolean;
-    isPlaylistMenuOpen: boolean;
-}
-
 const {
     params: { trackId }
 } = useRoute();
 
-const trackStore = useTrackStore();
-const { getTrack, clearTrackData, toggleSaveTrack } = trackStore;
-const { images, name, albumId, albumName, artists, uri, releaseDate, isSaved } =
-    storeToRefs(trackStore);
+const {
+    data: track,
+    isLoading,
+    isError,
+    refetch
+} = useTrack(trackId as string);
+
+const { mutate: toggleSaveTrack } = useToggleSaveTrack(trackId as string);
 
 const playerStore = usePlayerStore();
 const { isCurrentContext, togglePlay } = playerStore;
 const { isPlaying } = storeToRefs(playerStore);
 
-const formattedReleaseDate = useDateFormat(releaseDate, 'YYYY');
+const formattedReleaseDate = useDateFormat(
+    computed(() => track.value?.releaseDate),
+    'YYYY'
+);
 
 const copy = useCopy();
 
-const state = reactive<State>({
-    isLoading: true,
-    isPlaylistMenuOpen: false
-});
+const isPlaylistMenuOpen = ref<boolean>(false);
 
-const playlistMenuTitle = computed(
-    () => `${artists.value.map(({ name }) => name).join(', ')} - ${name.value}`
-);
+const playlistMenuTitle = computed(() => {
+    if (track.value) {
+        return `${track.value.artists.map(({ name }) => name).join(', ')} - ${
+            track.value.name
+        }`;
+    }
+
+    return '';
+});
 
 const menuOptions: DropdownMenuItem[] = [
     {
         icon: 'i-mi-add',
         label: 'Add to playlist',
         class: 'cursor-pointer',
-        onSelect: () => openPlaylistMenu()
+        onSelect: () => (isPlaylistMenuOpen.value = true)
     },
     {
         icon: 'i-mi-share',
@@ -49,43 +54,29 @@ const menuOptions: DropdownMenuItem[] = [
     }
 ];
 
-function openPlaylistMenu() {
-    state.isPlaylistMenuOpen = true;
-}
-
-function closePLaylistMenu() {
-    state.isPlaylistMenuOpen = false;
-}
-
-async function loadData() {
-    await getTrack(trackId as string);
-
-    state.isLoading = false;
-}
-
-useAppTitle(name);
-
-onMounted(loadData);
-
-onUnmounted(clearTrackData);
+useAppTitle(computed(() => track.value?.name));
 </script>
 
 <template>
     <section class="flex flex-col grow">
         <Transition name="fade" mode="out-in">
-            <Loader v-if="state.isLoading" />
+            <Loader v-if="isLoading" />
 
-            <div v-else class="relative flex flex-col grow">
+            <Error v-else-if="isError" @action="refetch()" />
+
+            <div v-else-if="track" class="relative flex flex-col grow">
                 <LayoutPageHeader
                     type="Track"
-                    :cover="images.medium || images.large"
-                    :title="name"
+                    :cover="track.images.medium || track.images.large"
+                    :title="track.name"
                 >
                     <template #subtitles>
                         <p class="flex gap-1">
                             <span>
                                 <template
-                                    v-for="({ id, name }, index) of artists"
+                                    v-for="(
+                                        { id, name }, index
+                                    ) of track.artists"
                                 >
                                     <span v-if="index > 0">{{ ', ' }}</span>
 
@@ -102,9 +93,9 @@ onUnmounted(clearTrackData);
 
                             <NuxtLink
                                 class="opacity-80 hover:opacity-100 transition-opacity hover:underline"
-                                :to="`/album/${albumId}`"
+                                :to="`/album/${track.albumId}`"
                             >
-                                {{ albumName }}
+                                {{ track.albumName }}
                             </NuxtLink>
 
                             <span>•</span>
@@ -116,8 +107,12 @@ onUnmounted(clearTrackData);
 
                 <div class="flex items-center gap-4 p-4">
                     <PlayButton
-                        :is-playing="isCurrentContext('', uri) && isPlaying"
-                        @click="togglePlay({ contextUri: '', trackUri: uri })"
+                        :is-playing="
+                            isCurrentContext('', track.uri) && isPlaying
+                        "
+                        @click="
+                            togglePlay({ contextUri: '', trackUri: track.uri })
+                        "
                     />
 
                     <button
@@ -127,9 +122,9 @@ onUnmounted(clearTrackData);
                         <UIcon
                             class="size-8"
                             :name="
-                                isSaved
+                                track.isSaved
                                     ? 'i-mi-circle-check'
-                                    : 'i-mi-circle-check'
+                                    : 'i-mi-circle-add'
                             "
                         />
                     </button>
@@ -139,11 +134,14 @@ onUnmounted(clearTrackData);
             </div>
         </Transition>
 
-        <PlaylistMenu
-            v-model:is-open="state.isPlaylistMenuOpen"
-            :track-id="(trackId as string)"
-            :title="playlistMenuTitle"
-            @close="closePLaylistMenu"
-        />
+        <UModal v-model:open="isPlaylistMenuOpen" :title="playlistMenuTitle">
+            <template #body>
+                <PlaylistMenu
+                    :track-id="(trackId as string)"
+                    :title="playlistMenuTitle"
+                    @saved="isPlaylistMenuOpen = false"
+                />
+            </template>
+        </UModal>
     </section>
 </template>

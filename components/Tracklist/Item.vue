@@ -156,7 +156,10 @@ const menuOptions = computed<ContextMenuItem[]>(() => [
 
         <UModal v-model:open="isPlaylistMenuOpen" :title="playlistMenuTitle">
             <template #body>
-                <PlaylistMenu :track-id="id" />
+                <PlaylistMenu
+                    :track-id="id"
+                    @saved="isPlaylistMenuOpen = false"
+                />
             </template>
         </UModal>
     </UContextMenu>

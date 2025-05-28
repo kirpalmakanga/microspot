@@ -19,7 +19,7 @@ import {
 export function useUserPlaylists(userId: MaybeRef<string>) {
     return useInfiniteQuery({
         queryKey: ['playlists', userId],
-        queryFn: async ({ pageParam: offset }) =>
+        queryFn: ({ pageParam: offset }) =>
             getUserPlaylists(toValue(userId), offset),
         initialPageParam: 0,
         getNextPageParam: ({ totalItemCount }, pages) => {
@@ -30,42 +30,6 @@ export function useUserPlaylists(userId: MaybeRef<string>) {
     });
 }
 
-// export function useAddPlaylistTrack() {
-//     const queryClient = useQueryClient();
-
-//     return useMutation({
-//         mutationFn: async ({
-//             playlistId,
-//             trackId
-//         }: {
-//             playlistId: string;
-//             trackId: string;
-//         }) => {
-//             await addPlaylistTrack(playlistId, trackId);
-
-//             return await getPlaylist(playlistId);
-//         },
-//         onSuccess: (playlist) => {
-//             queryClient.setQueryData(['playlists'], playlist);
-//         }
-//     });
-// }
-
-// export function useCreatePlaylist() {
-//     const queryClient = useQueryClient();
-//     const authStore = useAuthStore();
-
-//     return useMutation({
-//         mutationFn: (name: string) => createPlaylist(authStore.userId, name),
-//         onSuccess: (playlist) =>
-//             queryClient.setQueryData(['playlists'], (data) => {
-//                 console.log('data', data);
-
-//                 return data;
-//             })
-//     });
-// }
-
 export function usePlaylist(playlistId: MaybeRef<string>) {
     return useQuery({
         queryKey: ['playlist', playlistId],
@@ -74,17 +38,18 @@ export function usePlaylist(playlistId: MaybeRef<string>) {
 }
 
 export function useUpdatePlaylist(playlistId: MaybeRef<string>) {
-    const authStore = useAuthStore();
     const queryClient = useQueryClient();
+    const authStore = useAuthStore();
 
     return useMutation({
-        mutationFn: async (payload: {
+        mutationFn: async ({
+            cover,
+            ...playlistData
+        }: {
             name: string;
             description: string;
             cover?: string;
         }) => {
-            const { cover, ...playlistData } = payload;
-
             await updatePlaylist(toValue(playlistId), playlistData);
 
             if (cover && cover.startsWith('data:image')) {
@@ -96,62 +61,15 @@ export function useUpdatePlaylist(playlistId: MaybeRef<string>) {
                         encodedFile
                     ));
             }
-
-            return payload;
         },
-        onSuccess: ({ cover, ...playlistData }) => {
-            function updater(playlist: Playlist) {
-                return {
-                    ...playlist,
-                    ...playlistData,
-                    ...(cover && {
-                        images: { ...playlist.images, large: cover }
-                    })
-                };
-            }
-
+        onSuccess: () => {
             queryClient.invalidateQueries({
                 queryKey: ['playlist', playlistId]
             });
-            queryClient.setQueryData(['playlist', playlistId], updater);
 
             queryClient.invalidateQueries({
                 queryKey: ['playlists', authStore.userId]
             });
-            queryClient.setQueryData(
-                ['playlists', authStore.userId],
-                ({
-                    pages,
-                    ...data
-                }: {
-                    pages: { items: Playlist[]; totalItemCount: number }[];
-                }) => {
-                    return {
-                        ...data,
-                        pages: pages.map((page) => {
-                            const { items } = page;
-
-                            const index = items.findIndex(
-                                ({ id }) => id === toValue(playlistId)
-                            );
-
-                            if (index > -1) {
-                                console.log('hey');
-
-                                return {
-                                    ...page,
-                                    items: items.with(
-                                        index,
-                                        updater(items[index])
-                                    )
-                                };
-                            }
-
-                            return page;
-                        })
-                    };
-                }
-            );
         }
     });
 }
@@ -163,7 +81,7 @@ export function usePlaylistTracks(playlistId: MaybeRef<string>) {
 
     return useInfiniteQuery({
         queryKey: ['playlistTracks', playlistId],
-        queryFn: async ({ pageParam: offset }) =>
+        queryFn: ({ pageParam: offset }) =>
             getPlaylistTracks(toValue(playlistId), offset),
         initialPageParam: 0,
         getNextPageParam: (_, pages) => {
@@ -184,38 +102,65 @@ export function useToggleSavePlaylistTrack(playlistId: MaybeRef<string>) {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async (trackId: string) => {
-            const isSaved = await toggleSaveTrack(trackId);
-
-            return {
-                trackId,
-                isSaved
-            };
-        },
-        onSuccess: ({ trackId, isSaved }) => {
+        mutationFn: async (trackId: string) => toggleSaveTrack(trackId),
+        onSuccess: () => {
             queryClient.invalidateQueries({
                 queryKey: ['playlistTracks', playlistId]
             });
-            queryClient.setQueryData(
-                ['playlistTracks', playlistId],
-                (tracks: PlaylistTrack[]) => {
-                    const index = tracks.findIndex(({ id }) => id === trackId);
+        }
+    });
+}
 
-                    if (index > -1) {
-                        return tracks.with(index, {
-                            ...tracks[index],
-                            isSaved
-                        });
-                    }
+export function useAddPlaylistTrack() {
+    const router = useRouter();
+    const queryClient = useQueryClient();
+    const authStore = useAuthStore();
 
-                    return tracks;
-                }
-            );
+    return useMutation({
+        mutationFn: async ({
+            playlistId,
+            trackId
+        }: {
+            playlistId?: string;
+            trackId: string;
+        }) => {
+            if (!playlistId) {
+                const { id: playlistId } = await createPlaylist(
+                    authStore.userId,
+                    'New playlist'
+                );
+
+                await addPlaylistTrack(playlistId, trackId);
+
+                return { playlistId, isNewPlaylist: true };
+            } else {
+                await addPlaylistTrack(playlistId, trackId);
+
+                return { playlistId };
+            }
+        },
+        onSuccess: ({ playlistId, isNewPlaylist }) => {
+            queryClient.invalidateQueries({
+                queryKey: ['playlistTracks', playlistId]
+            });
+
+            queryClient.invalidateQueries({
+                queryKey: ['playlist', playlistId]
+            });
+
+            queryClient.invalidateQueries({
+                queryKey: ['playlists', authStore.userId]
+            });
+
+            if (isNewPlaylist) {
+                router.push(`/playlist/${playlistId}`);
+            }
         }
     });
 }
 
 export function useRemovePlaylistTrack(playlistId: MaybeRef<string>) {
+    const authStore = useAuthStore();
     const queryClient = useQueryClient();
 
     return useMutation({
@@ -224,16 +169,18 @@ export function useRemovePlaylistTrack(playlistId: MaybeRef<string>) {
 
             return trackId;
         },
-        onSuccess: (trackId) => {
+        onSuccess: () => {
             queryClient.invalidateQueries({
                 queryKey: ['playlistTracks', playlistId]
             });
-            queryClient.setQueryData(
-                ['playlistTracks', playlistId],
-                (tracks: PlaylistTrack[]) => {
-                    return tracks.filter(({ id }) => id !== trackId);
-                }
-            );
+
+            queryClient.invalidateQueries({
+                queryKey: ['playlist', playlistId]
+            });
+
+            queryClient.invalidateQueries({
+                queryKey: ['playlists', authStore.userId]
+            });
         }
     });
 }
