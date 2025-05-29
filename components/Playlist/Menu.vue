@@ -68,7 +68,7 @@ function handleSelectPlaylist(playlistId?: string) {
 
         <ScrollContainer class="grow">
             <ul>
-                <li v-for="{ id, name, images } of currentItems">
+                <li v-for="{ id, name, images } of currentItems" :key="id">
                     <button
                         class="flex items-center p-2 gap-2 rounded-md hover:bg-zinc-800 transition-colors w-full cursor-pointer overflow-hidden text-left"
                         @click="handleSelectPlaylist(id)"

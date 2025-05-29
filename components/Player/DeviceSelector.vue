@@ -37,9 +37,11 @@ const availableDevices = computed(() =>
         <p class="mb-2">Select another device</p>
 
         <ul>
-            <li v-for="{ id, name, type, isActive } of availableDevices">
+            <li
+                v-for="{ id, name, type, isActive } of availableDevices"
+                :key="id"
+            >
                 <button
-                    :key="id"
                     :disabled="isActive"
                     class="flex gap-2 items-center text-left p-4 cursor-pointer w-full rounded-md hover:bg-indigo-500 hover:active: transition-colors"
                     @click="$emit('select', id)"

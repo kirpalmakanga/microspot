@@ -74,6 +74,7 @@ useAppTitle(computed(() => album.value?.name));
                         <p class="flex gap-1">
                             <template
                                 v-for="({ id, name }, index) of album.artists"
+                                :key="id"
                             >
                                 <span v-if="index > 0">,</span>
 

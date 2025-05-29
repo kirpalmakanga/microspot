@@ -77,6 +77,7 @@ useAppTitle(computed(() => track.value?.name));
                                     v-for="(
                                         { id, name }, index
                                     ) of track.artists"
+                                    :key="id"
                                 >
                                     <span v-if="index > 0">{{ ', ' }}</span>
 

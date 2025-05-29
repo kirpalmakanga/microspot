@@ -17,7 +17,7 @@ const { isPlaying } = storeToRefs(playerStore);
 
 <template>
     <ul class="relative grow">
-        <li v-for="({ uri: trackUri, ...data }, index) in items">
+        <li v-for="({ uri: trackUri, ...data }, index) in items" :key="data.id">
             <TracklistItem
                 v-bind="data"
                 :is-playlist-item="props.type === 'playlist'"

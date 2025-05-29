@@ -32,17 +32,21 @@ const tabs = computed<{ title: string; href: string }[]>(() => {
 </script>
 
 <template>
-    <ul class="flex gap-2 p-4">
-        <li v-for="{ title, href } of tabs">
-            <UButton
-                color="neutral"
-                :to="href"
-                :class="{
-                    'opacity-50': href === route.fullPath
-                }"
-            >
-                {{ title }}
-            </UButton>
-        </li>
-    </ul>
+    <nav>
+        <ul class="flex gap-2 p-4">
+            <li v-for="{ title, href } of tabs" :key="href">
+                <UButton
+                    color="neutral"
+                    :to="href"
+                    class="hover:scale-110 hover:active:scale-90 transition"
+                    :class="{
+                        'opacity-50': href === route.fullPath
+                    }"
+                    :disabled="href === route.fullPath"
+                >
+                    {{ title }}
+                </UButton>
+            </li>
+        </ul>
+    </nav>
 </template>
