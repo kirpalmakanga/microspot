@@ -1,3 +1,11 @@
+import {
+    searchAlbums,
+    searchAll,
+    searchArtists,
+    searchPlaylists,
+    searchTracks
+} from '~/services/spotify-api';
+
 interface State {
     artists: Artist[];
     albums: Album[];
@@ -13,14 +21,6 @@ const getDefaultState = (): State => ({
 });
 
 export const useSearchStore = defineStore('search', () => {
-    const {
-        searchAll,
-        searchArtists,
-        searchTracks,
-        searchAlbums,
-        searchPlaylists
-    } = useSpotifyApi();
-
     const state = reactive<State>(getDefaultState());
 
     return {

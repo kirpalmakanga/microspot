@@ -1,6 +1,5 @@
-import axios from 'axios';
-
-const AUTH_API_URL = window.location.origin;
+import { exchangeCodeForTokens, refreshAccessToken } from '~/services/auth-api';
+import { getCurrentUserData } from '~/services/spotify-api';
 
 interface State {
     accessToken: string;
@@ -26,46 +25,32 @@ export const useAuthStore = defineStore(
         return {
             ...toRefs(state),
             isLoggedIn: computed(() => !!state.accessToken),
-            async getAccessToken(code: string) {
-                const {
-                    data: { accessToken, refreshToken }
-                } = await axios(`${AUTH_API_URL}/api/token/${code}`);
+            async fetchAccessToken(authorizationCode: string) {
+                const tokens = await exchangeCodeForTokens(authorizationCode);
 
-                state.accessToken = accessToken;
-                state.refreshToken = refreshToken;
+                Object.assign(state, tokens);
             },
             async refreshAccessToken() {
-                const {
-                    data: { accessToken }
-                } = await axios(
-                    `${AUTH_API_URL}/api/refresh/${state.refreshToken}`
+                const accessToken = await refreshAccessToken(
+                    state.refreshToken
                 );
 
                 state.accessToken = accessToken;
 
                 return accessToken as string;
             },
-            async getUserData() {
+            async fetchUserData() {
                 const {
-                    data: {
-                        id: userId,
-                        display_name: userName,
-                        images: [{ url: profilePicture = '' } = {}]
-                    }
-                } = await axios('/me');
+                    id: userId,
+                    name: userName,
+                    profilePicture
+                } = await getCurrentUserData();
 
                 Object.assign(state, {
                     userId,
                     userName,
                     profilePicture
                 });
-            },
-            async logIn() {
-                const {
-                    data: { url }
-                } = await axios(`${AUTH_API_URL}/api/login`);
-
-                window.location.href = url;
             },
             async logOut() {
                 Object.assign(state, getDefaultState());

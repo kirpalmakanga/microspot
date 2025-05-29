@@ -3,6 +3,22 @@ import type { SpotifyDevice, SpotifyTrack } from '~/utils/parsers';
 
 const ITEMS_PER_REQUEST = 50;
 
+export async function getCurrentUserData() {
+    const {
+        data: {
+            id,
+            display_name: name,
+            images: [{ url: profilePicture = '' } = {}]
+        }
+    } = await axios('/me');
+
+    return {
+        id,
+        name,
+        profilePicture
+    };
+}
+
 async function areTracksSaved(trackIds: string[]) {
     const { data } = await axios.get('/me/tracks/contains', {
         params: { ids: trackIds.join(',') }
