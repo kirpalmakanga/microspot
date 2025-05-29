@@ -197,7 +197,7 @@ export const parsePlaylistData = ({
 };
 
 // export const parseSearchData = ({}) => ({});
-interface SpotifyDevice {
+export interface SpotifyDevice {
     id: string;
     name: string;
     type: string;

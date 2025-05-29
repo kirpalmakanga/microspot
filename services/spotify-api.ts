@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { SpotifyTrack } from '~/utils/parsers';
+import type { SpotifyDevice, SpotifyTrack } from '~/utils/parsers';
 
 const ITEMS_PER_REQUEST = 50;
 
@@ -340,4 +340,56 @@ export async function searchPlaylists(query: string, offset: number = 0) {
     });
 
     return items.filter(Boolean).map(parsePlaylistData);
+}
+
+export async function getAvailableDevices() {
+    const {
+        data: { devices }
+    } = await axios('/me/player/devices');
+
+    return (devices as SpotifyDevice[]).map(parseDeviceData);
+}
+
+export async function setActiveDevice(deviceId: string, play: boolean) {
+    await axios.put('/me/player', {
+        device_ids: [deviceId],
+        play
+    });
+}
+
+export interface PlaybackContext {
+    contextUri: string;
+    trackUri?: string;
+    position?: number;
+}
+
+export async function setCurrentContext(
+    { contextUri, trackUri, position = 0 }: PlaybackContext,
+    deviceId: string
+) {
+    let payload:
+        | ({ position_ms: number } & {
+              context_uri: string;
+              offset?: { uri: string } | { position: 0 };
+          })
+        | { uris: string[] }
+        | null = null;
+
+    if (contextUri) {
+        payload = {
+            context_uri: contextUri,
+            position_ms: position,
+            ...(!contextUri.includes('artist') && {
+                offset: trackUri ? { uri: trackUri } : { position: 0 }
+            })
+        };
+    } else if (trackUri) {
+        payload = { uris: [trackUri], position_ms: position };
+    }
+
+    await axios.put('/me/player/play', payload, {
+        params: {
+            device_id: deviceId
+        }
+    });
 }

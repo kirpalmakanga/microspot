@@ -5,9 +5,9 @@ import { useFullscreen } from '@vueuse/core';
 const playerStore = usePlayerStore();
 const { context } = storeToRefs(playerStore);
 
-const playerWrapper = useTemplateRef('playerWrapper');
-
-const { isFullscreen, toggle: toggleFullscreen } = useFullscreen(playerWrapper);
+const { isFullscreen, toggle: toggleFullscreen } = useFullscreen(
+    useTemplateRef('playerWrapper')
+);
 
 const {
     isPlaying,
@@ -19,14 +19,12 @@ const {
     availableDevices,
     init,
     destroy,
-    play,
-    pause,
+    togglePlay,
     seek,
     goToPreviousTrack,
     goToNextTrack,
-    setCurrentTrack,
-    fetchDevices,
-    setActiveDevice,
+    fetchAvailableDevices,
+    selectActiveDevice,
     toggleSaveCurrentTrack
 } = useSpotifyPlayer();
 
@@ -83,29 +81,15 @@ const trackMenuOptions = computed<ContextMenuItem[]>(() => [
     }
 ]);
 
-function togglePlay() {
-    isPlaying.value ? pause() : play();
-}
-
 async function openDeviceSelector() {
-    await fetchDevices();
+    await fetchAvailableDevices();
 
     isDeviceSelectorVisible.value = true;
 }
 
-onMounted(async () => {
-    await init();
+onMounted(init);
 
-    emitter.on('launch', setCurrentTrack);
-    emitter.on('togglePlay', togglePlay);
-});
-
-onBeforeUnmount(() => {
-    destroy();
-
-    emitter.off('launch', setCurrentTrack);
-    emitter.off('togglePlay', togglePlay);
-});
+onBeforeUnmount(destroy);
 </script>
 
 <template>
@@ -242,7 +226,7 @@ onBeforeUnmount(() => {
         <template #body>
             <PlayerDeviceSelector
                 :items="availableDevices"
-                @select="setActiveDevice"
+                @select="selectActiveDevice"
             />
         </template>
     </USlideover>

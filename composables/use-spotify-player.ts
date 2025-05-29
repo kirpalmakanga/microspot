@@ -1,17 +1,11 @@
-import axios from 'axios';
-
-const loadPlayerAPI = async () => {
-    if (!window.Spotify) {
-        const promise = new Promise(
-            (resolve) =>
-                (window.onSpotifyWebPlaybackSDKReady = () => resolve(null))
-        );
-
-        await loadScript('https://sdk.scdn.co/spotify-player.js');
-
-        return promise;
-    }
-};
+import {
+    getAvailableDevices,
+    isTrackSaved,
+    setActiveDevice,
+    setCurrentContext,
+    toggleSaveTrack,
+    type PlaybackContext
+} from '~/services/spotify-api';
 
 interface State {
     isPlaying: boolean;
@@ -32,7 +26,20 @@ interface State {
     availableDevices: Device[];
 }
 
-const getDefaultState = () => ({
+async function loadPlayerAPI() {
+    if (!window.Spotify) {
+        const promise = new Promise(
+            (resolve) =>
+                (window.onSpotifyWebPlaybackSDKReady = () => resolve(null))
+        );
+
+        await loadScript('https://sdk.scdn.co/spotify-player.js');
+
+        return promise;
+    }
+}
+
+const getDefaultState = (): State => ({
     isPlaying: false,
     isReady: false,
     cannotSkipToPrevious: true,
@@ -52,10 +59,8 @@ const getDefaultState = () => ({
 });
 
 export function useSpotifyPlayer() {
-    const { isTrackSaved, toggleSaveTrack } = useSpotifyApi();
     const { refreshAccessToken } = useAuthStore();
     const playerStore = usePlayerStore();
-
     const state = reactive<State>(getDefaultState());
     const playerInstance = ref<Spotify.Player>();
     const timeWatcher = ref<ReturnType<typeof setInterval>>();
@@ -137,46 +142,8 @@ export function useSpotifyPlayer() {
         });
     }
 
-    async function setCurrentTrack({
-        contextUri,
-        trackUri,
-        position = 0
-    }: {
-        contextUri: string;
-        trackUri?: string;
-        position?: number;
-    }) {
-        const { localDeviceId } = state;
-
-        let payload:
-            | ({ position_ms: number } & {
-                  context_uri: string;
-                  offset?: { uri: string } | { position: 0 };
-              })
-            | { uris: string[] }
-            | null = null;
-
-        if (contextUri) {
-            payload = {
-                context_uri: contextUri,
-                position_ms: position,
-                ...(!contextUri.includes('artist') && {
-                    offset: trackUri ? { uri: trackUri } : { position: 0 }
-                })
-            };
-        } else if (trackUri) {
-            payload = { uris: [trackUri], position_ms: position };
-        }
-
-        if (payload) {
-            await axios.put('/me/player/play', payload, {
-                params: {
-                    device_id: localDeviceId
-                }
-            });
-        } else {
-            throw new Error('setCurrentTrack: no valid payload');
-        }
+    async function setContext(context: PlaybackContext) {
+        await setCurrentContext(context, state.localDeviceId);
     }
 
     async function onPlayerReady({
@@ -206,26 +173,65 @@ export function useSpotifyPlayer() {
         state.isReady = false;
     }
 
+    async function play() {
+        if (!playerInstance.value) {
+            return;
+        }
+
+        const {
+            context: { uri, currentTrack, currentTrackPosition }
+        } = playerStore;
+
+        if (
+            (uri || currentTrack.uri) &&
+            !(await playerInstance.value.getCurrentState())
+        ) {
+            await setContext({
+                contextUri: uri,
+                trackUri: currentTrack.uri,
+                position: currentTrackPosition
+            });
+        } else {
+            await playerInstance.value.resume();
+        }
+
+        state.isPlaying = true;
+    }
+
+    async function pause() {
+        if (playerInstance.value) {
+            await playerInstance.value.pause();
+
+            state.isPlaying = false;
+        }
+    }
+
+    function togglePlay() {
+        state.isPlaying ? pause() : play();
+    }
+
+    async function fetchCurrentTrackPosition() {
+        if (!state.isPlaying) {
+            return;
+        }
+
+        const currentState = await playerInstance.value?.getCurrentState();
+
+        if (currentState) {
+            state.currentTrackPosition = currentState.position;
+            playerStore.context.currentTrackPosition = currentState.position;
+        }
+    }
+
     watch(
         () => state.isPlaying,
         (isPlaying) => {
-            if (timeWatcher.value) clearInterval(timeWatcher.value);
+            if (timeWatcher.value) {
+                clearInterval(timeWatcher.value);
+            }
 
             if (isPlaying) {
-                timeWatcher.value = setInterval(async () => {
-                    if (!state.isPlaying) {
-                        return;
-                    }
-
-                    const currentState =
-                        await playerInstance.value?.getCurrentState();
-
-                    if (currentState) {
-                        state.currentTrackPosition = currentState.position;
-                        playerStore.context.currentTrackPosition =
-                            currentState.position;
-                    }
-                }, 200);
+                timeWatcher.value = setInterval(fetchCurrentTrackPosition, 200);
             }
         }
     );
@@ -237,7 +243,7 @@ export function useSpotifyPlayer() {
 
             playerInstance.value = new window.Spotify.Player({
                 name: 'MicroSpot',
-                getOAuthToken: async (callback) => {
+                async getOAuthToken(callback) {
                     const accessToken = await refreshAccessToken();
 
                     callback(accessToken);
@@ -248,6 +254,9 @@ export function useSpotifyPlayer() {
             playerInstance.value?.addListener('not_ready', onPlayerNotReady);
 
             await playerInstance.value?.connect();
+
+            emitter.on('launch', setContext);
+            emitter.on('togglePlay', togglePlay);
         },
         destroy() {
             if (playerInstance.value) {
@@ -258,39 +267,12 @@ export function useSpotifyPlayer() {
                 playerInstance.value.disconnect();
 
                 Object.assign(state, getDefaultState());
+
+                emitter.off('launch', setContext);
+                emitter.off('togglePlay', togglePlay);
             }
         },
-        async play() {
-            if (!playerInstance.value) {
-                return;
-            }
-
-            const {
-                context: { uri, currentTrack, currentTrackPosition }
-            } = playerStore;
-
-            if (
-                (uri || currentTrack.uri) &&
-                !(await playerInstance.value.getCurrentState())
-            ) {
-                await setCurrentTrack({
-                    contextUri: uri,
-                    trackUri: currentTrack.uri,
-                    position: currentTrackPosition
-                });
-            } else {
-                await playerInstance.value.resume();
-            }
-
-            state.isPlaying = true;
-        },
-        async pause() {
-            if (playerInstance.value) {
-                await playerInstance.value.pause();
-
-                state.isPlaying = false;
-            }
-        },
+        togglePlay,
         seek(position: number) {
             playerInstance.value?.seek(position);
 
@@ -302,19 +284,11 @@ export function useSpotifyPlayer() {
         goToNextTrack() {
             playerInstance.value?.nextTrack();
         },
-        setCurrentTrack,
-        async fetchDevices() {
-            const {
-                data: { devices }
-            } = await axios('/me/player/devices');
-
-            state.availableDevices = devices.map(parseDeviceData);
+        async fetchAvailableDevices() {
+            state.availableDevices = await getAvailableDevices();
         },
-        setActiveDevice(id: string) {
-            axios.put('/me/player', {
-                device_ids: [id],
-                play: state.isPlaying
-            });
+        selectActiveDevice(id: string) {
+            setActiveDevice(id, state.isPlaying);
 
             for (const device of state.availableDevices) {
                 device.isActive = device.id === id;
