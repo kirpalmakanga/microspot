@@ -1,30 +1,35 @@
 <script setup lang="ts">
 import type { DropdownMenuItem } from '@nuxt/ui';
 
-interface State {
-    isLoading: boolean;
-    isLoadingAlbums: boolean;
-    isMenuVisible: boolean;
-}
-
 const {
     params: { artistId }
 } = useRoute();
 
+const {
+    data: artist,
+    isLoading: isLoadingArtist,
+    isError: hasArtistError,
+    refetch: refetchArtist
+} = useArtist(artistId as string);
+
+const cover = computed(
+    () => artist.value?.images.medium || artist.value?.images.large
+);
+
+const {
+    data: artistAlbums,
+    isLoading: isLoadingAlbums,
+    isError: hasAlbumsError,
+    hasNextPage,
+    fetchNextPage,
+    refetch: refetchAlbums
+} = useArtistAlbums(artistId as string);
+
+const albums = computed(() =>
+    artistAlbums.value?.pages.flatMap(({ albums }) => albums)
+);
+
 const copy = useCopy();
-
-const artistStore = useArtistStore();
-const { name, images, albumCount, albums, hasLoadedAllAlbums } =
-    storeToRefs(artistStore);
-const { getArtist, getArtistAlbums } = artistStore;
-
-const state = reactive<State>({
-    isLoading: true,
-    isLoadingAlbums: false,
-    isMenuVisible: false
-});
-
-const cover = computed(() => images.value.medium || images.value.large);
 
 const menuOptions: DropdownMenuItem[] = [
     {
@@ -35,37 +40,27 @@ const menuOptions: DropdownMenuItem[] = [
     }
 ];
 
-async function loadData() {
-    await getArtist(artistId as string);
-
-    state.isLoading = false;
-}
-
-function openMenu() {
-    state.isMenuVisible = true;
-}
-
-function closeMenu() {
-    state.isMenuVisible = false;
-}
-
-useAppTitle(name);
-
-onMounted(loadData);
+useAppTitle(computed(() => artist.value?.name));
 </script>
 
 <template>
     <section class="flex flex-col grow">
         <Transition name="fade" mode="out-in">
-            <Loader v-if="state.isLoading" />
+            <Loader v-if="isLoadingArtist" />
 
-            <div v-else class="relative flex flex-col grow">
-                <LayoutPageHeader type="Artist" :cover="cover" :title="name">
+            <Error v-else-if="hasArtistError" @action="refetchArtist()" />
+
+            <div v-else-if="artist" class="relative flex flex-col grow">
+                <LayoutPageHeader
+                    type="Artist"
+                    :cover="cover"
+                    :title="artist.name"
+                >
                     <template #subtitles>
                         <p class="text-sm opacity-60">
                             {{
-                                `${albumCount} album${
-                                    albumCount === 1 ? '' : 's'
+                                `${artist.albumCount} album${
+                                    artist.albumCount === 1 ? '' : 's'
                                 }`
                             }}
                         </p>
@@ -76,14 +71,15 @@ onMounted(loadData);
                     <MenuButton :menu-options="menuOptions" />
                 </div>
 
+                <Loader v-if="isLoadingAlbums" />
+
+                <Error v-else-if="hasAlbumsError" @action="refetchAlbums()" />
+
                 <ScrollContainer
+                    v-else-if="albums"
                     class="bg-zinc-700"
                     scrollable-class="p-4"
-                    @reached-bottom="
-                        !state.isLoadingAlbums &&
-                            !hasLoadedAllAlbums &&
-                            getArtistAlbums()
-                    "
+                    @reached-bottom="hasNextPage && fetchNextPage()"
                 >
                     <AlbumGrid :items="albums" />
                 </ScrollContainer>

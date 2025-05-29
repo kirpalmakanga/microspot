@@ -27,7 +27,8 @@ const {
     isLoading: isLoadingTracks,
     isError: hasTracksError,
     hasNextPage,
-    fetchNextPage
+    fetchNextPage,
+    refetch: refetchTracks
 } = useAlbumTracks(albumId as string);
 
 const tracks = computed(() => albumTracks.value?.pages.flat());
@@ -130,7 +131,7 @@ useAppTitle(computed(() => album.value?.name));
 
                 <Loader v-if="isLoadingTracks" />
 
-                <Error v-else-if="hasTracksError" @action="refetchAlbum()" />
+                <Error v-else-if="hasTracksError" @action="refetchTracks()" />
 
                 <TracklistVirtualized
                     v-else-if="tracks"
