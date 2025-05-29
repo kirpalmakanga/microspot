@@ -1,24 +1,30 @@
 <template>
-    <section class="relative grow">
-        <Loader />
+    <section class="flex items-center justify-center relative grow">
+        <div class="flex flex-col items-center">
+            <Loader />
+
+            <p>Logging in...</p>
+        </div>
     </section>
 </template>
 
 <script setup lang="ts">
-const route = useRoute();
+const {
+    query: { code }
+} = useRoute();
 const router = useRouter();
-const auth = useAuthStore();
+const { fetchAccessToken, fetchUserData } = useAuthStore();
 
 onMounted(async () => {
-    const {
-        query: { code }
-    } = route;
-
     if (typeof code === 'string') {
-        await auth.getAccessToken(code);
-        await auth.getUserData();
+        await fetchAccessToken(code);
+        await fetchUserData();
 
         router.replace('/');
     }
+});
+
+definePageMeta({
+    layout: 'empty'
 });
 </script>
