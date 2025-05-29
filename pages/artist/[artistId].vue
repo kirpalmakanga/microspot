@@ -26,7 +26,20 @@ const {
 } = useArtistAlbums(artistId as string);
 
 const albums = computed(() =>
-    artistAlbums.value?.pages.flatMap(({ albums }) => albums)
+    (artistAlbums.value?.pages || []).reduce(
+        (result, { albums, albumCount }) => {
+            if (albums.length) {
+                result.items.push(...albums);
+            }
+
+            if (!result.albumCount) {
+                result.albumCount = albumCount;
+            }
+
+            return result;
+        },
+        { items: [], albumCount: 0 } as { items: Album[]; albumCount: number }
+    )
 );
 
 const copy = useCopy();
@@ -59,8 +72,8 @@ useAppTitle(computed(() => artist.value?.name));
                     <template #subtitles>
                         <p class="text-sm opacity-60">
                             {{
-                                `${artist.albumCount} album${
-                                    artist.albumCount === 1 ? '' : 's'
+                                `${albums.albumCount || 0} album${
+                                    albums.albumCount === 1 ? '' : 's'
                                 }`
                             }}
                         </p>
@@ -76,13 +89,20 @@ useAppTitle(computed(() => artist.value?.name));
                 <Error v-else-if="hasAlbumsError" @action="refetchAlbums()" />
 
                 <ScrollContainer
-                    v-else-if="albums"
+                    v-else-if="albums.items.length"
                     class="bg-zinc-700"
                     scrollable-class="p-4"
                     @reached-bottom="hasNextPage && fetchNextPage()"
                 >
-                    <AlbumGrid :items="albums" />
+                    <AlbumGrid :items="albums.items" />
                 </ScrollContainer>
+
+                <Placeholder
+                    v-else
+                    class="bg-zinc-700"
+                    icon="i-mi-list"
+                    text="This artist hasn't released anything yet."
+                />
             </div>
         </Transition>
     </section>

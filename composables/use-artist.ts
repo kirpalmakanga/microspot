@@ -15,7 +15,10 @@ export function useArtistAlbums(artistId: MaybeRef<string>) {
             getArtistAlbums(toValue(artistId), offset),
         initialPageParam: 0,
         getNextPageParam: ({ albumCount }, pages) => {
-            const currentItemCount = pages.flat().length;
+            const currentItemCount = pages.reduce(
+                (count, { albums }) => count + albums.length,
+                0
+            );
 
             return currentItemCount < albumCount ? currentItemCount : null;
         }

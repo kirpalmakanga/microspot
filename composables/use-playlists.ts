@@ -23,7 +23,10 @@ export function useUserPlaylists(userId: MaybeRef<string>) {
             getUserPlaylists(toValue(userId), offset),
         initialPageParam: 0,
         getNextPageParam: ({ totalItemCount }, pages) => {
-            const currentItemCount = pages.flatMap(({ items }) => items).length;
+            const currentItemCount = pages.reduce(
+                (count, { items }) => count + items.length,
+                0
+            );
 
             return currentItemCount < totalItemCount ? currentItemCount : null;
         }
