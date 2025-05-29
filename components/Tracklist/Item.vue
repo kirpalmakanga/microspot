@@ -16,7 +16,7 @@ const props = withDefaults(
         isPlaying: boolean;
         isPlayable: boolean;
         isSaved: boolean;
-        isPlaylistItem: boolean;
+        listType: TracklistType;
     }>(),
     {
         isPlayable: true
@@ -62,7 +62,7 @@ const menuOptions = computed<ContextMenuItem[]>(() => [
         label: 'Share',
         onSelect: () => copy(`${window.location.origin}/track/${props.id}`)
     },
-    ...(props.isPlaylistItem
+    ...(props.listType === 'playlist'
         ? [
               {
                   icon: 'i-mi-delete',
@@ -95,7 +95,7 @@ const menuOptions = computed<ContextMenuItem[]>(() => [
                 />
 
                 <span v-else class="group-hover:hidden size-6">
-                    {{ isPlaylistItem ? index : trackNumber }}
+                    {{ listType === 'album' ? trackNumber : index }}
                 </span>
 
                 <UIcon

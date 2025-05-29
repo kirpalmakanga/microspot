@@ -2,8 +2,13 @@
 const route = useRoute();
 const searchStore = useSearchStore();
 const { artists, albums, tracks, playlists } = storeToRefs(searchStore);
-const { searchArtists, searchAlbums, searchTracks, searchPlaylists } =
-    searchStore;
+const {
+    searchArtists,
+    searchAlbums,
+    searchTracks,
+    searchPlaylists,
+    toggleSaveTrack
+} = searchStore;
 
 const query = computed(() => (route.params.query as string) || '');
 const tab = computed(() => (route.params.tab as string) || '');
@@ -29,8 +34,9 @@ const selectedPLaylists = computed(() => playlists.value.slice(0, 6));
 
                 <Tracklist
                     :context-uri="''"
-                    type="album"
+                    type="search"
                     :items="selectedTracks"
+                    @toggle-save-track="toggleSaveTrack"
                 />
             </div>
 
@@ -71,8 +77,9 @@ const selectedPLaylists = computed(() => playlists.value.slice(0, 6));
     <TracklistVirtualized
         v-else-if="tab === 'tracks'"
         :context-uri="''"
-        type="album"
+        type="search"
         :items="tracks"
+        @toggle-save-track="toggleSaveTrack"
         @reached-bottom="searchTracks(query)"
     />
 

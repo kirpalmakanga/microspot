@@ -3,7 +3,7 @@ import { UseVirtualList } from '@vueuse/components';
 
 const props = withDefaults(
     defineProps<{
-        type: 'playlist' | 'album';
+        type: TracklistType;
         contextUri: string;
         items: TracklistItem[];
         scrollOffsetPercent?: number;
@@ -51,7 +51,7 @@ const virtualListOptions = {
             <template #default="{ data: { uri: trackUri, ...data }, index }">
                 <TracklistItem
                     v-bind="data"
-                    :is-playlist-item="props.type === 'playlist'"
+                    :list-type="props.type"
                     :index="index + 1"
                     :is-current="isCurrentContext(contextUri, trackUri)"
                     :is-playing="

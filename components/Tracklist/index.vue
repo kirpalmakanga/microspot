@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const props = defineProps<{
-    type: 'playlist' | 'album';
+    type: TracklistType;
     contextUri: string;
     items: TracklistItem[];
 }>();
@@ -20,7 +20,7 @@ const { isPlaying } = storeToRefs(playerStore);
         <li v-for="({ uri: trackUri, ...data }, index) in items" :key="data.id">
             <TracklistItem
                 v-bind="data"
-                :is-playlist-item="props.type === 'playlist'"
+                :list-type="props.type"
                 :index="index + 1"
                 :is-current="isCurrentContext(contextUri, trackUri)"
                 :is-playing="
