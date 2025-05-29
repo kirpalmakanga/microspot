@@ -5,23 +5,14 @@ const props = defineProps<{
     items: TracklistItem[];
 }>();
 
+const emit = defineEmits<{
+    toggleSaveTrack: [trackId: string];
+    deleteTrack: [trackId: string];
+}>();
+
 const playerStore = usePlayerStore();
 const { isCurrentContext, togglePlay } = playerStore;
 const { isPlaying } = storeToRefs(playerStore);
-
-const { toggleSavePlaylistTrack, removePlaylistTrack } = usePlaylistStore();
-// const { toggleSaveAlbumTrack } = useAlbumStore();
-
-function toggleSaveTrack(trackId: string) {
-    switch (props.type) {
-        case 'playlist':
-            toggleSavePlaylistTrack(trackId);
-            break;
-        case 'album':
-            // toggleSaveAlbumTrack(trackId);
-            break;
-    }
-}
 </script>
 
 <template>
@@ -35,8 +26,8 @@ function toggleSaveTrack(trackId: string) {
                 :is-playing="
                     isCurrentContext(contextUri, trackUri) && isPlaying
                 "
-                @save="toggleSaveTrack(data.id)"
-                @delete="removePlaylistTrack(data.id)"
+                @save="emit('toggleSaveTrack', data.id)"
+                @delete="emit('deleteTrack', data.id)"
                 @toggle-play="togglePlay({ contextUri, trackUri })"
             />
         </li>
