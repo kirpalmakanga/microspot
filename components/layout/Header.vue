@@ -35,10 +35,10 @@ const menuOptions: DropdownMenuItem[] = [
         label: 'Log out',
         class: 'cursor-pointer',
         color: 'error',
-        onSelect: () => {
-            logOut();
+        async onSelect() {
+            await router.push('/login');
 
-            router.push('/login');
+            logOut();
         }
     }
 ];
