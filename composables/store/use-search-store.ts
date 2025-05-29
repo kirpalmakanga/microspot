@@ -3,7 +3,8 @@ import {
     searchAll,
     searchArtists,
     searchPlaylists,
-    searchTracks
+    searchTracks,
+    toggleSaveTrack
 } from '~/services/spotify-api';
 
 interface State {
@@ -50,6 +51,11 @@ export const useSearchStore = defineStore('search', () => {
             const { playlists } = state;
 
             playlists.push(...(await searchPlaylists(query, playlists.length)));
+        },
+        async toggleSaveTrack(trackId: string) {
+            const isSaved = await toggleSaveTrack(trackId);
+
+            state.tracks = update(state.tracks, { id: trackId }, { isSaved });
         }
     };
 });
