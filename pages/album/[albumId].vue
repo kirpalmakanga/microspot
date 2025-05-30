@@ -63,7 +63,7 @@ useAppTitle(computed(() => album.value?.name));
         <template v-if="isLoadingAlbum || (isAlbumError && isFetchingAlbum)">
             <LayoutPageHeaderLoader />
 
-            <LayoutPageActionsLoader />
+            <LayoutPageActionsLoader has-play-button />
 
             <TracklistItemLoader />
         </template>
@@ -119,19 +119,12 @@ useAppTitle(computed(() => album.value?.name));
                     @click="togglePlay({ contextUri: album.uri })"
                 />
 
-                <button
-                    class="transition-transform transform hover:scale-110 hover:active:scale-90 cursor-pointer"
+                <IconButton
+                    :icon="
+                        album.isSaved ? 'i-mi-circle-check' : 'i-mi-circle-add'
+                    "
                     @click="toggleSaveAlbum()"
-                >
-                    <UIcon
-                        class="size-8"
-                        :name="
-                            album.isSaved
-                                ? 'i-mi-circle-check'
-                                : 'i-mi-circle-add'
-                        "
-                    />
-                </button>
+                />
 
                 <MenuButton :menu-options="menuOptions" />
             </div>
