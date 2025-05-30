@@ -45,9 +45,9 @@ definePageMeta({
                 </div>
             </ScrollContainer>
 
-            <Transition v-if="hasNextPage" name="fade" mode="out-in">
+            <!-- <Transition v-if="hasNextPage" name="fade" mode="out-in">
                 <Loader v-if="isFetching && !isLoading" />
-            </Transition>
+            </Transition> -->
         </div>
     </section>
 </template>
