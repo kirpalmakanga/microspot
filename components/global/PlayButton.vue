@@ -1,6 +1,6 @@
 <template>
     <button
-        class="flex items-center justify-center h-16 w-16 bg-indigo-500 hover:scale-110 hover:active:scale-90 transform transition rounded-full cursor-pointer disabled:pointer-events-none disabled:opacity-50"
+        class="flex items-center justify-center size-16 bg-indigo-500 hover:scale-110 hover:active:scale-90 transform transition rounded-full cursor-pointer disabled:pointer-events-none disabled:opacity-50"
     >
         <UIcon class="size-8" :name="isPlaying ? 'i-mi-pause' : 'i-mi-play'" />
     </button>
