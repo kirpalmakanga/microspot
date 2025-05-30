@@ -9,7 +9,8 @@ const {
 const {
     data: album,
     isLoading: isLoadingAlbum,
-    isError: hasAlbumError,
+    isError: isAlbumError,
+    isFetching: isFetchingAlbum,
     refetch: refetchAlbum
 } = useAlbum(albumId as string);
 
@@ -25,7 +26,7 @@ const formattedReleaseDate = useDateFormat(
 const {
     data: albumTracks,
     isLoading: isLoadingTracks,
-    isError: hasTracksError,
+    isError: isTracksError,
     hasNextPage,
     fetchNextPage,
     refetch: refetchTracks
@@ -59,91 +60,98 @@ useAppTitle(computed(() => album.value?.name));
 
 <template>
     <section class="flex flex-col grow">
-        <Transition name="fade" mode="out-in">
-            <Loader v-if="isLoadingAlbum" />
+        <template v-if="isLoadingAlbum || (isAlbumError && isFetchingAlbum)">
+            <LayoutPageHeaderLoader />
 
-            <Error v-else-if="hasAlbumError" @action="refetchAlbum()" />
+            <LayoutPageActionsLoader />
 
-            <div v-else-if="album" class="relative flex flex-col grow">
-                <LayoutPageHeader
-                    :type="album.albumType"
-                    :cover="cover"
-                    :title="album.name"
-                >
-                    <template #subtitles>
-                        <p class="flex gap-1">
-                            <template
-                                v-for="({ id, name }, index) of album.artists"
-                                :key="id"
-                            >
-                                <span v-if="index > 0">,</span>
+            <TracklistItemLoader />
+        </template>
 
-                                <span v-if="id === '0LyfQWJT6nXafLPZqxe9Of'">
-                                    {{ name }}
-                                </span>
+        <Error v-else-if="isAlbumError" @action="refetchAlbum()" />
 
-                                <NuxtLink
-                                    v-else
-                                    class="opacity-80 hover:opacity-100 transition-opacity hover:underline"
-                                    :to="`/artist/${id}`"
-                                >
-                                    {{ name }}
-                                </NuxtLink>
-                            </template>
-                        </p>
+        <div v-else-if="album" class="relative flex flex-col grow">
+            <LayoutPageHeader
+                :type="album.albumType"
+                :cover="cover"
+                :title="album.name"
+            >
+                <template #subtitles>
+                    <p class="flex gap-1">
+                        <template
+                            v-for="({ id, name }, index) of album.artists"
+                            :key="id"
+                        >
+                            <span v-if="index > 0">,</span>
 
-                        <p class="opacity-60">
-                            <span>
-                                {{
-                                    `${album.itemCount} track${
-                                        album.itemCount === 1 ? '' : 's'
-                                    }`
-                                }}
+                            <span v-if="id === '0LyfQWJT6nXafLPZqxe9Of'">
+                                {{ name }}
                             </span>
-                            |
-                            <span>{{ formattedReleaseDate }}</span>
-                        </p>
-                    </template>
-                </LayoutPageHeader>
 
-                <div class="flex items-center gap-4 p-4">
-                    <PlayButton
-                        :disabled="!album.isPlayable"
-                        :is-playing="isCurrentContext(album.uri) && isPlaying"
-                        @click="togglePlay({ contextUri: album.uri })"
-                    />
+                            <NuxtLink
+                                v-else
+                                class="opacity-80 hover:opacity-100 transition-opacity hover:underline"
+                                :to="`/artist/${id}`"
+                            >
+                                {{ name }}
+                            </NuxtLink>
+                        </template>
+                    </p>
 
-                    <button
-                        class="transition-transform transform hover:scale-110 hover:active:scale-90 cursor-pointer"
-                        @click="toggleSaveAlbum()"
-                    >
-                        <UIcon
-                            class="size-8"
-                            :name="
-                                album.isSaved
-                                    ? 'i-mi-circle-check'
-                                    : 'i-mi-circle-add'
-                            "
-                        />
-                    </button>
+                    <p class="opacity-60">
+                        <span>
+                            {{
+                                `${album.itemCount} track${
+                                    album.itemCount === 1 ? '' : 's'
+                                }`
+                            }}
+                        </span>
+                        |
+                        <span>{{ formattedReleaseDate }}</span>
+                    </p>
+                </template>
+            </LayoutPageHeader>
 
-                    <MenuButton :menu-options="menuOptions" />
-                </div>
-
-                <Loader v-if="isLoadingTracks" />
-
-                <Error v-else-if="hasTracksError" @action="refetchTracks()" />
-
-                <TracklistVirtualized
-                    v-else-if="tracks"
-                    class="bg-zinc-700"
-                    type="album"
-                    :context-uri="album.uri"
-                    :items="tracks"
-                    @toggle-save-track="toggleSaveAlbumTrack"
-                    @reached-bottom="hasNextPage && fetchNextPage()"
+            <div class="flex items-center gap-4 p-4">
+                <PlayButton
+                    :disabled="!album.isPlayable"
+                    :is-playing="isCurrentContext(album.uri) && isPlaying"
+                    @click="togglePlay({ contextUri: album.uri })"
                 />
+
+                <button
+                    class="transition-transform transform hover:scale-110 hover:active:scale-90 cursor-pointer"
+                    @click="toggleSaveAlbum()"
+                >
+                    <UIcon
+                        class="size-8"
+                        :name="
+                            album.isSaved
+                                ? 'i-mi-circle-check'
+                                : 'i-mi-circle-add'
+                        "
+                    />
+                </button>
+
+                <MenuButton :menu-options="menuOptions" />
             </div>
-        </Transition>
+
+            <Loader v-if="isLoadingTracks" />
+
+            <TracklistItemLoader
+                v-else-if="isTracksError"
+                @action="refetchTracks()"
+            />
+
+            <TracklistVirtualized
+                v-else-if="tracks"
+                class="bg-zinc-700"
+                type="album"
+                :context-uri="album.uri"
+                :items="tracks"
+                @toggle-save-track="toggleSaveAlbumTrack"
+                @reached-bottom="hasNextPage && fetchNextPage()"
+            />
+        </div>
     </section>
 </template>
