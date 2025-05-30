@@ -120,6 +120,7 @@ useAppTitle(computed(() => album.value?.name));
                 />
 
                 <IconButton
+                    class="size-8"
                     :icon="
                         album.isSaved ? 'i-mi-circle-check' : 'i-mi-circle-add'
                     "

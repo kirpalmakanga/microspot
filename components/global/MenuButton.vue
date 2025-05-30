@@ -11,10 +11,6 @@ const menuConfig = {
 
 <template>
     <UDropdownMenu :items="menuOptions" :content="menuConfig">
-        <button
-            class="size-8 hover:scale-110 hover:active:scale-90 transition-transform transform cursor-pointer"
-        >
-            <UIcon class="size-full" name="i-mi-options-horizontal" />
-        </button>
+        <IconButton class="size-8" icon="i-mi-options-horizontal" />
     </UDropdownMenu>
 </template>
