@@ -5,7 +5,6 @@ const emit = defineEmits<{ saved: [e: void] }>();
 
 const authStore = useAuthStore();
 
-/** TODO, handle next pages and error */
 const {
     data,
     isLoading,
