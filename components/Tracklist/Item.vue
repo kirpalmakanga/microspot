@@ -106,7 +106,7 @@ const menuOptions = computed<ContextMenuItem[]>(() => [
 
             <Img
                 v-if="images"
-                class="bg-zinc-700 size-12 flex-shrink-0"
+                class="bg-zinc-700 size-12 flex-shrink-0 rounded"
                 :src="images.small"
             />
 
