@@ -1,26 +1,3 @@
-<template>
-    <span class="relative flex items-center justify-center overflow-hidden">
-        <Transition name="fade" mode="out-in">
-            <UIcon
-                v-if="!src || isLoading || hasError"
-                class="size-1/2"
-                :class="{ 'animate-pulse': isLoading }"
-                name="i-mi-image"
-            />
-
-            <img
-                v-else-if="!isLoading"
-                class="block transition-opacity object-cover object-center w-full h-full"
-                :class="{
-                    [imgClass || '']: !!imgClass
-                }"
-                :src="src"
-                :alt="altText"
-            />
-        </Transition>
-    </span>
-</template>
-
 <script setup lang="ts">
 const props = defineProps<{
     src?: string;
@@ -56,3 +33,26 @@ watch(
     { immediate: true }
 );
 </script>
+
+<template>
+    <span class="relative flex items-center justify-center overflow-hidden">
+        <Transition name="fade" mode="out-in">
+            <UIcon
+                v-if="!src || isLoading || hasError"
+                class="size-1/2"
+                :class="{ 'animate-pulse': isLoading }"
+                name="i-mi-image"
+            />
+
+            <img
+                v-else-if="!isLoading"
+                class="block transition-opacity object-cover object-center w-full h-full"
+                :class="{
+                    [imgClass || '']: !!imgClass
+                }"
+                :src="src"
+                :alt="altText"
+            />
+        </Transition>
+    </span>
+</template>
