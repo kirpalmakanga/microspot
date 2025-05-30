@@ -8,7 +8,8 @@ const {
 const {
     data: artist,
     isLoading: isLoadingArtist,
-    isError: hasArtistError,
+    isError: isArtistError,
+    isFetching: isFetchingArtist,
     refetch: refetchArtist
 } = useArtist(artistId as string);
 
@@ -58,52 +59,55 @@ useAppTitle(computed(() => artist.value?.name));
 
 <template>
     <section class="flex flex-col grow">
-        <Transition name="fade" mode="out-in">
-            <Loader v-if="isLoadingArtist" />
+        <template v-if="isLoadingArtist || (isArtistError && isFetchingArtist)">
+            <LayoutPageHeaderLoader />
 
-            <Error v-else-if="hasArtistError" @action="refetchArtist()" />
+            <LayoutPageActionsLoader />
 
-            <div v-else-if="artist" class="relative flex flex-col grow">
-                <LayoutPageHeader
-                    type="Artist"
-                    :cover="cover"
-                    :title="artist.name"
-                >
-                    <template #subtitles>
-                        <p class="text-sm opacity-60">
-                            {{
-                                `${albums.albumCount || 0} album${
-                                    albums.albumCount === 1 ? '' : 's'
-                                }`
-                            }}
-                        </p>
-                    </template>
-                </LayoutPageHeader>
+            <PlaylistGridLoader class="bg-zinc-700 grow" />
+        </template>
 
-                <div class="flex items-center gap-4 p-4">
-                    <MenuButton :menu-options="menuOptions" />
-                </div>
+        <Error v-else-if="isArtistError" @action="refetchArtist()" />
 
-                <Loader v-if="isLoadingAlbums" />
+        <div v-else-if="artist" class="relative flex flex-col grow">
+            <LayoutPageHeader type="Artist" :cover="cover" :title="artist.name">
+                <template #subtitles>
+                    <p class="text-sm opacity-60">
+                        {{
+                            `${albums.albumCount || 0} album${
+                                albums.albumCount === 1 ? '' : 's'
+                            }`
+                        }}
+                    </p>
+                </template>
+            </LayoutPageHeader>
 
-                <Error v-else-if="hasAlbumsError" @action="refetchAlbums()" />
-
-                <ScrollContainer
-                    v-else-if="albums.items.length"
-                    class="bg-zinc-700"
-                    scrollable-class="p-4"
-                    @reached-bottom="hasNextPage && fetchNextPage()"
-                >
-                    <AlbumGrid :items="albums.items" />
-                </ScrollContainer>
-
-                <Placeholder
-                    v-else
-                    class="bg-zinc-700"
-                    icon="i-mi-list"
-                    text="This artist hasn't released anything yet."
-                />
+            <div class="flex items-center gap-4 p-4">
+                <MenuButton :menu-options="menuOptions" />
             </div>
-        </Transition>
+
+            <PlaylistGridLoader
+                class="bg-zinc-700 grow"
+                v-if="isLoadingAlbums"
+            />
+
+            <Error v-else-if="hasAlbumsError" @action="refetchAlbums()" />
+
+            <ScrollContainer
+                v-else-if="albums.items.length"
+                class="bg-zinc-700"
+                scrollable-class="p-4"
+                @reached-bottom="hasNextPage && fetchNextPage()"
+            >
+                <AlbumGrid :items="albums.items" />
+            </ScrollContainer>
+
+            <Placeholder
+                v-else
+                class="bg-zinc-700"
+                icon="i-mi-list"
+                text="This artist hasn't released anything yet."
+            />
+        </div>
     </section>
 </template>
