@@ -32,61 +32,62 @@ useHead({
 
 <template>
     <section class="flex flex-col grow">
-        <Transition name="fade" mode="out-in">
-            <Loader v-if="isLoadingUser" />
+        <template v-if="isLoadingUser">
+            <LayoutPageHeaderLoader />
 
-            <Error v-else-if="hasUserError" @action="refetch()" />
+            <USkeleton class="h-6 mx-4 mt-4 w-1/2 bg-zinc-500" />
 
-            <div v-else-if="user" class="flex flex-col grow">
-                <LayoutPageHeader
-                    type="User"
-                    :cover="user.profilePicture"
-                    :title="user.name"
-                >
-                    <template v-if="playlists" #subtitles>
-                        <p class="text-sm opacity-60">
-                            {{
-                                `${playlists.length} playlist${
-                                    playlists.length === 1 ? '' : 's'
-                                }`
-                            }}
-                        </p>
-                    </template>
-                </LayoutPageHeader>
+            <PlaylistGridLoader />
+        </template>
 
-                <Loader v-if="isLoadingPlaylists" />
+        <Error v-else-if="hasUserError" @action="refetch()" />
 
-                <Error
-                    v-else-if="hasPlaylistsError"
-                    @action="refetchPlaylists()"
-                />
+        <div v-else-if="user" class="flex flex-col grow">
+            <LayoutPageHeader
+                type="User"
+                :cover="user.profilePicture"
+                :title="user.name"
+            >
+                <template v-if="playlists" #subtitles>
+                    <p class="text-sm opacity-60">
+                        {{
+                            `${playlists.length} playlist${
+                                playlists.length === 1 ? '' : 's'
+                            }`
+                        }}
+                    </p>
+                </template>
+            </LayoutPageHeader>
 
-                <ScrollContainer
-                    v-else-if="playlists"
-                    class="bg-zinc-700"
-                    @reached-bottom="hasNextPage && fetchNextPage()"
-                >
-                    <div class="p-4">
-                        <h2 class="mb-4">Recent playlists</h2>
+            <PlaylistGridLoader v-if="isLoadingPlaylists" />
 
-                        <PlaylistGrid
-                            v-if="playlists.length"
-                            :items="playlists"
-                            :is-user-name-visible="false"
-                        />
+            <Error v-else-if="hasPlaylistsError" @action="refetchPlaylists()" />
 
-                        <Placeholder
-                            v-else
-                            icon="i-mi-list"
-                            text="This user hasn't created playlists yet."
-                        />
-                    </div>
-                </ScrollContainer>
+            <ScrollContainer
+                v-else-if="playlists"
+                class="bg-zinc-700"
+                @reached-bottom="hasNextPage && fetchNextPage()"
+            >
+                <div class="p-4">
+                    <h2 class="mb-4">Playlists</h2>
 
-                <Transition v-if="hasNextPage" name="fade" mode="out-in">
-                    <Loader v-if="isFetchingPlaylists" />
-                </Transition>
-            </div>
-        </Transition>
+                    <PlaylistGrid
+                        v-if="playlists.length"
+                        :items="playlists"
+                        :is-user-name-visible="false"
+                    />
+
+                    <Placeholder
+                        v-else
+                        icon="i-mi-list"
+                        text="This user hasn't created playlists yet."
+                    />
+                </div>
+            </ScrollContainer>
+
+            <Transition v-if="hasNextPage" name="fade" mode="out-in">
+                <Loader v-if="isFetchingPlaylists" />
+            </Transition>
+        </div>
     </section>
 </template>

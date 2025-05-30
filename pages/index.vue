@@ -24,9 +24,9 @@ definePageMeta({
 <template>
     <section class="flex flex-col grow">
         <div class="relative flex flex-col grow">
-            <h2 class="p-4">Recent playlists</h2>
+            <h2 class="p-4">Playlists</h2>
 
-            <Loader v-if="isLoading" />
+            <PlaylistGridLoader class="py-0" v-if="isLoading" />
 
             <Error v-else-if="isError" @action="refetch()" />
 
