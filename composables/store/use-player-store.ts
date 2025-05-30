@@ -73,8 +73,7 @@ export const usePlayerStore = defineStore(
     },
     {
         persist: {
-            key: 'player',
-            storage: persistedState.localStorage
+            storage: piniaPluginPersistedstate.localStorage()
         }
     }
 );
