@@ -60,7 +60,7 @@ useAppTitle(computed(() => playlist.value?.name));
         <template v-if="isLoading || (isError && isFetching)">
             <LayoutPageHeaderLoader />
 
-            <LayoutPageActionsLoader />
+            <LayoutPageActionsLoader has-play-button />
 
             <TracklistItemLoader />
         </template>
