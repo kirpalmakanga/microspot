@@ -8,6 +8,8 @@ const {
 const {
     data: playlist,
     isLoading,
+    isFetching,
+    isError,
     refetch
 } = usePlaylist(playlistId as string);
 
@@ -15,7 +17,7 @@ const {
     data: playlistTracks,
     isLoading: isLoadingTracks,
     isFetching: isFetchingTracks,
-    isError,
+    isError: isTracksError,
     hasNextPage,
     fetchNextPage
 } = usePlaylistTracks(playlistId as string);
@@ -55,84 +57,84 @@ useAppTitle(computed(() => playlist.value?.name));
 
 <template>
     <section class="flex flex-col grow">
-        <Transition name="fade" mode="out-in">
-            <Loader v-if="isLoading" />
+        <template v-if="isLoading || (isError && isFetching)">
+            <LayoutPageHeaderLoader />
 
-            <Error v-else-if="isError" @action="refetch()" />
+            <LayoutPageActionsLoader />
 
-            <div v-else-if="playlist" class="relative flex flex-col grow">
-                <LayoutPageHeader
-                    type="Playlist"
-                    :cover="cover"
-                    :title="playlist.name"
-                >
-                    <template #cover-overlay>
-                        <button
-                            class="absolute inset-0 flex items-center justify-center bg-zinc-900/50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity cursor-pointer"
-                            @click="isEditFormOpen = true"
-                        >
-                            <UIcon class="size-12" name="i-mi-edit" />
-                        </button>
-                    </template>
+            <TracklistItemLoader />
+        </template>
 
-                    <template #subtitles>
-                        <p v-if="playlist.description" class="opacity-80">
-                            <Ellipsis has-tooltip>
-                                <span v-html="playlist.description"></span>
-                            </Ellipsis>
-                        </p>
+        <Error v-else-if="isError" @action="refetch()" />
 
-                        <p class="text-sm opacity-60">
-                            {{
-                                `${playlist.totalItemCount} track${
-                                    playlist.totalItemCount === 1 ? '' : 's'
-                                }`
-                            }}
-                        </p>
-                    </template>
-                </LayoutPageHeader>
+        <div v-else-if="playlist" class="relative flex flex-col grow">
+            <LayoutPageHeader
+                type="Playlist"
+                :cover="cover"
+                :title="playlist.name"
+            >
+                <template #cover-overlay>
+                    <button
+                        class="absolute inset-0 flex items-center justify-center bg-zinc-900/50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity cursor-pointer"
+                        @click="isEditFormOpen = true"
+                    >
+                        <UIcon class="size-12" name="i-mi-edit" />
+                    </button>
+                </template>
 
-                <div class="flex items-center gap-4 p-4">
-                    <PlayButton
-                        :is-playing="
-                            isCurrentContext(playlist.uri) && isPlaying
-                        "
-                        @click="togglePlay({ contextUri: playlist.uri })"
-                    />
+                <template #subtitles>
+                    <p v-if="playlist.description" class="opacity-80">
+                        <Ellipsis has-tooltip>
+                            <span v-html="playlist.description"></span>
+                        </Ellipsis>
+                    </p>
 
-                    <MenuButton :menu-options="menuOptions" />
-                </div>
+                    <p class="text-sm opacity-60">
+                        {{
+                            `${playlist.totalItemCount} track${
+                                playlist.totalItemCount === 1 ? '' : 's'
+                            }`
+                        }}
+                    </p>
+                </template>
+            </LayoutPageHeader>
 
-                <Loader v-if="isLoadingTracks" />
-
-                <TracklistVirtualized
-                    v-if="tracks"
-                    class="bg-zinc-700"
-                    type="playlist"
-                    :context-uri="playlist.uri"
-                    :items="tracks"
-                    @toggle-save-track="toggleSavePlaylistTrack"
-                    @delete-track="removePlaylistTrack"
-                    @reached-bottom="hasNextPage && fetchNextPage()"
+            <div class="flex items-center gap-4 p-4">
+                <PlayButton
+                    :is-playing="isCurrentContext(playlist.uri) && isPlaying"
+                    @click="togglePlay({ contextUri: playlist.uri })"
                 />
 
-                <!-- <Transition v-if="hasNextPage" name="fade" mode="out-in">
-                    <Loader v-if="isFetchingTracks" />
-                </Transition> -->
-
-                <UModal v-model:open="isEditFormOpen" title="Edit details">
-                    <template #body>
-                        <PlaylistEditForm
-                            v-model:is-open="isEditFormOpen"
-                            :playlist-id="playlist.id"
-                            :cover="cover"
-                            :name="playlist.name"
-                            :description="playlist.description"
-                            @saved="isEditFormOpen = false"
-                        />
-                    </template>
-                </UModal>
+                <MenuButton :menu-options="menuOptions" />
             </div>
-        </Transition>
+
+            <TracklistItemLoader v-if="isLoadingTracks" />
+
+            <TracklistVirtualized
+                v-if="tracks"
+                class="bg-zinc-700"
+                type="playlist"
+                :context-uri="playlist.uri"
+                :items="tracks"
+                @toggle-save-track="toggleSavePlaylistTrack"
+                @delete-track="removePlaylistTrack"
+                @reached-bottom="hasNextPage && fetchNextPage()"
+            />
+
+            <!-- <TracklistItemLoader v-if="hasNextPage && isFetchingTracks" /> -->
+
+            <UModal v-model:open="isEditFormOpen" title="Edit details">
+                <template #body>
+                    <PlaylistEditForm
+                        v-model:is-open="isEditFormOpen"
+                        :playlist-id="playlist.id"
+                        :cover="cover"
+                        :name="playlist.name"
+                        :description="playlist.description"
+                        @saved="isEditFormOpen = false"
+                    />
+                </template>
+            </UModal>
+        </div>
     </section>
 </template>
