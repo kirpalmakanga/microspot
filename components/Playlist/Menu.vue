@@ -36,9 +36,7 @@ function handleSelectPlaylist(playlistId?: string) {
 </script>
 
 <template>
-    <Loader v-if="isLoading" />
-
-    <div class="flex flex-col gap-2 grow sm:h-[50dvh]" v-else>
+    <div class="flex flex-col gap-2 grow h-[50dvh]">
         <UInput
             variant="soft"
             size="xl"
@@ -66,7 +64,15 @@ function handleSelectPlaylist(playlistId?: string) {
             New playlist
         </button>
 
-        <ScrollContainer class="grow">
+        <PlaylistMenuLoader v-if="isLoading || (isError && isFetching)" />
+
+        <Error v-else-if="isError" @action="refetch()" />
+
+        <ScrollContainer
+            v-else
+            class="grow"
+            @reached-bottom="hasNextPage && fetchNextPage()"
+        >
             <ul>
                 <li v-for="{ id, name, images } of currentItems" :key="id">
                     <button
@@ -74,7 +80,7 @@ function handleSelectPlaylist(playlistId?: string) {
                         @click="handleSelectPlaylist(id)"
                     >
                         <Img
-                            class="flex-shrink-0 size-8"
+                            class="flex-shrink-0 size-8 rounded"
                             :src="images.small || images.medium || images.large"
                         />
 
