@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { DropdownMenuItem } from '@nuxt/ui';
+import type { DropdownMenuItem, DropdownMenuProps } from '@nuxt/ui';
 
 defineProps<{ menuOptions: DropdownMenuItem[] }>();
 
-const menuConfig = {
+const menuConfig: DropdownMenuProps['content'] = {
     align: 'start',
     side: 'bottom'
 };
