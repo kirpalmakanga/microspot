@@ -55,7 +55,9 @@ export const useSearchStore = defineStore('search', () => {
         async toggleSaveTrack(trackId: string) {
             const isSaved = await toggleSaveTrack(trackId);
 
-            state.tracks = update(state.tracks, { id: trackId }, { isSaved });
+            state.tracks = update(state.tracks, ({ id }) => id === trackId, {
+                isSaved
+            });
         }
     };
 });

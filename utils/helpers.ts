@@ -162,12 +162,10 @@ export function isEqual(a: unknown, b: unknown): boolean {
 
 export function update<T extends Record<K, unknown>, K extends keyof T>(
     arr: T[],
-    match: Partial<T>,
+    predicate: (item: T, index: number, array: T[]) => boolean,
     payload: Partial<T>
 ) {
-    const targetIndex = arr.findIndex((item) =>
-        Object.entries(match).every(([k, v]) => isEqual(item[k as K], v))
-    );
+    const targetIndex = arr.findIndex(predicate);
 
     if (targetIndex > -1) {
         return arr.with(targetIndex, { ...arr[targetIndex], ...payload });
