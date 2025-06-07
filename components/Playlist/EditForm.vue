@@ -9,7 +9,7 @@ const props = defineProps<{
 const emit = defineEmits<{ saved: [e: void] }>();
 
 function getInitialFormData() {
-    return pick(props, 'name', 'description');
+    return pick(props, 'name', 'description', 'cover');
 }
 
 const { mutate } = useUpdatePlaylist(props.playlistId);
