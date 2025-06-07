@@ -56,13 +56,7 @@ export function useUpdatePlaylist(playlistId: MaybeRef<string>) {
             await updatePlaylist(toValue(playlistId), playlistData);
 
             if (cover && cover.startsWith('data:image')) {
-                const encodedFile = cover.split(',').pop();
-
-                encodedFile &&
-                    (await updatePlaylistCover(
-                        toValue(playlistId),
-                        encodedFile
-                    ));
+                await updatePlaylistCover(toValue(playlistId), cover);
             }
         },
         onSuccess: () => {

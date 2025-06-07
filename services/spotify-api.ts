@@ -180,9 +180,12 @@ export async function updatePlaylist(
 
 export async function updatePlaylistCover(
     playlistId: string,
-    encodedFile: string
+    imageDataUrl: string
 ) {
-    await axios.put(`/playlists/${playlistId}/images`, encodedFile);
+    await axios.put(
+        `/playlists/${playlistId}/images`,
+        imageDataUrl.split(',').pop()
+    );
 }
 
 export async function getPlaylistTracks(

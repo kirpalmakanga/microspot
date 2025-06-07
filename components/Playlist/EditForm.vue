@@ -8,26 +8,26 @@ const props = defineProps<{
 
 const emit = defineEmits<{ saved: [e: void] }>();
 
-const { isPending, mutate } = useUpdatePlaylist(props.playlistId);
+function getInitialFormData() {
+    return pick(props, 'name', 'description');
+}
+
+const { mutate } = useUpdatePlaylist(props.playlistId);
 
 const formData = reactive<{
     name: string;
     description: string;
     cover?: string;
-}>({
-    name: props.name,
-    description: props.description,
-    cover: props.cover
-});
+}>(getInitialFormData());
 
 async function openFilePicker() {
-    const file = await pickFile('image/jpeg,image/png');
+    const file = await pickFile('image/jpeg');
 
     formData.cover = await getDataUrl(file);
 }
 
 async function handleSubmit() {
-    if (!isEqual(formData, pick(props, 'name', 'description', 'cover'))) {
+    if (!isEqual(formData, getInitialFormData())) {
         mutate(formData);
     }
 
