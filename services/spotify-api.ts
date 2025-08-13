@@ -3,6 +3,10 @@ import type { SpotifyDevice, SpotifyTrack } from '~/utils/parsers';
 
 const ITEMS_PER_REQUEST = 50;
 
+export const apiInstance = axios.create({
+    baseURL: 'https://api.spotify.com/v1'
+});
+
 export async function getCurrentUserData() {
     const {
         data: {
@@ -10,7 +14,7 @@ export async function getCurrentUserData() {
             display_name: name,
             images: [{ url: profilePicture = '' } = {}]
         }
-    } = await axios('/me');
+    } = await apiInstance.get('/me');
 
     return {
         id,
@@ -20,7 +24,7 @@ export async function getCurrentUserData() {
 }
 
 async function areTracksSaved(trackIds: string[]) {
-    const { data } = await axios.get('/me/tracks/contains', {
+    const { data } = await apiInstance.get('/me/tracks/contains', {
         params: { ids: trackIds.join(',') }
     });
 
@@ -37,7 +41,7 @@ async function areTracksSaved(trackIds: string[]) {
 export async function isTrackSaved(trackId: string): Promise<boolean> {
     const {
         data: [isSaved]
-    } = await axios.get('/me/tracks/contains', {
+    } = await apiInstance.get('/me/tracks/contains', {
         params: { ids: trackId }
     });
 
@@ -47,7 +51,7 @@ export async function isTrackSaved(trackId: string): Promise<boolean> {
 export async function isAlbumSaved(trackId: string): Promise<boolean> {
     const {
         data: [isSaved]
-    } = await axios.get('/me/albums/contains', {
+    } = await apiInstance.get('/me/albums/contains', {
         params: { ids: trackId }
     });
 
@@ -58,7 +62,7 @@ export async function isAlbumSaved(trackId: string): Promise<boolean> {
 export async function isPlaylistSaved(playlistId: string): Promise<boolean> {
     const {
         data: [isSaved]
-    } = await axios.get('/me/playlists/contains', {
+    } = await apiInstance.get('/me/playlists/contains', {
         params: { ids: playlistId }
     });
 
@@ -79,9 +83,9 @@ export async function toggleSaveTrack(trackId: string) {
     const isSaved = await isTrackSaved(trackId);
 
     if (isSaved) {
-        await axios.delete('/me/tracks', { params: { ids: trackId } });
+        await apiInstance.delete('/me/tracks', { params: { ids: trackId } });
     } else {
-        await axios.put('/me/tracks', { ids: [trackId] });
+        await apiInstance.put('/me/tracks', { ids: [trackId] });
     }
 
     return !isSaved;
@@ -89,7 +93,7 @@ export async function toggleSaveTrack(trackId: string) {
 
 export async function getTrack(trackId: string) {
     const [{ data: track }, isSaved] = await Promise.all([
-        axios.get(`/tracks/${trackId}`),
+        apiInstance.get(`/tracks/${trackId}`),
         isTrackSaved(trackId)
     ]);
 
@@ -103,9 +107,9 @@ export async function toggleSaveAlbum(albumId: string) {
     const isSaved = await isAlbumSaved(albumId);
 
     if (isSaved) {
-        await axios.delete('/me/albums', { params: { ids: albumId } });
+        await apiInstance.delete('/me/albums', { params: { ids: albumId } });
     } else {
-        await axios.put('/me/albums', { ids: [albumId] });
+        await apiInstance.put('/me/albums', { ids: [albumId] });
     }
 
     return !isSaved;
@@ -113,7 +117,7 @@ export async function toggleSaveAlbum(albumId: string) {
 
 export async function getAlbum(albumId: string) {
     const [{ data }, isSaved] = await Promise.all([
-        axios.get(`/albums/${albumId}`, {
+        apiInstance.get(`/albums/${albumId}`, {
             params: { market: 'FR' }
         }),
         isAlbumSaved(albumId)
@@ -125,7 +129,7 @@ export async function getAlbum(albumId: string) {
 export async function getAlbumTracks(albumId: string, offset: number = 0) {
     const {
         data: { items }
-    } = await axios.get(`/albums/${albumId}/tracks`, {
+    } = await apiInstance.get(`/albums/${albumId}/tracks`, {
         params: { market: 'FR', limit: ITEMS_PER_REQUEST, offset }
     });
 
@@ -139,7 +143,7 @@ export async function getAlbumTracks(albumId: string, offset: number = 0) {
 }
 
 export async function getArtist(artistId: string) {
-    const { data } = await axios(`/artists/${artistId}`);
+    const { data } = await apiInstance.get(`/artists/${artistId}`);
 
     return parseArtistData(data);
 }
@@ -147,7 +151,7 @@ export async function getArtist(artistId: string) {
 export async function getArtistAlbums(artistId: string, offset: number = 0) {
     const {
         data: { items, total }
-    } = await axios(`/artists/${artistId}/albums`, {
+    } = await apiInstance.get(`/artists/${artistId}/albums`, {
         params: { limit: ITEMS_PER_REQUEST, offset }
     });
 
@@ -158,7 +162,7 @@ export async function getArtistAlbums(artistId: string, offset: number = 0) {
 }
 
 export async function createPlaylist(userId: string, name: string) {
-    const { data } = await axios.post(`/users/${userId}/playlists`, {
+    const { data } = await apiInstance.post(`/users/${userId}/playlists`, {
         name
     });
 
@@ -166,7 +170,7 @@ export async function createPlaylist(userId: string, name: string) {
 }
 
 export async function getPlaylist(playlistId: string) {
-    const { data } = await axios.get(`/playlists/${playlistId}`);
+    const { data } = await apiInstance.get(`/playlists/${playlistId}`);
 
     return parsePlaylistData(data);
 }
@@ -175,14 +179,14 @@ export async function updatePlaylist(
     playlistId: string,
     data: { name: string; description: string }
 ) {
-    await axios.put(`/playlists/${playlistId}`, data);
+    await apiInstance.put(`/playlists/${playlistId}`, data);
 }
 
 export async function updatePlaylistCover(
     playlistId: string,
     imageDataUrl: string
 ) {
-    await axios.put(
+    await apiInstance.put(
         `/playlists/${playlistId}/images`,
         imageDataUrl.split(',').pop()
     );
@@ -194,7 +198,7 @@ export async function getPlaylistTracks(
 ) {
     const {
         data: { items }
-    } = await axios.get(`/playlists/${playlistId}/tracks`, {
+    } = await apiInstance.get(`/playlists/${playlistId}/tracks`, {
         params: { market: 'FR', limit: ITEMS_PER_REQUEST, offset }
     });
 
@@ -216,7 +220,7 @@ export async function getUser(userId: string) {
             display_name: name,
             images: [{ url: profilePicture = '' } = {}]
         }
-    } = await axios(`/users/${userId}`);
+    } = await apiInstance.get(`/users/${userId}`);
 
     return {
         id,
@@ -228,12 +232,15 @@ export async function getUser(userId: string) {
 export async function getUserPlaylists(userId?: string, offset: number = 0) {
     const {
         data: { items, total }
-    } = await axios.get(`/${userId ? `users/${userId}` : 'me'}/playlists`, {
-        params: {
-            offset,
-            limit: ITEMS_PER_REQUEST
+    } = await apiInstance.get(
+        `/${userId ? `users/${userId}` : 'me'}/playlists`,
+        {
+            params: {
+                offset,
+                limit: ITEMS_PER_REQUEST
+            }
         }
-    });
+    );
 
     return {
         items: items.map((data: SpotifyPlaylist) => ({
@@ -247,13 +254,13 @@ export async function getUserPlaylists(userId?: string, offset: number = 0) {
 }
 
 export async function addPlaylistTrack(playlistId: string, trackId: string) {
-    await axios.post(`/playlists/${playlistId}/tracks`, {
+    await apiInstance.post(`/playlists/${playlistId}/tracks`, {
         uris: [`spotify:track:${trackId}`]
     });
 }
 
 export async function removePlaylistTrack(playlistId: string, trackId: string) {
-    await axios.delete(`/playlists/${playlistId}/tracks`, {
+    await apiInstance.delete(`/playlists/${playlistId}/tracks`, {
         data: {
             tracks: [{ uri: `spotify:track:${trackId}` }]
         }
@@ -263,7 +270,7 @@ export async function removePlaylistTrack(playlistId: string, trackId: string) {
 export async function getSavedTracks(offset: number) {
     const {
         data: { items }
-    } = await axios.get('/me/tracks', {
+    } = await apiInstance.get('/me/tracks', {
         params: { limit: ITEMS_PER_REQUEST, offset }
     });
 
@@ -278,7 +285,7 @@ export async function searchAll(query: string) {
             tracks: { items: tracks },
             playlists: { items: playlists }
         }
-    } = await axios.get('/search', {
+    } = await apiInstance.get('/search', {
         params: {
             q: query,
             type: 'album,artist,playlist,track'
@@ -298,7 +305,7 @@ export async function searchArtists(query: string, offset: number = 0) {
         data: {
             artists: { items }
         }
-    } = await axios.get('/search', {
+    } = await apiInstance.get('/search', {
         params: {
             q: query,
             type: 'artist',
@@ -315,7 +322,7 @@ export async function searchAlbums(query: string, offset: number = 0) {
         data: {
             albums: { items }
         }
-    } = await axios.get('/search', {
+    } = await apiInstance.get('/search', {
         params: {
             q: query,
             type: 'album',
@@ -332,7 +339,7 @@ export async function searchTracks(query: string, offset: number = 0) {
         data: {
             tracks: { items }
         }
-    } = await axios.get('/search', {
+    } = await apiInstance.get('/search', {
         params: {
             q: query,
             type: 'track',
@@ -349,7 +356,7 @@ export async function searchPlaylists(query: string, offset: number = 0) {
         data: {
             playlists: { items }
         }
-    } = await axios.get('/search', {
+    } = await apiInstance.get('/search', {
         params: {
             q: query,
             type: 'playlist',
@@ -364,13 +371,13 @@ export async function searchPlaylists(query: string, offset: number = 0) {
 export async function getAvailableDevices() {
     const {
         data: { devices }
-    } = await axios('/me/player/devices');
+    } = await apiInstance.get('/me/player/devices');
 
     return (devices as SpotifyDevice[]).map(parseDeviceData);
 }
 
 export async function setActiveDevice(deviceId: string, play: boolean) {
-    await axios.put('/me/player', {
+    await apiInstance.put('/me/player', {
         device_ids: [deviceId],
         play
     });
@@ -406,7 +413,7 @@ export async function setCurrentContext(
         payload = { uris: [trackUri], position_ms: position };
     }
 
-    await axios.put('/me/player/play', payload, {
+    await apiInstance.put('/me/player/play', payload, {
         params: {
             device_id: deviceId
         }
