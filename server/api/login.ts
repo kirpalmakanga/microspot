@@ -6,7 +6,7 @@ const {
     env: { CLIENT_ID, APP_REDIRECT_URL }
 } = process;
 
-export default defineEventHandler((event) => {
+export default defineEventHandler(() => {
     if (!CLIENT_ID) {
         throw createError({
             statusCode: 500,

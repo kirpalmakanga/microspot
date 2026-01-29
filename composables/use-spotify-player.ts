@@ -190,7 +190,11 @@ export function useSpotifyPlayer() {
     }
 
     function togglePlay() {
-        state.isPlaying ? pause() : play();
+        if (state.isPlaying) {
+            pause();
+        } else {
+            play();
+        }
     }
 
     async function fetchCurrentTrackPosition() {
