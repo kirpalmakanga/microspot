@@ -7,7 +7,9 @@
         "preview": "nuxt preview",
         "postinstall": "nuxt prepare",
         "fmt": "oxfmt",
-        "fmt:check": "oxfmt --check"
+        "fmt:check": "oxfmt --check",
+        "lint": "oxlint",
+        "lint:fix": "oxlint --fix"
     },
     "dependencies": {
         "@iconify-json/mi": "^1.2.2",
