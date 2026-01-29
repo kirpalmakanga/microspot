@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { AUTH_API_URL } from '~/server/config';
+import { AUTH_API_URI } from '~/server/config';
 import { createBasicToken, createFormData } from '~/server/helpers';
 
 const {
@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
     const {
         data: { access_token: accessToken }
     } = await axios.post(
-        AUTH_API_URL,
+        AUTH_API_URI,
         createFormData({
             grant_type: 'refresh_token',
             refresh_token: refreshToken

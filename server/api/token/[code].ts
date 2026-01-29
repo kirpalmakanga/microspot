@@ -1,9 +1,9 @@
 import axios from 'axios';
-import { AUTH_API_URL } from '~/server/config';
+import { AUTH_API_URI } from '~/server/config';
 import { createBasicToken, createFormData } from '~/server/helpers';
 
 const {
-    env: { CLIENT_ID, CLIENT_SECRET, APP_REDIRECT_URL }
+    env: { CLIENT_ID, CLIENT_SECRET, APP_REDIRECT_URI }
 } = process;
 
 export default defineEventHandler(async (event) => {
@@ -16,21 +16,21 @@ export default defineEventHandler(async (event) => {
         });
     }
 
-    if (!APP_REDIRECT_URL) {
+    if (!APP_REDIRECT_URI) {
         throw createError({
             statusCode: 500,
-            statusMessage: 'Environment: APP_REDIRECT_URL is not defined'
+            statusMessage: 'Environment: APP_REDIRECT_URI is not defined'
         });
     }
 
     const {
         data: { access_token: accessToken, refresh_token: refreshToken }
     } = await axios.post(
-        AUTH_API_URL,
+        AUTH_API_URI,
         createFormData({
             code,
             grant_type: 'authorization_code',
-            redirect_uri: APP_REDIRECT_URL
+            redirect_uri: APP_REDIRECT_URI
         }),
         {
             headers: {

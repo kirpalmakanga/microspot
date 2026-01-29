@@ -5,20 +5,20 @@ const {
 
 const {
     data: user,
-    isLoading: isLoadingUser,
-    isError: hasUserError,
-    refetch
+    isPending: isUserPending,
+    isLoading: isUserLoading,
+    error: userError,
+    refetch: refetchUser
 } = useUser(userId as string);
 
-const authStore = useAuthStore();
 const {
     data: playlistData,
-    isLoading: isLoadingPlaylists,
-    isFetching: isFetchingPlaylists,
-    hasNextPage,
-    isError: hasPlaylistsError,
+    isPending: arePlaylistsPending,
+    isLoading: arePlaylistsLoading,
+    error: playlistsError,
     refetch: refetchPlaylists,
-    fetchNextPage
+    hasNextPage,
+    loadNextPage
 } = useUserPlaylists(userId as string);
 
 const playlists = computed(() => playlistData.value?.pages.flatMap(({ items }) => items));
@@ -30,7 +30,7 @@ useHead({
 
 <template>
     <section class="flex flex-col grow">
-        <template v-if="isLoadingUser">
+        <template v-if="isUserPending || (userError && isUserLoading)">
             <LayoutPageHeaderLoader />
 
             <USkeleton class="h-6 mx-4 mt-4 w-1/2 bg-zinc-500" />
@@ -38,7 +38,7 @@ useHead({
             <PlaylistGridLoader />
         </template>
 
-        <Error v-else-if="hasUserError" @action="refetch()" />
+        <Error v-else-if="userError" @action="refetchUser()" />
 
         <div v-else-if="user" class="flex flex-col grow">
             <LayoutPageHeader type="User" :cover="user.profilePicture" :title="user.name">
@@ -49,14 +49,16 @@ useHead({
                 </template>
             </LayoutPageHeader>
 
-            <PlaylistGridLoader v-if="isLoadingPlaylists" />
+            <PlaylistGridLoader
+                v-if="arePlaylistsPending || (playlistsError && arePlaylistsLoading)"
+            />
 
-            <Error v-else-if="hasPlaylistsError" @action="refetchPlaylists()" />
+            <Error v-else-if="playlistsError" @action="refetchPlaylists()" />
 
             <ScrollContainer
                 v-else-if="playlists"
                 class="bg-zinc-700"
-                @reached-bottom="hasNextPage && fetchNextPage()"
+                @reached-bottom="hasNextPage && loadNextPage()"
             >
                 <div class="p-4">
                     <h2 class="mb-4">Playlists</h2>
@@ -75,9 +77,9 @@ useHead({
                 </div>
             </ScrollContainer>
 
-            <Transition v-if="hasNextPage" name="fade" mode="out-in">
-                <Loader v-if="isFetchingPlaylists" />
-            </Transition>
+            <!-- <Transition v-if="hasNextPage" name="fade" mode="out-in">
+                <Loader v-if="arePlaylistsLoading" />
+            </Transition> -->
         </div>
     </section>
 </template>

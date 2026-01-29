@@ -3,7 +3,7 @@ import { SCOPES } from '~/server/config';
 import { createUrl } from '~/server/helpers';
 
 const {
-    env: { CLIENT_ID, APP_REDIRECT_URL }
+    env: { CLIENT_ID, APP_REDIRECT_URI }
 } = process;
 
 export default defineEventHandler(() => {
@@ -14,10 +14,10 @@ export default defineEventHandler(() => {
         });
     }
 
-    if (!APP_REDIRECT_URL) {
+    if (!APP_REDIRECT_URI) {
         throw createError({
             statusCode: 500,
-            statusMessage: 'Environment: APP_REDIRECT_URL is not defined'
+            statusMessage: 'Environment: APP_REDIRECT_URI is not defined'
         });
     }
 
@@ -26,7 +26,7 @@ export default defineEventHandler(() => {
             response_type: 'code',
             client_id: CLIENT_ID,
             scope: SCOPES.join(' '),
-            redirect_uri: APP_REDIRECT_URL,
+            redirect_uri: APP_REDIRECT_URI,
             show_dialog: 'true',
             state: randomUUID()
         })

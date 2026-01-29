@@ -1,9 +1,9 @@
 import axios from 'axios';
 
-const APP_URL = window.location.origin;
+const APP_URI = window.location.origin;
 
 const authInstance = axios.create({
-    baseURL: `${APP_URL}/api`
+    baseURL: `${APP_URI}/api`
 });
 
 export async function redirectToLogIn() {

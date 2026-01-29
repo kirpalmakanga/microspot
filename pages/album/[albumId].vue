@@ -8,9 +8,9 @@ const {
 
 const {
     data: album,
-    isLoading: isLoadingAlbum,
-    isError: isAlbumError,
-    isFetching: isFetchingAlbum,
+    isPending: isAlbumPending,
+    isLoading: isAlbumLoading,
+    error: albumError,
     refetch: refetchAlbum
 } = useAlbum(albumId as string);
 
@@ -23,10 +23,11 @@ const formattedReleaseDate = useDateFormat(
 
 const {
     data: albumTracks,
-    isLoading: isLoadingTracks,
-    isError: isTracksError,
+    isPending: areTracksPending,
+    isLoading: areTracksLoading,
+    error: tracksError,
     hasNextPage,
-    fetchNextPage,
+    loadNextPage,
     refetch: refetchTracks
 } = useAlbumTracks(albumId as string);
 
@@ -56,7 +57,7 @@ useAppTitle(computed(() => album.value?.name));
 
 <template>
     <section class="flex flex-col grow">
-        <template v-if="isLoadingAlbum || (isAlbumError && isFetchingAlbum)">
+        <template v-if="isAlbumPending || (albumError && isAlbumLoading)">
             <LayoutPageHeaderLoader />
 
             <LayoutPageActionsLoader has-play-button />
@@ -64,7 +65,7 @@ useAppTitle(computed(() => album.value?.name));
             <TracklistItemLoader />
         </template>
 
-        <Error v-else-if="isAlbumError" @action="refetchAlbum()" />
+        <Error v-else-if="albumError" @action="refetchAlbum()" />
 
         <div v-else-if="album" class="relative flex flex-col grow">
             <LayoutPageHeader :type="album.albumType" :cover="cover" :title="album.name">
@@ -113,9 +114,9 @@ useAppTitle(computed(() => album.value?.name));
                 <MenuButton :menu-options="menuOptions" />
             </div>
 
-            <Loader v-if="isLoadingTracks" />
+            <TracklistItemLoader v-if="areTracksPending || (tracksError && areTracksLoading)" />
 
-            <TracklistItemLoader v-else-if="isTracksError" @action="refetchTracks()" />
+            <Error v-else-if="tracksError" @action="refetchTracks()" />
 
             <TracklistVirtualized
                 v-else-if="tracks"
@@ -124,7 +125,7 @@ useAppTitle(computed(() => album.value?.name));
                 :context-uri="album.uri"
                 :items="tracks"
                 @toggle-save-track="toggleSaveAlbumTrack"
-                @reached-bottom="hasNextPage && fetchNextPage()"
+                @reached-bottom="hasNextPage && loadNextPage()"
             />
         </div>
     </section>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { VueQueryDevtools } from '@tanstack/vue-query-devtools';
+import { PiniaColadaDevtools } from '@pinia/colada-devtools';
 </script>
 
 <style>
@@ -18,5 +18,5 @@ import { VueQueryDevtools } from '@tanstack/vue-query-devtools';
         </UApp>
     </main>
 
-    <VueQueryDevtools button-position="bottom-left" />
+    <PiniaColadaDevtools />
 </template>

@@ -64,12 +64,20 @@ export function useSpotifyPlayer() {
     const playerInstance = ref<Spotify.Player>();
     const timeWatcher = ref<ReturnType<typeof setInterval>>();
 
+    const defaultImage = { url: '' };
+
     async function parseCurrentTrackData({
         id,
         uri,
         name,
         duration_ms,
-        album: { images: [{ url: large = '' }, { url: medium = '' }, { url: small = '' }] = [] },
+        album: {
+            images: [
+                { url: large = '' } = defaultImage,
+                { url: medium = '' } = defaultImage,
+                { url: small = '' } = defaultImage
+            ] = []
+        },
         artists
     }: Spotify.Track) {
         if (id !== state.currentTrack.id) {

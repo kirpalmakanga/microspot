@@ -7,7 +7,7 @@ const {
     params: { trackId }
 } = useRoute();
 
-const { data: track, isLoading, isError, refetch } = useTrack(trackId as string);
+const { data: track, isPending, isLoading, error, refetch } = useTrack(trackId as string);
 
 const { mutate: toggleSaveTrack } = useToggleSaveTrack(trackId as string);
 
@@ -53,9 +53,9 @@ useAppTitle(computed(() => track.value?.name));
 <template>
     <section class="flex flex-col grow">
         <Transition name="fade" mode="out-in">
-            <Loader v-if="isLoading" />
+            <Loader v-if="isPending || (error && isLoading)" />
 
-            <Error v-else-if="isError" @action="refetch()" />
+            <Error v-else-if="error" @action="refetch()" />
 
             <div v-else-if="track" class="relative flex flex-col grow">
                 <LayoutPageHeader

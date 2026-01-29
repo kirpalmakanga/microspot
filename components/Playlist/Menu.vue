@@ -5,7 +5,7 @@ const emit = defineEmits<{ saved: [e: void] }>();
 
 const authStore = useAuthStore();
 
-const { data, isLoading, isFetching, isError, hasNextPage, refetch, fetchNextPage } =
+const { data, isLoading, isFetching, isError, hasNextPage, refetch, loadNextPage } =
     useUserPlaylists(authStore.userId);
 
 const { mutate: addPlaylistTrack } = useAddPlaylistTrack();
@@ -52,7 +52,7 @@ function handleSelectPlaylist(playlistId?: string) {
 
         <Error v-else-if="isError" @action="refetch()" />
 
-        <ScrollContainer v-else class="grow" @reached-bottom="hasNextPage && fetchNextPage()">
+        <ScrollContainer v-else class="grow" @reached-bottom="hasNextPage && loadNextPage()">
             <ul>
                 <li v-for="{ id, name, images } of currentItems" :key="id">
                     <button

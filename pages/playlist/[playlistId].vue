@@ -7,19 +7,20 @@ const {
 
 const {
     data: playlist,
-    isLoading,
-    isFetching,
-    isError,
-    refetch
+    isPending: isPlaylistPending,
+    isLoading: isPlaylistLoading,
+    error: playlistError,
+    refetch: refetchPlaylist
 } = usePlaylist(playlistId as string);
 
 const {
     data: playlistTracks,
-    isLoading: isLoadingTracks,
-    isFetching: isFetchingTracks,
-    isError: isTracksError,
+    isPending: areTracksPending,
+    isLoading: areTracksLoading,
+    error: tracksError,
     hasNextPage,
-    fetchNextPage
+    loadNextPage,
+    refetch: refetchTracks
 } = usePlaylistTracks(playlistId as string);
 
 const { mutate: toggleSavePlaylistTrack } = useToggleSavePlaylistTrack(playlistId as string);
@@ -51,7 +52,7 @@ useAppTitle(computed(() => playlist.value?.name));
 
 <template>
     <section class="flex flex-col grow">
-        <template v-if="isLoading || (isError && isFetching)">
+        <template v-if="isPlaylistPending || (playlistError && isPlaylistLoading)">
             <LayoutPageHeaderLoader />
 
             <LayoutPageActionsLoader has-play-button />
@@ -59,7 +60,7 @@ useAppTitle(computed(() => playlist.value?.name));
             <TracklistItemLoader />
         </template>
 
-        <Error v-else-if="isError" @action="refetch()" />
+        <Error v-else-if="playlistError" @action="refetchPlaylist()" />
 
         <div v-else-if="playlist" class="relative flex flex-col grow">
             <LayoutPageHeader type="Playlist" :cover="cover" :title="playlist.name">
@@ -98,17 +99,19 @@ useAppTitle(computed(() => playlist.value?.name));
                 <MenuButton :menu-options="menuOptions" />
             </div>
 
-            <TracklistItemLoader v-if="isLoadingTracks" />
+            <TracklistItemLoader v-if="areTracksPending || (tracksError && areTracksLoading)" />
+
+            <Error v-else-if="tracksError" @action="refetchTracks()" />
 
             <TracklistVirtualized
-                v-if="tracks"
+                v-else-if="tracks"
                 class="bg-zinc-700"
                 type="playlist"
                 :context-uri="playlist.uri"
                 :items="tracks"
                 @toggle-save-track="toggleSavePlaylistTrack"
                 @delete-track="removePlaylistTrack"
-                @reached-bottom="hasNextPage && fetchNextPage()"
+                @reached-bottom="hasNextPage && loadNextPage()"
             />
 
             <!-- <TracklistItemLoader v-if="hasNextPage && isFetchingTracks" /> -->

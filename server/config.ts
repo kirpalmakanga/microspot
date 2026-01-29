@@ -1,4 +1,4 @@
-export const AUTH_API_URL = 'https://accounts.spotify.com/api/token';
+export const AUTH_API_URI = 'https://accounts.spotify.com/api/token';
 
 export const SCOPES = [
     'user-read-recently-played',

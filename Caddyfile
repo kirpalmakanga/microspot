@@ -1,0 +1,5 @@
+microspot.local {
+	encode gzip
+
+	reverse_proxy localhost:3000
+}

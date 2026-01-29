@@ -7,9 +7,9 @@ const {
 
 const {
     data: artist,
-    isLoading: isLoadingArtist,
-    isError: isArtistError,
-    isFetching: isFetchingArtist,
+    isPending: isArtistPending,
+    isLoading: isArtistLoading,
+    error: artistError,
     refetch: refetchArtist
 } = useArtist(artistId as string);
 
@@ -17,10 +17,11 @@ const cover = computed(() => artist.value?.images.medium || artist.value?.images
 
 const {
     data: artistAlbums,
-    isLoading: isLoadingAlbums,
-    isError: hasAlbumsError,
+    isPending: areAlbumsPending,
+    isLoading: areAlbumsLoading,
+    error: albumsError,
     hasNextPage,
-    fetchNextPage,
+    loadNextPage,
     refetch: refetchAlbums
 } = useArtistAlbums(artistId as string);
 
@@ -57,7 +58,7 @@ useAppTitle(computed(() => artist.value?.name));
 
 <template>
     <section class="flex flex-col grow">
-        <template v-if="isLoadingArtist || (isArtistError && isFetchingArtist)">
+        <template v-if="isArtistLoading || (artistError && isArtistLoading)">
             <LayoutPageHeaderLoader />
 
             <LayoutPageActionsLoader />
@@ -65,7 +66,7 @@ useAppTitle(computed(() => artist.value?.name));
             <PlaylistGridLoader class="bg-zinc-700 grow" />
         </template>
 
-        <Error v-else-if="isArtistError" @action="refetchArtist()" />
+        <Error v-else-if="artistError" @action="refetchArtist()" />
 
         <div v-else-if="artist" class="relative flex flex-col grow">
             <LayoutPageHeader type="Artist" :cover="cover" :title="artist.name">
@@ -80,15 +81,18 @@ useAppTitle(computed(() => artist.value?.name));
                 <MenuButton :menu-options="menuOptions" />
             </div>
 
-            <PlaylistGridLoader class="bg-zinc-700 grow" v-if="isLoadingAlbums" />
+            <PlaylistGridLoader
+                class="bg-zinc-700 grow"
+                v-if="areAlbumsPending || (albumsError && areAlbumsLoading)"
+            />
 
-            <Error v-else-if="hasAlbumsError" @action="refetchAlbums()" />
+            <Error v-else-if="albumsError" @action="refetchAlbums()" />
 
             <ScrollContainer
                 v-else-if="albums.items.length"
                 class="bg-zinc-700"
                 scrollable-class="p-4"
-                @reached-bottom="hasNextPage && fetchNextPage()"
+                @reached-bottom="hasNextPage && loadNextPage()"
             >
                 <AlbumGrid :items="albums.items" />
             </ScrollContainer>

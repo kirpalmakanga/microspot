@@ -1,9 +1,16 @@
 <script setup lang="ts">
 const authStore = useAuthStore();
-const { data, isLoading, isFetching, isError, hasNextPage, refetch, fetchNextPage } =
-    useUserPlaylists(computed(() => authStore.userId));
+const {
+    data: playlists,
+    isPending,
+    isLoading,
+    error,
+    refetch,
+    hasNextPage,
+    loadNextPage
+} = useUserPlaylists(computed(() => authStore.userId));
 
-const playlists = computed(() => data.value?.pages.flatMap(({ items }) => items));
+const items = computed(() => playlists.value?.pages.flatMap(({ items }) => items));
 
 useAppTitle('Dashboard');
 
@@ -17,13 +24,13 @@ definePageMeta({
         <div class="relative flex flex-col grow">
             <h2 class="p-4">Playlists</h2>
 
-            <PlaylistGridLoader class="py-0" v-if="isLoading" />
+            <PlaylistGridLoader class="py-0" v-if="isPending || (error && isLoading)" />
 
-            <Error v-else-if="isError" @action="refetch()" />
+            <Error v-else-if="error" @action="refetch()" />
 
-            <ScrollContainer v-else-if="playlists" @reached-bottom="hasNextPage && fetchNextPage()">
+            <ScrollContainer v-else-if="items" @reached-bottom="hasNextPage && loadNextPage()">
                 <div class="flex flex-col grow px-4 pb-4">
-                    <PlaylistGrid v-if="playlists.length" :items="playlists" />
+                    <PlaylistGrid v-if="items.length" :items="items" />
 
                     <Placeholder
                         v-else

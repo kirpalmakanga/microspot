@@ -1,21 +1,20 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import { getTrack, toggleSaveTrack } from '~/services/spotify-api';
 
 export function useTrack(trackId: MaybeRef<string>) {
     return useQuery({
-        queryKey: ['track', trackId],
-        queryFn: () => getTrack(toValue(trackId))
+        key: ['track', toValue(trackId)],
+        query: () => getTrack(toValue(trackId))
     });
 }
 
 export function useToggleSaveTrack(trackId: MaybeRef<string>) {
-    const queryClient = useQueryClient();
+    const queryCache = useQueryCache();
 
     return useMutation({
-        mutationFn: async (trackId: string) => toggleSaveTrack(toValue(trackId)),
+        mutation: (trackId: string) => toggleSaveTrack(toValue(trackId)),
         onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ['track', trackId]
+            queryCache.invalidateQueries({
+                key: ['track', toValue(trackId)]
             });
         }
     });

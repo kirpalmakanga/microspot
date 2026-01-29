@@ -1,4 +1,3 @@
-import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import {
     addPlaylistTrack,
     createPlaylist,
@@ -13,8 +12,8 @@ import {
 
 export function useUserPlaylists(userId: MaybeRef<string>) {
     return useInfiniteQuery({
-        queryKey: ['playlists', userId],
-        queryFn: ({ pageParam: offset }) => getUserPlaylists(toValue(userId), offset),
+        key: () => ['playlists', toValue(userId)],
+        query: ({ pageParam: offset }) => getUserPlaylists(toValue(userId), offset),
         initialPageParam: 0,
         getNextPageParam: ({ totalItemCount }, pages) => {
             const currentItemCount = pages.reduce((count, { items }) => count + items.length, 0);
@@ -26,17 +25,17 @@ export function useUserPlaylists(userId: MaybeRef<string>) {
 
 export function usePlaylist(playlistId: MaybeRef<string>) {
     return useQuery({
-        queryKey: ['playlist', playlistId],
-        queryFn: () => getPlaylist(toValue(playlistId))
+        key: () => ['playlist', toValue(playlistId)],
+        query: () => getPlaylist(toValue(playlistId))
     });
 }
 
 export function useUpdatePlaylist(playlistId: MaybeRef<string>) {
-    const queryClient = useQueryClient();
+    const queryCache = useQueryCache();
     const authStore = useAuthStore();
 
     return useMutation({
-        mutationFn: async ({
+        mutation: async ({
             cover,
             ...playlistData
         }: {
@@ -51,12 +50,12 @@ export function useUpdatePlaylist(playlistId: MaybeRef<string>) {
             }
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ['playlist', playlistId]
+            queryCache.invalidateQueries({
+                key: ['playlist', playlistId]
             });
 
-            queryClient.invalidateQueries({
-                queryKey: ['playlists', authStore.userId]
+            queryCache.invalidateQueries({
+                key: ['playlists', authStore.userId]
             });
         }
     });
@@ -68,8 +67,8 @@ export function usePlaylistTracks(playlistId: MaybeRef<string>) {
     /** TODO: load saved tracks (playlistId === 'saved') */
 
     return useInfiniteQuery({
-        queryKey: ['playlistTracks', playlistId],
-        queryFn: ({ pageParam: offset }) => getPlaylistTracks(toValue(playlistId), offset),
+        key: () => ['playlistTracks', toValue(playlistId)],
+        query: ({ pageParam: offset }) => getPlaylistTracks(toValue(playlistId), offset),
         initialPageParam: 0,
         getNextPageParam: (_, pages) => {
             const { totalItemCount } = playlist?.value || {};
@@ -86,13 +85,13 @@ export function usePlaylistTracks(playlistId: MaybeRef<string>) {
 }
 
 export function useToggleSavePlaylistTrack(playlistId: MaybeRef<string>) {
-    const queryClient = useQueryClient();
+    const queryCache = useQueryCache();
 
     return useMutation({
-        mutationFn: (trackId: string) => toggleSaveTrack(trackId),
+        mutation: (trackId: string) => toggleSaveTrack(trackId),
         onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ['playlistTracks', playlistId]
+            queryCache.invalidateQueries({
+                key: ['playlistTracks', playlistId]
             });
         }
     });
@@ -100,11 +99,11 @@ export function useToggleSavePlaylistTrack(playlistId: MaybeRef<string>) {
 
 export function useAddPlaylistTrack() {
     const router = useRouter();
-    const queryClient = useQueryClient();
+    const queryCache = useQueryCache();
     const authStore = useAuthStore();
 
     return useMutation({
-        mutationFn: async ({ playlistId, trackId }: { playlistId?: string; trackId: string }) => {
+        mutation: async ({ playlistId, trackId }: { playlistId?: string; trackId: string }) => {
             if (!playlistId) {
                 const { id: playlistId } = await createPlaylist(authStore.userId, 'New playlist');
 
@@ -118,16 +117,16 @@ export function useAddPlaylistTrack() {
             }
         },
         onSuccess: ({ playlistId, isNewPlaylist }) => {
-            queryClient.invalidateQueries({
-                queryKey: ['playlistTracks', playlistId]
+            queryCache.invalidateQueries({
+                key: ['playlistTracks', playlistId]
             });
 
-            queryClient.invalidateQueries({
-                queryKey: ['playlist', playlistId]
+            queryCache.invalidateQueries({
+                key: ['playlist', playlistId]
             });
 
-            queryClient.invalidateQueries({
-                queryKey: ['playlists', authStore.userId]
+            queryCache.invalidateQueries({
+                key: ['playlists', authStore.userId]
             });
 
             if (isNewPlaylist) {
@@ -139,25 +138,25 @@ export function useAddPlaylistTrack() {
 
 export function useRemovePlaylistTrack(playlistId: MaybeRef<string>) {
     const authStore = useAuthStore();
-    const queryClient = useQueryClient();
+    const queryCache = useQueryCache();
 
     return useMutation({
-        mutationFn: async (trackId: string) => {
+        mutation: async (trackId: string) => {
             await removePlaylistTrack(toValue(playlistId), trackId);
 
             return trackId;
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ['playlistTracks', playlistId]
+            queryCache.invalidateQueries({
+                key: ['playlistTracks', playlistId]
             });
 
-            queryClient.invalidateQueries({
-                queryKey: ['playlist', playlistId]
+            queryCache.invalidateQueries({
+                key: ['playlist', playlistId]
             });
 
-            queryClient.invalidateQueries({
-                queryKey: ['playlists', authStore.userId]
+            queryCache.invalidateQueries({
+                key: ['playlists', authStore.userId]
             });
         }
     });

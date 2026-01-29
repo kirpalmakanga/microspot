@@ -1,10 +1,9 @@
-import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import { getAlbum, getAlbumTracks, toggleSaveAlbum, toggleSaveTrack } from '~/services/spotify-api';
 
 export function useAlbum(albumId: MaybeRef<string>) {
     return useQuery({
-        queryKey: ['album', albumId],
-        queryFn: () => getAlbum(toValue(albumId))
+        key: () => ['album', toValue(albumId)],
+        query: () => getAlbum(toValue(albumId))
     });
 }
 
@@ -12,15 +11,11 @@ export function useAlbumTracks(albumId: MaybeRef<string>) {
     const { data: album } = useAlbum(albumId);
 
     return useInfiniteQuery({
-        queryKey: ['albumTracks', albumId],
-        queryFn: ({ pageParam: offset }) => getAlbumTracks(toValue(albumId), offset),
+        key: () => ['albumTracks', toValue(albumId)],
+        query: ({ pageParam: offset }) => getAlbumTracks(toValue(albumId), offset),
         initialPageParam: 0,
         getNextPageParam: (_, pages) => {
-            const { itemCount } = album?.value || {};
-
-            if (!itemCount) {
-                return 0;
-            }
+            const { itemCount = 0 } = album?.value || {};
 
             const currentItemCount = pages.flat().length;
 
@@ -30,24 +25,24 @@ export function useAlbumTracks(albumId: MaybeRef<string>) {
 }
 
 export function useToggleSaveAlbum(albumId: MaybeRef<string>) {
-    const queryClient = useQueryClient();
+    const queryCache = useQueryCache();
 
     return useMutation({
-        mutationFn: () => toggleSaveAlbum(toValue(albumId)),
+        mutation: () => toggleSaveAlbum(toValue(albumId)),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['album', albumId] });
+            queryCache.invalidateQueries({ key: ['album', albumId] });
         }
     });
 }
 
 export function useToggleSaveAlbumTrack(albumId: MaybeRef<string>) {
-    const queryClient = useQueryClient();
+    const queryCache = useQueryCache();
 
     return useMutation({
-        mutationFn: (trackId: string) => toggleSaveTrack(trackId),
+        mutation: (trackId: string) => toggleSaveTrack(trackId),
         onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ['albumTracks', albumId]
+            queryCache.invalidateQueries({
+                key: ['albumTracks', albumId]
             });
         }
     });
