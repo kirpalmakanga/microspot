@@ -3,8 +3,7 @@
 .env file
 
 ```
-APP_URL=[your_app_url]
-APP_REDIRECT_URL=[your_app_url]/callback
+APP_REDIRECT_URI=[your_app_uri]/callback
 CLIENT_ID=[your_spotify_client_id]
 CLIENT_SECRET=[your_spotify_client_secret]
 ```
