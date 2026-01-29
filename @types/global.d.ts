@@ -237,10 +237,7 @@ declare global {
             cb: PlaybackInstanceListener
         ) => void) &
             ((event: 'autoplay_failed', cb: EmptyListener) => void) &
-            ((
-                event: 'player_state_changed',
-                cb: PlaybackStateListener
-            ) => void) &
+            ((event: 'player_state_changed', cb: PlaybackStateListener) => void) &
             ((event: ErrorTypes, cb: ErrorListener) => void);
 
         class Player {
@@ -257,15 +254,8 @@ declare global {
             on: AddListenerFn;
 
             removeListener(
-                event:
-                    | 'ready'
-                    | 'not_ready'
-                    | 'player_state_changed'
-                    | ErrorTypes,
-                cb?:
-                    | ErrorListener
-                    | PlaybackInstanceListener
-                    | PlaybackStateListener
+                event: 'ready' | 'not_ready' | 'player_state_changed' | ErrorTypes,
+                cb?: ErrorListener | PlaybackInstanceListener | PlaybackStateListener
             ): void;
 
             pause(): Promise<void>;

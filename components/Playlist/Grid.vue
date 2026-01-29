@@ -7,13 +7,8 @@ defineProps<{ items: Playlist[]; isUserNameVisible?: boolean }>();
 </script>
 
 <template>
-    <ul
-        class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4"
-    >
-        <li
-            v-for="{ id, name, images, totalItemCount, uri } of items"
-            :key="id"
-        >
+    <ul class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+        <li v-for="{ id, name, images, totalItemCount, uri } of items" :key="id">
             <Card
                 :title="name"
                 :subtitle="`${totalItemCount} track${

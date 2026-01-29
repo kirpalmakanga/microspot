@@ -28,14 +28,11 @@ async function areTracksSaved(trackIds: string[]) {
         params: { ids: trackIds.join(',') }
     });
 
-    return trackIds.reduce(
-        (obj: { [key: string]: boolean }, trackId, index) => {
-            obj[trackId] = data[index];
+    return trackIds.reduce((obj: { [key: string]: boolean }, trackId, index) => {
+        obj[trackId] = data[index];
 
-            return obj;
-        },
-        {}
-    );
+        return obj;
+    }, {});
 }
 
 export async function isTrackSaved(trackId: string): Promise<boolean> {
@@ -182,20 +179,11 @@ export async function updatePlaylist(
     await apiInstance.put(`/playlists/${playlistId}`, data);
 }
 
-export async function updatePlaylistCover(
-    playlistId: string,
-    imageDataUrl: string
-) {
-    await apiInstance.put(
-        `/playlists/${playlistId}/images`,
-        imageDataUrl.split(',').pop()
-    );
+export async function updatePlaylistCover(playlistId: string, imageDataUrl: string) {
+    await apiInstance.put(`/playlists/${playlistId}/images`, imageDataUrl.split(',').pop());
 }
 
-export async function getPlaylistTracks(
-    playlistId: string,
-    offset: number = 0
-) {
+export async function getPlaylistTracks(playlistId: string, offset: number = 0) {
     const {
         data: { items }
     } = await apiInstance.get(`/playlists/${playlistId}/tracks`, {
@@ -203,9 +191,7 @@ export async function getPlaylistTracks(
     });
 
     if (items.length) {
-        const tracks = (items as SpotifyPlaylistTrack[]).map(
-            parsePlaylistTrackData
-        );
+        const tracks = (items as SpotifyPlaylistTrack[]).map(parsePlaylistTrackData);
 
         return await getTracksWithSavedStatus(tracks);
     }
@@ -232,15 +218,12 @@ export async function getUser(userId: string) {
 export async function getUserPlaylists(userId?: string, offset: number = 0) {
     const {
         data: { items, total }
-    } = await apiInstance.get(
-        `/${userId ? `users/${userId}` : 'me'}/playlists`,
-        {
-            params: {
-                offset,
-                limit: ITEMS_PER_REQUEST
-            }
+    } = await apiInstance.get(`/${userId ? `users/${userId}` : 'me'}/playlists`, {
+        params: {
+            offset,
+            limit: ITEMS_PER_REQUEST
         }
-    );
+    });
 
     return {
         items: items.map((data: SpotifyPlaylist) => ({

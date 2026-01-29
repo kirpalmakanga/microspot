@@ -2,9 +2,7 @@
 const route = useRoute();
 
 const tabs = computed<{ title: string; href: string }[]>(() => {
-    const basePath = `/search/${encodeURIComponent(
-        route.params.query as string
-    )}`;
+    const basePath = `/search/${encodeURIComponent(route.params.query as string)}`;
 
     return [
         {

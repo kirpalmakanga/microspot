@@ -52,9 +52,7 @@ const menuOptions = computed<ContextMenuItem[]>(() => [
     },
     {
         icon: props.isSaved ? 'i-mi-circle-check' : 'i-mi-circle-add',
-        label: props.isSaved
-            ? 'Remove from liked tracks'
-            : 'Save to liked tracks',
+        label: props.isSaved ? 'Remove from liked tracks' : 'Save to liked tracks',
         onSelect: () => emit('save')
     },
     {
@@ -123,10 +121,7 @@ const menuOptions = computed<ContextMenuItem[]>(() => [
                     <template v-if="albumName">
                         <span>{{ ' - ' }}</span>
 
-                        <NuxtLink
-                            class="hover:underline"
-                            :to="`/album/${albumId}`"
-                        >
+                        <NuxtLink class="hover:underline" :to="`/album/${albumId}`">
                             {{ albumName }}
                         </NuxtLink>
                     </template>
@@ -137,10 +132,7 @@ const menuOptions = computed<ContextMenuItem[]>(() => [
                 class="flex items-center justify-center p-2 transition-transform transform hover:scale-110 hover:active:scale-90 cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity"
                 @click="emit('save')"
             >
-                <UIcon
-                    class="size-6"
-                    :name="isSaved ? 'i-mi-circle-check' : 'i-mi-circle-add'"
-                />
+                <UIcon class="size-6" :name="isSaved ? 'i-mi-circle-check' : 'i-mi-circle-add'" />
             </button>
 
             <div class="text-sm">{{ formatTime(duration / 1000) }}</div>
@@ -156,10 +148,7 @@ const menuOptions = computed<ContextMenuItem[]>(() => [
 
         <UModal v-model:open="isPlaylistMenuOpen" :title="playlistMenuTitle">
             <template #body>
-                <PlaylistMenu
-                    :track-id="id"
-                    @saved="isPlaylistMenuOpen = false"
-                />
+                <PlaylistMenu :track-id="id" @saved="isPlaylistMenuOpen = false" />
             </template>
         </UModal>
     </UContextMenu>

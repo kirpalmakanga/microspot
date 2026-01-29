@@ -29,8 +29,7 @@ interface State {
 async function loadPlayerAPI() {
     if (!window.Spotify) {
         const promise = new Promise(
-            (resolve) =>
-                (window.onSpotifyWebPlaybackSDKReady = () => resolve(null))
+            (resolve) => (window.onSpotifyWebPlaybackSDKReady = () => resolve(null))
         );
 
         await loadScript('https://sdk.scdn.co/spotify-player.js');
@@ -70,13 +69,7 @@ export function useSpotifyPlayer() {
         uri,
         name,
         duration_ms,
-        album: {
-            images: [
-                { url: large = '' },
-                { url: medium = '' },
-                { url: small = '' }
-            ] = []
-        },
+        album: { images: [{ url: large = '' }, { url: medium = '' }, { url: small = '' }] = [] },
         artists
     }: Spotify.Track) {
         if (id !== state.currentTrack.id) {
@@ -100,10 +93,7 @@ export function useSpotifyPlayer() {
     async function parseCurrentState({
         position: currentTrackPosition,
         paused,
-        disallows: {
-            skipping_prev: disallowSkippingPrev,
-            skipping_next: disallowSkippingNext
-        },
+        disallows: { skipping_prev: disallowSkippingPrev, skipping_next: disallowSkippingNext },
         track_window: {
             current_track: trackData,
             previous_tracks: previousTracks,
@@ -113,10 +103,8 @@ export function useSpotifyPlayer() {
     }: Spotify.PlaybackState) {
         if (!trackData) return;
 
-        const cannotSkipToPrevious =
-            disallowSkippingPrev || previousTracks.length === 0;
-        const cannotSkipToNext =
-            disallowSkippingNext || nextTracks.length === 0;
+        const cannotSkipToPrevious = disallowSkippingPrev || previousTracks.length === 0;
+        const cannotSkipToNext = disallowSkippingNext || nextTracks.length === 0;
 
         if (cannotSkipToPrevious !== state.cannotSkipToPrevious) {
             state.cannotSkipToPrevious = cannotSkipToPrevious;
@@ -146,9 +134,7 @@ export function useSpotifyPlayer() {
         await setCurrentContext(context, state.localDeviceId);
     }
 
-    async function onPlayerReady({
-        device_id: localDeviceId
-    }: Spotify.WebPlaybackInstance) {
+    async function onPlayerReady({ device_id: localDeviceId }: Spotify.WebPlaybackInstance) {
         const {
             context: { currentTrack, currentTrackPosition }
         } = playerStore;
@@ -182,10 +168,7 @@ export function useSpotifyPlayer() {
             context: { uri, currentTrack, currentTrackPosition }
         } = playerStore;
 
-        if (
-            (uri || currentTrack.uri) &&
-            !(await playerInstance.value.getCurrentState())
-        ) {
+        if ((uri || currentTrack.uri) && !(await playerInstance.value.getCurrentState())) {
             await setContext({
                 contextUri: uri,
                 trackUri: currentTrack.uri,

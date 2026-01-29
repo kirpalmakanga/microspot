@@ -12,9 +12,7 @@ import { VueQueryDevtools } from '@tanstack/vue-query-devtools';
 </style>
 
 <template>
-    <main
-        class="flex flex-col grow min-h-screen bg-zinc-800 overflow-hidden font-sans"
-    >
+    <main class="flex flex-col grow min-h-screen bg-zinc-800 overflow-hidden font-sans">
         <UApp>
             <NuxtLayout />
         </UApp>

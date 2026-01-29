@@ -2,13 +2,7 @@
 const route = useRoute();
 const searchStore = useSearchStore();
 const { artists, albums, tracks, playlists } = storeToRefs(searchStore);
-const {
-    searchArtists,
-    searchAlbums,
-    searchTracks,
-    searchPlaylists,
-    toggleSaveTrack
-} = searchStore;
+const { searchArtists, searchAlbums, searchTracks, searchPlaylists, toggleSaveTrack } = searchStore;
 
 const query = computed(() => (route.params.query as string) || '');
 const tab = computed(() => (route.params.tab as string) || '');
@@ -22,12 +16,7 @@ const selectedPLaylists = computed(() => playlists.value.slice(0, 6));
 <template>
     <template v-if="!tab">
         <ScrollContainer
-            v-if="
-                tracks.length ||
-                artists.length ||
-                albums.length ||
-                playlists.length
-            "
+            v-if="tracks.length || artists.length || albums.length || playlists.length"
         >
             <div class="p-4">
                 <h2 class="mb-4 font-bold font-secondary">Tracks</h2>
@@ -60,17 +49,11 @@ const selectedPLaylists = computed(() => playlists.value.slice(0, 6));
         </ScrollContainer>
     </template>
 
-    <ScrollContainer
-        v-else-if="tab === 'artists'"
-        @reached-bottom="searchArtists(query)"
-    >
+    <ScrollContainer v-else-if="tab === 'artists'" @reached-bottom="searchArtists(query)">
         <ArtistGrid class="p-4" :items="artists" />
     </ScrollContainer>
 
-    <ScrollContainer
-        v-else-if="tab === 'albums'"
-        @reached-bottom="searchAlbums(query)"
-    >
+    <ScrollContainer v-else-if="tab === 'albums'" @reached-bottom="searchAlbums(query)">
         <AlbumGrid class="p-4" :items="albums" />
     </ScrollContainer>
 
@@ -83,10 +66,7 @@ const selectedPLaylists = computed(() => playlists.value.slice(0, 6));
         @reached-bottom="searchTracks(query)"
     />
 
-    <ScrollContainer
-        v-else-if="tab === 'playlists'"
-        @reached-bottom="searchPlaylists(query)"
-    >
+    <ScrollContainer v-else-if="tab === 'playlists'" @reached-bottom="searchPlaylists(query)">
         <PlaylistGrid class="p-4" :items="playlists" />
     </ScrollContainer>
 </template>

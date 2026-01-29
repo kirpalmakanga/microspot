@@ -31,10 +31,7 @@ export const formatTime = (t: number) => {
     return units.map((unit) => `${unit}`.padStart(2, '0')).join(':');
 };
 
-export function uniqueByKey<T extends object, K extends keyof T>(
-    arr: T[],
-    key: K
-) {
+export function uniqueByKey<T extends object, K extends keyof T>(arr: T[], key: K) {
     return [...new Map(arr.map((item) => [item[key], item])).values()];
 }
 
@@ -42,10 +39,7 @@ export function isNumber(value: unknown) {
     return typeof value === 'number';
 }
 
-export function pick<T extends object, K extends keyof T>(
-    base: T,
-    ...keys: K[]
-): Pick<T, K> {
+export function pick<T extends object, K extends keyof T>(base: T, ...keys: K[]): Pick<T, K> {
     if (!keys.length) return base;
 
     const entries = keys.map((key) => [key, base[key]]);
@@ -53,10 +47,7 @@ export function pick<T extends object, K extends keyof T>(
     return Object.fromEntries(entries);
 }
 
-export function omit<T extends object, K extends keyof T>(
-    base: T,
-    ...keys: K[]
-): Omit<T, K> {
+export function omit<T extends object, K extends keyof T>(base: T, ...keys: K[]): Omit<T, K> {
     if (keys.length) {
         const result = { ...base };
 

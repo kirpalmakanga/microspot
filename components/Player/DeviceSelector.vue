@@ -9,13 +9,9 @@ defineEmits<{ select: [id: string] }>();
 
 const props = defineProps<{ items: Device[] }>();
 
-const activeDevice = computed(() =>
-    props.items.find(({ isActive }) => isActive)
-);
+const activeDevice = computed(() => props.items.find(({ isActive }) => isActive));
 
-const availableDevices = computed(() =>
-    props.items.filter(({ isActive }) => !isActive)
-);
+const availableDevices = computed(() => props.items.filter(({ isActive }) => !isActive));
 </script>
 
 <template>
@@ -37,10 +33,7 @@ const availableDevices = computed(() =>
         <p class="mb-2">Select another device</p>
 
         <ul>
-            <li
-                v-for="{ id, name, type, isActive } of availableDevices"
-                :key="id"
-            >
+            <li v-for="{ id, name, type, isActive } of availableDevices" :key="id">
                 <button
                     :disabled="isActive"
                     class="flex gap-2 items-center text-left p-4 cursor-pointer w-full rounded-md hover:bg-indigo-500 hover:active: transition-colors"

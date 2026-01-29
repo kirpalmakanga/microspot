@@ -1,15 +1,5 @@
-import {
-    useInfiniteQuery,
-    useMutation,
-    useQuery,
-    useQueryClient
-} from '@tanstack/vue-query';
-import {
-    getAlbum,
-    getAlbumTracks,
-    toggleSaveAlbum,
-    toggleSaveTrack
-} from '~/services/spotify-api';
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
+import { getAlbum, getAlbumTracks, toggleSaveAlbum, toggleSaveTrack } from '~/services/spotify-api';
 
 export function useAlbum(albumId: MaybeRef<string>) {
     return useQuery({
@@ -23,8 +13,7 @@ export function useAlbumTracks(albumId: MaybeRef<string>) {
 
     return useInfiniteQuery({
         queryKey: ['albumTracks', albumId],
-        queryFn: ({ pageParam: offset }) =>
-            getAlbumTracks(toValue(albumId), offset),
+        queryFn: ({ pageParam: offset }) => getAlbumTracks(toValue(albumId), offset),
         initialPageParam: 0,
         getNextPageParam: (_, pages) => {
             const { itemCount } = album?.value || {};

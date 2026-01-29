@@ -10,9 +10,7 @@
                     <USkeleton class="aspect-square h-full" />
                 </div>
 
-                <div
-                    class="flex flex-col grow justify-end overflow-hidden mt-4"
-                >
+                <div class="flex flex-col grow justify-end overflow-hidden mt-4">
                     <USkeleton class="h-4 w-full" />
 
                     <USkeleton class="h-3.5 w-1/2 opacity-60 mt-2" />

@@ -14,9 +14,7 @@ const {
     refetch: refetchAlbum
 } = useAlbum(albumId as string);
 
-const cover = computed(
-    () => album.value?.images.medium || album.value?.images.large
-);
+const cover = computed(() => album.value?.images.medium || album.value?.images.large);
 
 const formattedReleaseDate = useDateFormat(
     computed(() => album.value?.releaseDate),
@@ -36,9 +34,7 @@ const tracks = computed(() => albumTracks.value?.pages.flat());
 
 const { mutate: toggleSaveAlbum } = useToggleSaveAlbum(albumId as string);
 
-const { mutate: toggleSaveAlbumTrack } = useToggleSaveAlbumTrack(
-    albumId as string
-);
+const { mutate: toggleSaveAlbumTrack } = useToggleSaveAlbumTrack(albumId as string);
 
 const playerStore = usePlayerStore();
 const { isCurrentContext, togglePlay } = playerStore;
@@ -71,17 +67,10 @@ useAppTitle(computed(() => album.value?.name));
         <Error v-else-if="isAlbumError" @action="refetchAlbum()" />
 
         <div v-else-if="album" class="relative flex flex-col grow">
-            <LayoutPageHeader
-                :type="album.albumType"
-                :cover="cover"
-                :title="album.name"
-            >
+            <LayoutPageHeader :type="album.albumType" :cover="cover" :title="album.name">
                 <template #subtitles>
                     <p class="flex gap-1">
-                        <template
-                            v-for="({ id, name }, index) of album.artists"
-                            :key="id"
-                        >
+                        <template v-for="({ id, name }, index) of album.artists" :key="id">
                             <span v-if="index > 0">,</span>
 
                             <span v-if="id === '0LyfQWJT6nXafLPZqxe9Of'">
@@ -100,11 +89,7 @@ useAppTitle(computed(() => album.value?.name));
 
                     <p class="opacity-60">
                         <span>
-                            {{
-                                `${album.itemCount} track${
-                                    album.itemCount === 1 ? '' : 's'
-                                }`
-                            }}
+                            {{ `${album.itemCount} track${album.itemCount === 1 ? '' : 's'}` }}
                         </span>
                         |
                         <span>{{ formattedReleaseDate }}</span>
@@ -121,9 +106,7 @@ useAppTitle(computed(() => album.value?.name));
 
                 <IconButton
                     class="size-8"
-                    :icon="
-                        album.isSaved ? 'i-mi-circle-check' : 'i-mi-circle-add'
-                    "
+                    :icon="album.isSaved ? 'i-mi-circle-check' : 'i-mi-circle-add'"
                     @click="toggleSaveAlbum()"
                 />
 
@@ -132,10 +115,7 @@ useAppTitle(computed(() => album.value?.name));
 
             <Loader v-if="isLoadingTracks" />
 
-            <TracklistItemLoader
-                v-else-if="isTracksError"
-                @action="refetchTracks()"
-            />
+            <TracklistItemLoader v-else-if="isTracksError" @action="refetchTracks()" />
 
             <TracklistVirtualized
                 v-else-if="tracks"

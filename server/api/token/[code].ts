@@ -35,10 +35,7 @@ export default defineEventHandler(async (event) => {
         {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
-                Authorization: `Basic ${createBasicToken(
-                    CLIENT_ID,
-                    CLIENT_SECRET
-                )}`
+                Authorization: `Basic ${createBasicToken(CLIENT_ID, CLIENT_SECRET)}`
             }
         }
     );

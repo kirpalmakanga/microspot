@@ -1,9 +1,4 @@
-import {
-    useInfiniteQuery,
-    useMutation,
-    useQuery,
-    useQueryClient
-} from '@tanstack/vue-query';
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import {
     addPlaylistTrack,
     createPlaylist,
@@ -19,14 +14,10 @@ import {
 export function useUserPlaylists(userId: MaybeRef<string>) {
     return useInfiniteQuery({
         queryKey: ['playlists', userId],
-        queryFn: ({ pageParam: offset }) =>
-            getUserPlaylists(toValue(userId), offset),
+        queryFn: ({ pageParam: offset }) => getUserPlaylists(toValue(userId), offset),
         initialPageParam: 0,
         getNextPageParam: ({ totalItemCount }, pages) => {
-            const currentItemCount = pages.reduce(
-                (count, { items }) => count + items.length,
-                0
-            );
+            const currentItemCount = pages.reduce((count, { items }) => count + items.length, 0);
 
             return currentItemCount < totalItemCount ? currentItemCount : null;
         }
@@ -78,8 +69,7 @@ export function usePlaylistTracks(playlistId: MaybeRef<string>) {
 
     return useInfiniteQuery({
         queryKey: ['playlistTracks', playlistId],
-        queryFn: ({ pageParam: offset }) =>
-            getPlaylistTracks(toValue(playlistId), offset),
+        queryFn: ({ pageParam: offset }) => getPlaylistTracks(toValue(playlistId), offset),
         initialPageParam: 0,
         getNextPageParam: (_, pages) => {
             const { totalItemCount } = playlist?.value || {};
@@ -114,18 +104,9 @@ export function useAddPlaylistTrack() {
     const authStore = useAuthStore();
 
     return useMutation({
-        mutationFn: async ({
-            playlistId,
-            trackId
-        }: {
-            playlistId?: string;
-            trackId: string;
-        }) => {
+        mutationFn: async ({ playlistId, trackId }: { playlistId?: string; trackId: string }) => {
             if (!playlistId) {
-                const { id: playlistId } = await createPlaylist(
-                    authStore.userId,
-                    'New playlist'
-                );
+                const { id: playlistId } = await createPlaylist(authStore.userId, 'New playlist');
 
                 await addPlaylistTrack(playlistId, trackId);
 

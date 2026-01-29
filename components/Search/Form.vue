@@ -62,12 +62,7 @@ watch(
 </script>
 
 <template>
-    <UInput
-        class="grow pr-2.5"
-        variant="soft"
-        placeholder="Search"
-        v-model="query"
-    >
+    <UInput class="grow pr-2.5" variant="soft" placeholder="Search" v-model="query">
         <template v-if="query" #trailing>
             <UButton
                 class="rounded-l-none rounded-r-md cursor-pointer"

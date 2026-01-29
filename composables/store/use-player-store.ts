@@ -40,10 +40,7 @@ export const usePlayerStore = defineStore(
     () => {
         const state = reactive<State>(getDefaultState());
 
-        const isCurrentContext = (
-            targetContextUri: string,
-            targetTrackUri?: string
-        ) => {
+        const isCurrentContext = (targetContextUri: string, targetTrackUri?: string) => {
             const {
                 context: {
                     uri,
@@ -52,8 +49,7 @@ export const usePlayerStore = defineStore(
             } = state;
 
             return (
-                uri === targetContextUri &&
-                (targetTrackUri ? trackUri === targetTrackUri : true)
+                uri === targetContextUri && (targetTrackUri ? trackUri === targetTrackUri : true)
             );
         };
 

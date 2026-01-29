@@ -5,15 +5,8 @@ const emit = defineEmits<{ saved: [e: void] }>();
 
 const authStore = useAuthStore();
 
-const {
-    data,
-    isLoading,
-    isFetching,
-    isError,
-    hasNextPage,
-    refetch,
-    fetchNextPage
-} = useUserPlaylists(authStore.userId);
+const { data, isLoading, isFetching, isError, hasNextPage, refetch, fetchNextPage } =
+    useUserPlaylists(authStore.userId);
 
 const { mutate: addPlaylistTrack } = useAddPlaylistTrack();
 
@@ -22,9 +15,7 @@ const query = ref<string>('');
 const currentItems = computed(() => {
     return (data.value?.pages || [])
         .flatMap(({ items }) => items)
-        .filter(({ name }) =>
-            name.toLowerCase().includes(query.value.toLowerCase())
-        );
+        .filter(({ name }) => name.toLowerCase().includes(query.value.toLowerCase()));
 });
 
 function handleSelectPlaylist(playlistId?: string) {
@@ -36,13 +27,7 @@ function handleSelectPlaylist(playlistId?: string) {
 
 <template>
     <div class="flex flex-col gap-2 grow h-[50dvh]">
-        <UInput
-            variant="soft"
-            size="xl"
-            type="text"
-            placeholder="Find a playlist"
-            v-model="query"
-        >
+        <UInput variant="soft" size="xl" type="text" placeholder="Find a playlist" v-model="query">
             <template v-if="query" #trailing>
                 <UButton
                     class="rounded-none rounded-r-md -me-2.5 cursor-pointer"
@@ -67,11 +52,7 @@ function handleSelectPlaylist(playlistId?: string) {
 
         <Error v-else-if="isError" @action="refetch()" />
 
-        <ScrollContainer
-            v-else
-            class="grow"
-            @reached-bottom="hasNextPage && fetchNextPage()"
-        >
+        <ScrollContainer v-else class="grow" @reached-bottom="hasNextPage && fetchNextPage()">
             <ul>
                 <li v-for="{ id, name, images } of currentItems" :key="id">
                     <button

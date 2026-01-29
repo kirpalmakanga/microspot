@@ -30,10 +30,7 @@ defineEmits<{ togglePlay: [e: void] }>();
                 {{ title }}
             </NuxtLink>
 
-            <div
-                v-if="subtitle"
-                class="text-sm opacity-60 truncate leading-none mt-2"
-            >
+            <div v-if="subtitle" class="text-sm opacity-60 truncate leading-none mt-2">
                 {{ subtitle }}
             </div>
         </div>

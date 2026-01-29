@@ -13,11 +13,7 @@ export const parseArtistData = ({
     id,
     uri,
     name,
-    images: [
-        { url: large = '' } = {},
-        { url: medium = '' } = {},
-        { url: small = '' } = {}
-    ] = []
+    images: [{ url: large = '' } = {}, { url: medium = '' } = {}, { url: small = '' } = {}] = []
 }: SpotifyArtist): Artist => ({
     id,
     uri,
@@ -129,11 +125,7 @@ export const parseAlbumData = ({
     id,
     name,
     artists,
-    images: [
-        { url: large = '' } = {},
-        { url: medium = '' } = {},
-        { url: small = '' } = {}
-    ] = [],
+    images: [{ url: large = '' } = {}, { url: medium = '' } = {}, { url: small = '' } = {}] = [],
     release_date: releaseDate,
     total_tracks: itemCount,
     album_type: albumType,
@@ -177,11 +169,8 @@ export const parsePlaylistData = ({
 }: SpotifyPlaylist): Playlist => {
     const { id: userId = '', display_name: userName = '' } = owner || {};
 
-    const [
-        { url: large = '' } = {},
-        { url: medium = '' } = {},
-        { url: small = '' } = {}
-    ] = images || [];
+    const [{ url: large = '' } = {}, { url: medium = '' } = {}, { url: small = '' } = {}] =
+        images || [];
 
     return {
         id,

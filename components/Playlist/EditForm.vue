@@ -39,10 +39,7 @@ async function handleSubmit() {
     <form class="flex flex-col gap-4" @submit.prevent="handleSubmit">
         <div class="flex gap-4">
             <div class="group relative">
-                <Img
-                    class="size-48 flex-shrink-0 bg-zinc-700 rounded-md"
-                    :src="formData.cover"
-                />
+                <Img class="size-48 flex-shrink-0 bg-zinc-700 rounded-md" :src="formData.cover" />
 
                 <button
                     class="absolute inset-0 flex items-center justify-center bg-zinc-900/50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity cursor-pointer"

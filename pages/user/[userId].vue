@@ -21,9 +21,7 @@ const {
     fetchNextPage
 } = useUserPlaylists(userId as string);
 
-const playlists = computed(() =>
-    playlistData.value?.pages.flatMap(({ items }) => items)
-);
+const playlists = computed(() => playlistData.value?.pages.flatMap(({ items }) => items));
 
 useHead({
     title: () => user.value?.name
@@ -43,18 +41,10 @@ useHead({
         <Error v-else-if="hasUserError" @action="refetch()" />
 
         <div v-else-if="user" class="flex flex-col grow">
-            <LayoutPageHeader
-                type="User"
-                :cover="user.profilePicture"
-                :title="user.name"
-            >
+            <LayoutPageHeader type="User" :cover="user.profilePicture" :title="user.name">
                 <template v-if="playlists" #subtitles>
                     <p class="text-sm opacity-60">
-                        {{
-                            `${playlists.length} playlist${
-                                playlists.length === 1 ? '' : 's'
-                            }`
-                        }}
+                        {{ `${playlists.length} playlist${playlists.length === 1 ? '' : 's'}` }}
                     </p>
                 </template>
             </LayoutPageHeader>

@@ -13,10 +13,7 @@ defineProps<{ cover: string; title: string; artists: Artist[] }>();
                 </p>
 
                 <p class="opacity-60">
-                    <template
-                        v-for="({ id, name }, index) of artists"
-                        :key="id"
-                    >
+                    <template v-for="({ id, name }, index) of artists" :key="id">
                         <template v-if="index > 0">
                             {{ ', ' }}
                         </template>

@@ -47,10 +47,7 @@ const menuOptions: DropdownMenuItem[] = [
 <template>
     <header class="flex items-center justify-between h-12 bg-zinc-900 shadow">
         <template v-if="isLoggedIn">
-            <NuxtLink
-                class="flex items-center justify-center h-12 w-12 cursor-pointer"
-                to="/"
-            >
+            <NuxtLink class="flex items-center justify-center h-12 w-12 cursor-pointer" to="/">
                 <UIcon class="size-6" name="i-mi-home" />
             </NuxtLink>
 
@@ -64,11 +61,7 @@ const menuOptions: DropdownMenuItem[] = [
                 <button
                     class="hover:scale-110 hover:active:scale-90 transition-transform cursor-pointer"
                 >
-                    <UAvatar
-                        color="neutral"
-                        icon="i-mi-user"
-                        :src="profilePicture"
-                    />
+                    <UAvatar color="neutral" icon="i-mi-user" :src="profilePicture" />
                 </button>
             </UDropdownMenu>
         </div>

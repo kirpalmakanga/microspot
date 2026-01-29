@@ -13,9 +13,7 @@ const {
     refetch: refetchArtist
 } = useArtist(artistId as string);
 
-const cover = computed(
-    () => artist.value?.images.medium || artist.value?.images.large
-);
+const cover = computed(() => artist.value?.images.medium || artist.value?.images.large);
 
 const {
     data: artistAlbums,
@@ -73,11 +71,7 @@ useAppTitle(computed(() => artist.value?.name));
             <LayoutPageHeader type="Artist" :cover="cover" :title="artist.name">
                 <template #subtitles>
                     <p class="text-sm opacity-60">
-                        {{
-                            `${albums.albumCount || 0} album${
-                                albums.albumCount === 1 ? '' : 's'
-                            }`
-                        }}
+                        {{ `${albums.albumCount || 0} album${albums.albumCount === 1 ? '' : 's'}` }}
                     </p>
                 </template>
             </LayoutPageHeader>
@@ -86,10 +80,7 @@ useAppTitle(computed(() => artist.value?.name));
                 <MenuButton :menu-options="menuOptions" />
             </div>
 
-            <PlaylistGridLoader
-                class="bg-zinc-700 grow"
-                v-if="isLoadingAlbums"
-            />
+            <PlaylistGridLoader class="bg-zinc-700 grow" v-if="isLoadingAlbums" />
 
             <Error v-else-if="hasAlbumsError" @action="refetchAlbums()" />
 

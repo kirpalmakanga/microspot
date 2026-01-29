@@ -1,18 +1,9 @@
 <script setup lang="ts">
 const authStore = useAuthStore();
-const {
-    data,
-    isLoading,
-    isFetching,
-    isError,
-    hasNextPage,
-    refetch,
-    fetchNextPage
-} = useUserPlaylists(computed(() => authStore.userId));
+const { data, isLoading, isFetching, isError, hasNextPage, refetch, fetchNextPage } =
+    useUserPlaylists(computed(() => authStore.userId));
 
-const playlists = computed(() =>
-    data.value?.pages.flatMap(({ items }) => items)
-);
+const playlists = computed(() => data.value?.pages.flatMap(({ items }) => items));
 
 useAppTitle('Dashboard');
 
@@ -30,10 +21,7 @@ definePageMeta({
 
             <Error v-else-if="isError" @action="refetch()" />
 
-            <ScrollContainer
-                v-else-if="playlists"
-                @reached-bottom="hasNextPage && fetchNextPage()"
-            >
+            <ScrollContainer v-else-if="playlists" @reached-bottom="hasNextPage && fetchNextPage()">
                 <div class="flex flex-col grow px-4 pb-4">
                     <PlaylistGrid v-if="playlists.length" :items="playlists" />
 

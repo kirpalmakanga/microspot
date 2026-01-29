@@ -31,20 +31,14 @@ export const useAuthStore = defineStore(
                 Object.assign(state, tokens);
             },
             async refreshAccessToken() {
-                const accessToken = await refreshAccessToken(
-                    state.refreshToken
-                );
+                const accessToken = await refreshAccessToken(state.refreshToken);
 
                 state.accessToken = accessToken;
 
                 return accessToken as string;
             },
             async fetchUserData() {
-                const {
-                    id: userId,
-                    name: userName,
-                    profilePicture
-                } = await getCurrentUserData();
+                const { id: userId, name: userName, profilePicture } = await getCurrentUserData();
 
                 Object.assign(state, {
                     userId,

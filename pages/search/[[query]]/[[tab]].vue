@@ -1,13 +1,7 @@
 <script setup lang="ts">
 const route = useRoute();
-const {
-    searchAll,
-    searchArtists,
-    searchAlbums,
-    searchTracks,
-    searchPlaylists,
-    clearSearch
-} = useSearchStore();
+const { searchAll, searchArtists, searchAlbums, searchTracks, searchPlaylists, clearSearch } =
+    useSearchStore();
 
 const isLoading = ref<boolean>(false);
 

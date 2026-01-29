@@ -7,12 +7,7 @@ const {
     params: { trackId }
 } = useRoute();
 
-const {
-    data: track,
-    isLoading,
-    isError,
-    refetch
-} = useTrack(trackId as string);
+const { data: track, isLoading, isError, refetch } = useTrack(trackId as string);
 
 const { mutate: toggleSaveTrack } = useToggleSaveTrack(trackId as string);
 
@@ -31,9 +26,7 @@ const isPlaylistMenuOpen = ref<boolean>(false);
 
 const playlistMenuTitle = computed(() => {
     if (track.value) {
-        return `${track.value.artists.map(({ name }) => name).join(', ')} - ${
-            track.value.name
-        }`;
+        return `${track.value.artists.map(({ name }) => name).join(', ')} - ${track.value.name}`;
     }
 
     return '';
@@ -73,12 +66,7 @@ useAppTitle(computed(() => track.value?.name));
                     <template #subtitles>
                         <p class="flex gap-1">
                             <span>
-                                <template
-                                    v-for="(
-                                        { id, name }, index
-                                    ) of track.artists"
-                                    :key="id"
-                                >
+                                <template v-for="({ id, name }, index) of track.artists" :key="id">
                                     <span v-if="index > 0">{{ ', ' }}</span>
 
                                     <NuxtLink
@@ -108,12 +96,8 @@ useAppTitle(computed(() => track.value?.name));
 
                 <div class="flex items-center gap-4 p-4">
                     <PlayButton
-                        :is-playing="
-                            isCurrentContext('', track.uri) && isPlaying
-                        "
-                        @click="
-                            togglePlay({ contextUri: '', trackUri: track.uri })
-                        "
+                        :is-playing="isCurrentContext('', track.uri) && isPlaying"
+                        @click="togglePlay({ contextUri: '', trackUri: track.uri })"
                     />
 
                     <button
@@ -122,11 +106,7 @@ useAppTitle(computed(() => track.value?.name));
                     >
                         <UIcon
                             class="size-8"
-                            :name="
-                                track.isSaved
-                                    ? 'i-mi-circle-check'
-                                    : 'i-mi-circle-add'
-                            "
+                            :name="track.isSaved ? 'i-mi-circle-check' : 'i-mi-circle-add'"
                         />
                     </button>
 
@@ -138,7 +118,7 @@ useAppTitle(computed(() => track.value?.name));
         <UModal v-model:open="isPlaylistMenuOpen" :title="playlistMenuTitle">
             <template #body>
                 <PlaylistMenu
-                    :track-id="(trackId as string)"
+                    :track-id="trackId as string"
                     :title="playlistMenuTitle"
                     @saved="isPlaylistMenuOpen = false"
                 />

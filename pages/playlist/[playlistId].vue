@@ -22,12 +22,8 @@ const {
     fetchNextPage
 } = usePlaylistTracks(playlistId as string);
 
-const { mutate: toggleSavePlaylistTrack } = useToggleSavePlaylistTrack(
-    playlistId as string
-);
-const { mutate: removePlaylistTrack } = useRemovePlaylistTrack(
-    playlistId as string
-);
+const { mutate: toggleSavePlaylistTrack } = useToggleSavePlaylistTrack(playlistId as string);
+const { mutate: removePlaylistTrack } = useRemovePlaylistTrack(playlistId as string);
 
 const tracks = computed(() => playlistTracks.value?.pages.flat());
 
@@ -39,9 +35,7 @@ const copy = useCopy();
 
 const isEditFormOpen = ref<boolean>(false);
 
-const cover = computed(
-    () => playlist.value?.images.large || playlist.value?.images.medium
-);
+const cover = computed(() => playlist.value?.images.large || playlist.value?.images.medium);
 
 const menuOptions: DropdownMenuItem[] = [
     {
@@ -68,11 +62,7 @@ useAppTitle(computed(() => playlist.value?.name));
         <Error v-else-if="isError" @action="refetch()" />
 
         <div v-else-if="playlist" class="relative flex flex-col grow">
-            <LayoutPageHeader
-                type="Playlist"
-                :cover="cover"
-                :title="playlist.name"
-            >
+            <LayoutPageHeader type="Playlist" :cover="cover" :title="playlist.name">
                 <template #cover-overlay>
                     <button
                         class="absolute inset-0 flex items-center justify-center bg-zinc-900/50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity cursor-pointer"

@@ -26,9 +26,7 @@ function handleScrollEnd({ currentTarget }: ElementEvent<HTMLDivElement>) {
 
     if (
         scrollTop >=
-        scrollHeight -
-            offsetHeight -
-            (props.scrollOffsetPercent / 100) * scrollHeight
+        scrollHeight - offsetHeight - (props.scrollOffsetPercent / 100) * scrollHeight
     ) {
         emit('reachedBottom');
     }
@@ -54,9 +52,7 @@ const virtualListOptions = {
                     :list-type="props.type"
                     :index="index + 1"
                     :is-current="isCurrentContext(contextUri, trackUri)"
-                    :is-playing="
-                        isCurrentContext(contextUri, trackUri) && isPlaying
-                    "
+                    :is-playing="isCurrentContext(contextUri, trackUri) && isPlaying"
                     @save="emit('toggleSaveTrack', data.id)"
                     @delete="emit('deleteTrack', data.id)"
                     @toggle-play="togglePlay({ contextUri, trackUri })"
