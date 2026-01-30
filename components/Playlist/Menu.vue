@@ -5,8 +5,9 @@ const emit = defineEmits<{ saved: [e: void] }>();
 
 const authStore = useAuthStore();
 
-const { data, isLoading, isFetching, isError, hasNextPage, refetch, loadNextPage } =
-    useUserPlaylists(authStore.userId);
+const { data, isPending, isLoading, error, hasNextPage, refetch, loadNextPage } = useUserPlaylists(
+    authStore.userId
+);
 
 const { mutate: addPlaylistTrack } = useAddPlaylistTrack();
 
@@ -48,9 +49,9 @@ function handleSelectPlaylist(playlistId?: string) {
             New playlist
         </button>
 
-        <PlaylistMenuLoader v-if="isLoading || (isError && isFetching)" />
+        <PlaylistMenuLoader v-if="isPending || (error && isLoading)" />
 
-        <Error v-else-if="isError" @action="refetch()" />
+        <Error v-else-if="error" @action="refetch()" />
 
         <ScrollContainer v-else class="grow" @reached-bottom="hasNextPage && loadNextPage()">
             <ul>
