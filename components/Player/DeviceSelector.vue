@@ -5,13 +5,13 @@ const iconsByType: Record<string, string> = {
     speaker: 'i-mi-speakers'
 };
 
-defineEmits<{ select: [id: string] }>();
+const { data: devices, error, isPending, isLoading, refetch } = useAvailableDevices();
 
-const props = defineProps<{ items: Device[] }>();
+const { mutate: setActiveDevice, isLoading: isSavingDevice } = useSetActiveDevice();
 
-const activeDevice = computed(() => props.items.find(({ isActive }) => isActive));
+const activeDevice = computed(() => devices.value?.find(({ isActive }) => isActive));
 
-const availableDevices = computed(() => props.items.filter(({ isActive }) => !isActive));
+const availableDevices = computed(() => devices.value?.filter(({ isActive }) => !isActive));
 </script>
 
 <template>
@@ -32,12 +32,23 @@ const availableDevices = computed(() => props.items.filter(({ isActive }) => !is
 
         <p class="mb-2">Select another device</p>
 
-        <ul>
-            <li v-for="{ id, name, type, isActive } of availableDevices" :key="id">
+        <div
+            v-if="isPending || (error && isLoading)"
+            class="bg-zinc-700 flex h-14 gap-2 rounded-md p-4 items-center"
+        >
+            <USkeleton class="size-6" />
+
+            <USkeleton class="h-6 grow" />
+        </div>
+
+        <Error v-else-if="error" @action="refetch()" />
+
+        <ul v-else-if="availableDevices">
+            <li v-for="{ id, name, type } of availableDevices" :key="id">
                 <button
-                    :disabled="isActive"
-                    class="flex gap-2 items-center text-left p-4 cursor-pointer w-full rounded-md hover:bg-indigo-500 hover:active: transition-colors"
-                    @click="$emit('select', id)"
+                    :disabled="isSavingDevice"
+                    class="flex gap-2 items-center text-left p-4 cursor-pointer w-full rounded-md hover:bg-indigo-500 hover:active:scale-95 transition-transform"
+                    @click="setActiveDevice(id)"
                 >
                     <UIcon class="size-6" :name="iconsByType[type]" />
 

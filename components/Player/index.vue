@@ -14,15 +14,12 @@ const {
     cannotSkipToNext,
     currentTrack,
     currentTrackPosition,
-    availableDevices,
     init,
     destroy,
     togglePlay,
     seek,
     goToPreviousTrack,
     goToNextTrack,
-    fetchAvailableDevices,
-    selectActiveDevice,
     toggleSaveCurrentTrack
 } = useSpotifyPlayer();
 
@@ -70,10 +67,12 @@ const trackMenuOptions = computed<ContextMenuItem[]>(() => [
     }
 ]);
 
-async function openDeviceSelector() {
-    await fetchAvailableDevices();
-
+function openDeviceSelector() {
     isDeviceSelectorVisible.value = true;
+}
+
+function closeDeviceSelector() {
+    isDeviceSelectorVisible.value = false;
 }
 
 onMounted(init);
@@ -200,7 +199,7 @@ onBeforeUnmount(destroy);
         }"
     >
         <template #body>
-            <PlayerDeviceSelector :items="availableDevices" @select="selectActiveDevice" />
+            <PlayerDeviceSelector />
         </template>
     </USlideover>
 </template>

@@ -7,6 +7,27 @@ import {
     type PlaybackContext
 } from '~/services/spotify-api';
 
+export function useAvailableDevices() {
+    return useQuery({
+        key: () => ['devices'],
+        query: getAvailableDevices
+    });
+}
+
+export function useSetActiveDevice() {
+    const playerStore = usePlayerStore();
+    const queryCache = useQueryCache();
+
+    return useMutation({
+        mutation: (deviceId: string) => setActiveDevice(deviceId, playerStore.isPlaying),
+        onSuccess: () => {
+            queryCache.invalidateQueries({
+                key: ['devices']
+            });
+        }
+    });
+}
+
 interface State {
     isPlaying: boolean;
     isReady: boolean;
@@ -23,7 +44,6 @@ interface State {
     };
     currentTrackPosition: number;
     localDeviceId: string;
-    availableDevices: Device[];
 }
 
 async function loadPlayerAPI() {
@@ -53,8 +73,7 @@ const getDefaultState = (): State => ({
         isSaved: false
     },
     currentTrackPosition: 0,
-    localDeviceId: '',
-    availableDevices: []
+    localDeviceId: ''
 });
 
 export function useSpotifyPlayer() {
@@ -278,16 +297,6 @@ export function useSpotifyPlayer() {
         },
         goToNextTrack() {
             playerInstance.value?.nextTrack();
-        },
-        async fetchAvailableDevices() {
-            state.availableDevices = await getAvailableDevices();
-        },
-        selectActiveDevice(id: string) {
-            setActiveDevice(id, state.isPlaying);
-
-            for (const device of state.availableDevices) {
-                device.isActive = device.id === id;
-            }
         },
         async toggleSaveCurrentTrack() {
             const {
