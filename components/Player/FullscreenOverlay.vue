@@ -5,7 +5,7 @@ defineProps<{ cover: string; title: string; artists: Artist[] }>();
 <template>
     <div class="grow flex justify-center items-center bg-zinc-800">
         <div class="flex gap-4 items-end">
-            <Img class="size-96 rounded-md" :src="cover" />
+            <Img class="bg-zinc-900 size-96 rounded-md" :src="cover" />
 
             <div>
                 <p class="text-xl">
