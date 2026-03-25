@@ -105,7 +105,7 @@ export function useAddPlaylistTrack() {
     return useMutation({
         mutation: async ({ playlistId, trackId }: { playlistId?: string; trackId: string }) => {
             if (!playlistId) {
-                const { id: playlistId } = await createPlaylist(authStore.userId, 'New playlist');
+                const { id: playlistId } = await createPlaylist('New playlist');
 
                 await addPlaylistTrack(playlistId, trackId);
 

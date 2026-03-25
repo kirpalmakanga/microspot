@@ -1,7 +1,7 @@
 import axios from 'axios';
 import type { SpotifyDevice, SpotifyTrack } from '~/utils/parsers';
 
-const ITEMS_PER_REQUEST = 50;
+const ITEMS_PER_REQUEST = 40;
 
 export const apiInstance = axios.create({
     baseURL: 'https://api.spotify.com/v1'
@@ -24,8 +24,8 @@ export async function getCurrentUserData() {
 }
 
 async function areTracksSaved(trackIds: string[]) {
-    const { data } = await apiInstance.get('/me/tracks/contains', {
-        params: { ids: trackIds.join(',') }
+    const { data } = await apiInstance.get('/me/library/contains', {
+        params: { uris: trackIds.map((id) => `spotify:track:${id}`).join(',') }
     });
 
     return trackIds.reduce((obj: { [key: string]: boolean }, trackId, index) => {
@@ -38,29 +38,28 @@ async function areTracksSaved(trackIds: string[]) {
 export async function isTrackSaved(trackId: string): Promise<boolean> {
     const {
         data: [isSaved]
-    } = await apiInstance.get('/me/tracks/contains', {
-        params: { ids: trackId }
+    } = await apiInstance.get('/me/library/contains', {
+        params: { uris: `spotify:track:${trackId}` }
     });
 
     return isSaved;
 }
 
-export async function isAlbumSaved(trackId: string): Promise<boolean> {
+export async function isAlbumSaved(albumId: string): Promise<boolean> {
     const {
         data: [isSaved]
-    } = await apiInstance.get('/me/albums/contains', {
-        params: { ids: trackId }
+    } = await apiInstance.get('/me/library/contains', {
+        params: { uris: `spotify:album:${albumId}` }
     });
 
     return isSaved;
 }
 
-/** TODO: implémenter dans getPlaylist + implémenter sauvegarde de playlists tierces ? */
 export async function isPlaylistSaved(playlistId: string): Promise<boolean> {
     const {
         data: [isSaved]
-    } = await apiInstance.get('/me/playlists/contains', {
-        params: { ids: playlistId }
+    } = await apiInstance.get('/me/library/contains', {
+        params: { uris: `spotify:playlist:${playlistId}` }
     });
 
     return isSaved;
@@ -79,11 +78,11 @@ async function getTracksWithSavedStatus<T extends { id: string }>(tracks: T[]) {
 export async function toggleSaveTrack(trackId: string) {
     const isSaved = await isTrackSaved(trackId);
 
-    if (isSaved) {
-        await apiInstance.delete('/me/tracks', { params: { ids: trackId } });
-    } else {
-        await apiInstance.put('/me/tracks', { ids: [trackId] });
-    }
+    await apiInstance.request({
+        url: '/me/library',
+        method: isSaved ? 'DELETE' : 'PUT',
+        params: { uris: `spotify:track:${trackId}` }
+    });
 
     return !isSaved;
 }
@@ -103,11 +102,11 @@ export async function getTrack(trackId: string) {
 export async function toggleSaveAlbum(albumId: string) {
     const isSaved = await isAlbumSaved(albumId);
 
-    if (isSaved) {
-        await apiInstance.delete('/me/albums', { params: { ids: albumId } });
-    } else {
-        await apiInstance.put('/me/albums', { ids: [albumId] });
-    }
+    await apiInstance.request({
+        url: '/me/library',
+        method: isSaved ? 'DELETE' : 'PUT',
+        params: { uris: `spotify:album:${albumId}` }
+    });
 
     return !isSaved;
 }
@@ -158,18 +157,25 @@ export async function getArtistAlbums(artistId: string, offset: number = 0) {
     };
 }
 
-export async function createPlaylist(userId: string, name: string) {
-    const { data } = await apiInstance.post(`/users/${userId}/playlists`, {
+export async function createPlaylist(name: string) {
+    const { data } = await apiInstance.post(`/me/playlists`, {
         name
     });
 
     return parsePlaylistData(data);
 }
 
-export async function getPlaylist(playlistId: string) {
-    const { data } = await apiInstance.get(`/playlists/${playlistId}`);
+export async function removePlaylist(playlistId: string) {
+    await apiInstance.delete('/me/library', { params: { uris: `spotify:playlist:${playlistId}` } });
+}
 
-    return parsePlaylistData(data);
+export async function getPlaylist(playlistId: string) {
+    const [{ data }, isSaved] = await Promise.all([
+        apiInstance.get(`/playlists/${playlistId}`),
+        isPlaylistSaved(playlistId)
+    ]);
+
+    return { ...parsePlaylistData(data), isSaved };
 }
 
 export async function updatePlaylist(
@@ -186,7 +192,7 @@ export async function updatePlaylistCover(playlistId: string, imageDataUrl: stri
 export async function getPlaylistTracks(playlistId: string, offset: number = 0) {
     const {
         data: { items }
-    } = await apiInstance.get(`/playlists/${playlistId}/tracks`, {
+    } = await apiInstance.get(`/playlists/${playlistId}/items`, {
         params: { market: 'FR', limit: ITEMS_PER_REQUEST, offset }
     });
 
@@ -237,15 +243,15 @@ export async function getUserPlaylists(userId?: string, offset: number = 0) {
 }
 
 export async function addPlaylistTrack(playlistId: string, trackId: string) {
-    await apiInstance.post(`/playlists/${playlistId}/tracks`, {
+    await apiInstance.post(`/playlists/${playlistId}/items`, {
         uris: [`spotify:track:${trackId}`]
     });
 }
 
 export async function removePlaylistTrack(playlistId: string, trackId: string) {
-    await apiInstance.delete(`/playlists/${playlistId}/tracks`, {
+    await apiInstance.delete(`/playlists/${playlistId}/items`, {
         data: {
-            tracks: [{ uri: `spotify:track:${trackId}` }]
+            items: [{ uri: `spotify:track:${trackId}` }]
         }
     });
 }
