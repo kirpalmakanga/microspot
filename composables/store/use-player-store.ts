@@ -38,6 +38,7 @@ const getDefaultState = (): State => ({
 export const usePlayerStore = defineStore(
     'player',
     () => {
+        const emitter = useEmitter();
         const state = reactive<State>(getDefaultState());
 
         const isCurrentContext = (targetContextUri: string, targetTrackUri?: string) => {

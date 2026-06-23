@@ -77,6 +77,7 @@ const getDefaultState = (): State => ({
 });
 
 export function useSpotifyPlayer() {
+    const emitter = useEmitter();
     const { refreshAccessToken } = useAuthStore();
     const playerStore = usePlayerStore();
     const state = reactive<State>(getDefaultState());
@@ -282,8 +283,8 @@ export function useSpotifyPlayer() {
 
                 Object.assign(state, getDefaultState());
 
-                emitter.off('launch', setContext);
-                emitter.off('togglePlay', togglePlay);
+                emitter.off('launch');
+                emitter.off('togglePlay');
             }
         },
         togglePlay,
