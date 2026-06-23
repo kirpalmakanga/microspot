@@ -1,3 +1,5 @@
+import { H3Event } from 'h3';
+
 export function createFormData(obj: Record<string, string>) {
     return new URLSearchParams(obj);
 }
@@ -30,4 +32,10 @@ export function createBasicToken(clientId?: string, clientSecret?: string) {
     }
 
     return Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
+}
+
+export function getRedirectUri(event: H3Event) {
+    const { origin } = getRequestURL(event);
+
+    return `${origin}/callback`;
 }

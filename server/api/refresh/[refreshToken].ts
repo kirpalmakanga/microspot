@@ -2,9 +2,7 @@ import axios from 'axios';
 import { AUTH_API_URI } from '~/server/config';
 import { createBasicToken, createFormData } from '~/server/helpers';
 
-const {
-    env: { CLIENT_ID, CLIENT_SECRET }
-} = process;
+const { CLIENT_ID, CLIENT_SECRET } = process.env;
 
 export default defineEventHandler(async (event) => {
     const refreshToken = getRouterParam(event, 'refreshToken');
