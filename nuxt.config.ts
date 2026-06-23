@@ -10,7 +10,7 @@ export default defineNuxtConfig({
             allowedHosts: true
         },
         optimizeDeps: {
-            include: ['@pinia/colada-devtools', 'axios']
+            include: ['@pinia/colada-devtools', '@vueuse/core', 'axios', 'mitt']
         }
     }
 });
