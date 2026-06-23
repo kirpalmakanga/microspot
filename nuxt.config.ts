@@ -8,6 +8,9 @@ export default defineNuxtConfig({
     vite: {
         server: {
             allowedHosts: true
+        },
+        optimizeDeps: {
+            include: ['@pinia/colada-devtools', 'axios']
         }
     }
 });
