@@ -53,7 +53,9 @@ export const useAuthStore = defineStore(
     },
     {
         persist: {
-            storage: piniaPluginPersistedstate.localStorage()
+            storage: piniaPluginPersistedstate.cookies({
+                expires: new Date(Date.now() + 6 * 30 * 24 * 60 * 60 * 1000) // 6 months
+            })
         }
     }
 );
