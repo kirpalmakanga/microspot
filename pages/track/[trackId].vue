@@ -114,15 +114,12 @@ useAppTitle(computed(() => track.value?.name));
                 </div>
             </div>
         </Transition>
-
-        <UModal v-model:open="isPlaylistMenuOpen" :title="playlistMenuTitle">
-            <template #body>
-                <PlaylistMenu
-                    :track-id="trackId as string"
-                    :title="playlistMenuTitle"
-                    @saved="isPlaylistMenuOpen = false"
-                />
-            </template>
-        </UModal>
     </section>
+
+    <PlaylistMenu
+        v-if="track"
+        v-model:open="isPlaylistMenuOpen"
+        :track-data="pick(track, 'id', 'name', 'artists')"
+        :title="playlistMenuTitle"
+    />
 </template>

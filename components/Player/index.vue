@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { ContextMenuItem } from '@nuxt/ui';
 import { useFullscreen } from '@vueuse/core';
 
 const playerStore = usePlayerStore();
@@ -26,10 +25,6 @@ const {
 
 const { isFullscreen, toggle: toggleFullscreen } = useFullscreen(useTemplateRef('playerWrapper'));
 
-const copy = useCopy();
-
-const isDeviceSelectorVisible = ref<boolean>(false);
-
 const contextHref = computed(() => {
     const uri = contextUri.value || track.value.uri;
 
@@ -39,42 +34,6 @@ const contextHref = computed(() => {
 const formattedPosition = computed(() => formatTime(trackPosition.value / 1000));
 
 const formattedDuration = computed(() => formatTime(track.value.duration / 1000));
-
-const isPlaylistMenuOpen = ref<boolean>(false);
-
-const playlistMenuTitle = computed(() => {
-    const {
-        value: { name, artists }
-    } = track;
-
-    return `${artists.map(({ name }) => name).join(', ')} - ${name}`;
-});
-
-const trackMenuOptions = computed<ContextMenuItem[]>(() => [
-    {
-        icon: 'i-mi-add',
-        label: 'Add to playlist',
-        onSelect: () => (isPlaylistMenuOpen.value = true)
-    },
-    {
-        icon: track.value.isSaved ? 'i-mi-circle-check' : 'i-mi-circle-add',
-        label: track.value.isSaved ? 'Remove from liked tracks' : 'Save to liked tracks',
-        onSelect: () => toggleSaveCurrentTrack()
-    },
-    {
-        icon: 'i-mi-share',
-        label: 'Share',
-        onSelect: () => copy(`${window.location.origin}/track/${track.value.id}`)
-    }
-]);
-
-function openDeviceSelector() {
-    isDeviceSelectorVisible.value = true;
-}
-
-function closeDeviceSelector() {
-    isDeviceSelectorVisible.value = false;
-}
 
 onMounted(init);
 
@@ -114,18 +73,18 @@ onBeforeUnmount(destroy);
             </div>
 
             <div class="flex grow bg-zinc-700">
-                <UContextMenu :items="trackMenuOptions">
+                <PlayerTrackMenu :track-data="track">
                     <Img
                         v-if="track.id"
                         class="bg-zinc-400 flex-shrink-0 inline-flex w-16 h-16 rounded-md ml-2 my-2"
                         :src="track.images.small"
                     />
-                </UContextMenu>
+                </PlayerTrackMenu>
 
                 <div class="flex flex-col grow p-2">
                     <div v-if="track.id" class="flex gap-2 overflow-hidden">
                         <div class="flex flex-col grow overflow-hidden">
-                            <UContextMenu :items="trackMenuOptions">
+                            <PlayerTrackMenu :track-data="track">
                                 <NuxtLink
                                     v-if="track.name && contextHref"
                                     class="inline-block text-md truncate no-underline hover:underline"
@@ -133,7 +92,7 @@ onBeforeUnmount(destroy);
                                 >
                                     {{ track.name }}
                                 </NuxtLink>
-                            </UContextMenu>
+                            </PlayerTrackMenu>
 
                             <Artists
                                 v-if="track.artists.length"
@@ -172,7 +131,9 @@ onBeforeUnmount(destroy);
             </div>
 
             <div class="flex">
-                <PlayerControl icon="i-mi-speakers" @click="openDeviceSelector" />
+                <PlayerDeviceSelector>
+                    <PlayerControl icon="i-mi-speakers" />
+                </PlayerDeviceSelector>
 
                 <PlayerControl
                     :icon="isFullscreen ? 'i-mi-minimize' : 'i-mi-expand'"
@@ -181,24 +142,4 @@ onBeforeUnmount(destroy);
             </div>
         </div>
     </div>
-
-    <UModal v-model:open="isPlaylistMenuOpen" :title="playlistMenuTitle">
-        <template #body>
-            <PlaylistMenu :track-id="track.id" @saved="isPlaylistMenuOpen = false" />
-        </template>
-    </UModal>
-
-    <USlideover
-        v-model:open="isDeviceSelectorVisible"
-        title="Connect to a device"
-        :close="{
-            color: 'primary',
-            variant: 'soft',
-            class: 'cursor-pointer'
-        }"
-    >
-        <template #body>
-            <PlayerDeviceSelector />
-        </template>
-    </USlideover>
 </template>

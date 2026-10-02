@@ -146,10 +146,10 @@ const menuOptions = computed<ContextMenuItem[]>(() => [
             </UDropdownMenu>
         </article>
 
-        <UModal v-model:open="isPlaylistMenuOpen" :title="playlistMenuTitle">
-            <template #body>
-                <PlaylistMenu :track-id="id" @saved="isPlaylistMenuOpen = false" />
-            </template>
-        </UModal>
+        <PlaylistMenu
+            v-model:open="isPlaylistMenuOpen"
+            :track-data="{ id, name, artists }"
+            :title="playlistMenuTitle"
+        />
     </UContextMenu>
 </template>
