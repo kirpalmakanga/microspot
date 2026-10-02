@@ -56,8 +56,8 @@ export const usePlayerStore = defineStore(
         const { refreshAccessToken } = useAuthStore();
 
         const state = reactive<State>(getDefaultState());
-        const playerInstance = ref<Spotify.Player>();
-        const timeWatcher = ref<ReturnType<typeof setInterval>>();
+        const playerInstance = ref<Spotify.Player | null>(null);
+        const timeWatcher = ref<ReturnType<typeof setInterval> | null>(null);
 
         const defaultImage = { url: '' };
 
@@ -136,18 +136,17 @@ export const usePlayerStore = defineStore(
         async function onPlayerReady({ device_id: localDeviceId }: Spotify.WebPlaybackInstance) {
             state.localDeviceId = localDeviceId;
 
-            playerInstance.value?.addListener(
-                'player_state_changed',
-                (state: Spotify.PlaybackState) => {
-                    if (state) parseCurrentState(state);
-                }
-            );
-
             state.isReady = true;
         }
 
         function onPlayerNotReady() {
             state.isReady = false;
+        }
+
+        function onPlayerStateChanged(state: Spotify.PlaybackState) {
+            if (state) {
+                parseCurrentState(state);
+            }
         }
 
         async function play() {
@@ -222,6 +221,8 @@ export const usePlayerStore = defineStore(
 
                 if (isPlaying) {
                     timeWatcher.value = setInterval(fetchCurrentTrackPosition, 200);
+                } else {
+                    timeWatcher.value = null;
                 }
             }
         );
@@ -240,10 +241,11 @@ export const usePlayerStore = defineStore(
                     }
                 });
 
-                playerInstance.value?.addListener('ready', onPlayerReady);
-                playerInstance.value?.addListener('not_ready', onPlayerNotReady);
+                playerInstance.value.addListener('ready', onPlayerReady);
+                playerInstance.value.addListener('not_ready', onPlayerNotReady);
+                playerInstance.value.addListener('player_state_changed', onPlayerStateChanged);
 
-                await playerInstance.value?.connect();
+                await playerInstance.value.connect();
             },
             destroy() {
                 if (playerInstance.value) {
@@ -252,6 +254,8 @@ export const usePlayerStore = defineStore(
                     playerInstance.value.removeListener('player_state_changed');
 
                     playerInstance.value.disconnect();
+
+                    playerInstance.value = null;
 
                     Object.assign(state, getDefaultState());
                 }
