@@ -11,7 +11,7 @@ const emit = defineEmits<{
 }>();
 
 const playerStore = usePlayerStore();
-const { isCurrentContext, togglePlay } = playerStore;
+const { isCurrentContext, toggleContextPlay } = playerStore;
 const { isPlaying } = storeToRefs(playerStore);
 </script>
 
@@ -26,7 +26,7 @@ const { isPlaying } = storeToRefs(playerStore);
                 :is-playing="isCurrentContext(contextUri, trackUri) && isPlaying"
                 @save="emit('toggleSaveTrack', data.id)"
                 @delete="emit('deleteTrack', data.id)"
-                @toggle-play="togglePlay({ contextUri, trackUri })"
+                @toggle-play="toggleContextPlay(contextUri, trackUri)"
             />
         </li>
     </ul>

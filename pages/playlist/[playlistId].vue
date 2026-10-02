@@ -29,7 +29,7 @@ const { mutate: removePlaylistTrack } = useRemovePlaylistTrack(playlistId as str
 const tracks = computed(() => playlistTracks.value?.pages.flat());
 
 const playerStore = usePlayerStore();
-const { isCurrentContext, togglePlay } = playerStore;
+const { isCurrentContext, toggleContextPlay } = playerStore;
 const { isPlaying } = storeToRefs(playerStore);
 
 const copy = useCopy();
@@ -93,7 +93,7 @@ useAppTitle(computed(() => playlist.value?.name));
             <div class="flex items-center gap-4 p-4">
                 <PlayButton
                     :is-playing="isCurrentContext(playlist.uri) && isPlaying"
-                    @click="togglePlay({ contextUri: playlist.uri })"
+                    @click="toggleContextPlay(playlist.uri)"
                 />
 
                 <MenuButton :menu-options="menuOptions" />

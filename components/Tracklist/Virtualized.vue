@@ -18,7 +18,7 @@ const emit = defineEmits<{
 }>();
 
 const playerStore = usePlayerStore();
-const { isCurrentContext, togglePlay } = playerStore;
+const { isCurrentContext, toggleContextPlay } = playerStore;
 const { isPlaying } = storeToRefs(playerStore);
 
 function handleScrollEnd({ currentTarget }: ElementEvent<HTMLDivElement>) {
@@ -55,7 +55,7 @@ const virtualListOptions = {
                     :is-playing="isCurrentContext(contextUri, trackUri) && isPlaying"
                     @save="emit('toggleSaveTrack', data.id)"
                     @delete="emit('deleteTrack', data.id)"
-                    @toggle-play="togglePlay({ contextUri, trackUri })"
+                    @toggle-play="toggleContextPlay(contextUri, trackUri)"
                 />
             </template>
         </UseVirtualList>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const playerStore = usePlayerStore();
-const { isCurrentContext, togglePlay } = playerStore;
+const { isCurrentContext, toggleContextPlay } = playerStore;
 const { isPlaying } = storeToRefs(playerStore);
 
 defineProps<{ items: Album[] }>();
@@ -15,7 +15,7 @@ defineProps<{ items: Album[] }>();
                 :cover="images.medium || images.large"
                 :href="`/album/${id}`"
                 :is-playing="isCurrentContext(uri) && isPlaying"
-                @toggle-play="togglePlay({ contextUri: uri })"
+                @toggle-play="toggleContextPlay(uri)"
             />
         </li>
     </ul>

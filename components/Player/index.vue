@@ -3,17 +3,8 @@ import type { ContextMenuItem } from '@nuxt/ui';
 import { useFullscreen } from '@vueuse/core';
 
 const playerStore = usePlayerStore();
-const { context } = storeToRefs(playerStore);
-
-const { isFullscreen, toggle: toggleFullscreen } = useFullscreen(useTemplateRef('playerWrapper'));
 
 const {
-    isPlaying,
-    isReady,
-    cannotSkipToPrevious,
-    cannotSkipToNext,
-    currentTrack,
-    currentTrackPosition,
     init,
     destroy,
     togglePlay,
@@ -21,30 +12,40 @@ const {
     goToPreviousTrack,
     goToNextTrack,
     toggleSaveCurrentTrack
-} = useSpotifyPlayer();
+} = playerStore;
+
+const {
+    isPlaying,
+    isReady,
+    cannotSkipToPrevious,
+    cannotSkipToNext,
+    contextUri,
+    track,
+    trackPosition
+} = storeToRefs(playerStore);
+
+const { isFullscreen, toggle: toggleFullscreen } = useFullscreen(useTemplateRef('playerWrapper'));
 
 const copy = useCopy();
 
 const isDeviceSelectorVisible = ref<boolean>(false);
 
-const contextUri = computed(() => {
-    const {
-        value: { uri }
-    } = context;
+const contextHref = computed(() => {
+    const uri = contextUri.value || track.value.uri;
 
     return uri ? uri.replace('spotify', '').replaceAll(':', '/') : '';
 });
 
-const formattedPosition = computed(() => formatTime(currentTrackPosition.value / 1000));
+const formattedPosition = computed(() => formatTime(trackPosition.value / 1000));
 
-const formattedDuration = computed(() => formatTime(currentTrack.value.duration / 1000));
+const formattedDuration = computed(() => formatTime(track.value.duration / 1000));
 
 const isPlaylistMenuOpen = ref<boolean>(false);
 
 const playlistMenuTitle = computed(() => {
     const {
         value: { name, artists }
-    } = currentTrack;
+    } = track;
 
     return `${artists.map(({ name }) => name).join(', ')} - ${name}`;
 });
@@ -56,14 +57,14 @@ const trackMenuOptions = computed<ContextMenuItem[]>(() => [
         onSelect: () => (isPlaylistMenuOpen.value = true)
     },
     {
-        icon: currentTrack.value.isSaved ? 'i-mi-circle-check' : 'i-mi-circle-add',
-        label: currentTrack.value.isSaved ? 'Remove from liked tracks' : 'Save to liked tracks',
+        icon: track.value.isSaved ? 'i-mi-circle-check' : 'i-mi-circle-add',
+        label: track.value.isSaved ? 'Remove from liked tracks' : 'Save to liked tracks',
         onSelect: () => toggleSaveCurrentTrack()
     },
     {
         icon: 'i-mi-share',
         label: 'Share',
-        onSelect: () => copy(`${window.location.origin}/track/${currentTrack.value.id}`)
+        onSelect: () => copy(`${window.location.origin}/track/${track.value.id}`)
     }
 ]);
 
@@ -85,9 +86,9 @@ onBeforeUnmount(destroy);
         <PlayerFullscreenOverlay
             v-if="isFullscreen"
             class="grow flex justify-center items-center bg-zinc-800"
-            :cover="currentTrack.images.large"
-            :title="currentTrack.name"
-            :artists="currentTrack.artists"
+            :cover="track.images.large"
+            :title="track.name"
+            :artists="track.artists"
             @click="togglePlay"
         />
 
@@ -101,7 +102,7 @@ onBeforeUnmount(destroy);
 
                 <PlayerControl
                     :icon="isPlaying && isReady ? 'i-mi-pause' : 'i-mi-play'"
-                    :disabled="!currentTrack.id || !isReady"
+                    :disabled="!track.id || !isReady"
                     @click="togglePlay"
                 />
 
@@ -115,29 +116,29 @@ onBeforeUnmount(destroy);
             <div class="flex grow bg-zinc-700">
                 <UContextMenu :items="trackMenuOptions">
                     <Img
-                        v-if="currentTrack.id"
+                        v-if="track.id"
                         class="bg-zinc-400 flex-shrink-0 inline-flex w-16 h-16 rounded-md ml-2 my-2"
-                        :src="currentTrack.images.small"
+                        :src="track.images.small"
                     />
                 </UContextMenu>
 
                 <div class="flex flex-col grow p-2">
-                    <div v-if="currentTrack.id" class="flex gap-2 overflow-hidden">
+                    <div v-if="track.id" class="flex gap-2 overflow-hidden">
                         <div class="flex flex-col grow overflow-hidden">
                             <UContextMenu :items="trackMenuOptions">
                                 <NuxtLink
-                                    v-if="currentTrack.name && contextUri"
+                                    v-if="track.name && contextHref"
                                     class="inline-block text-md truncate no-underline hover:underline"
-                                    :to="contextUri"
+                                    :to="contextHref"
                                 >
-                                    {{ currentTrack.name }}
+                                    {{ track.name }}
                                 </NuxtLink>
                             </UContextMenu>
 
                             <Artists
-                                v-if="currentTrack.artists.length"
+                                v-if="track.artists.length"
                                 class="inline-block text-sm truncate"
-                                :items="currentTrack.artists"
+                                :items="track.artists"
                             />
                         </div>
 
@@ -147,9 +148,7 @@ onBeforeUnmount(destroy);
                         >
                             <UIcon
                                 class="h-6 w-6"
-                                :name="
-                                    currentTrack.isSaved ? 'i-mi-circle-check' : 'i-mi-circle-add'
-                                "
+                                :name="track.isSaved ? 'i-mi-circle-check' : 'i-mi-circle-add'"
                             />
                         </button>
                     </div>
@@ -160,8 +159,8 @@ onBeforeUnmount(destroy);
                         </div>
 
                         <PlayerSeekbar
-                            :position="currentTrackPosition"
-                            :duration="currentTrack.duration"
+                            :position="trackPosition"
+                            :duration="track.duration"
                             @update="seek"
                         />
 
@@ -185,7 +184,7 @@ onBeforeUnmount(destroy);
 
     <UModal v-model:open="isPlaylistMenuOpen" :title="playlistMenuTitle">
         <template #body>
-            <PlaylistMenu :track-id="currentTrack.id" @saved="isPlaylistMenuOpen = false" />
+            <PlaylistMenu :track-id="track.id" @saved="isPlaylistMenuOpen = false" />
         </template>
     </UModal>
 

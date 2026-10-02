@@ -9,10 +9,10 @@ const {
 
 const { data: track, isPending, isLoading, error, refetch } = useTrack(trackId as string);
 
-const { mutate: toggleSaveTrack } = useToggleSaveTrack(trackId as string);
+const { mutate: toggleSaveTrack } = useToggleSaveTrack();
 
 const playerStore = usePlayerStore();
-const { isCurrentContext, togglePlay } = playerStore;
+const { isCurrentContext, toggleContextPlay } = playerStore;
 const { isPlaying } = storeToRefs(playerStore);
 
 const formattedReleaseDate = useDateFormat(
@@ -97,12 +97,12 @@ useAppTitle(computed(() => track.value?.name));
                 <div class="flex items-center gap-4 p-4">
                     <PlayButton
                         :is-playing="isCurrentContext('', track.uri) && isPlaying"
-                        @click="togglePlay({ contextUri: '', trackUri: track.uri })"
+                        @click="toggleContextPlay('', track.uri)"
                     />
 
                     <button
                         class="transition-transform transform hover:scale-110 hover:active:scale-90 cursor-pointer"
-                        @click="toggleSaveTrack(trackId as string)"
+                        @click="toggleSaveTrack(track.id)"
                     >
                         <UIcon
                             class="size-8"

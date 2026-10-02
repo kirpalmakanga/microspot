@@ -38,7 +38,7 @@ const { mutate: toggleSaveAlbum } = useToggleSaveAlbum(albumId as string);
 const { mutate: toggleSaveAlbumTrack } = useToggleSaveAlbumTrack(albumId as string);
 
 const playerStore = usePlayerStore();
-const { isCurrentContext, togglePlay } = playerStore;
+const { isCurrentContext, toggleContextPlay } = playerStore;
 const { isPlaying } = storeToRefs(playerStore);
 
 const copy = useCopy();
@@ -102,7 +102,7 @@ useAppTitle(computed(() => album.value?.name));
                 <PlayButton
                     :disabled="!album.isPlayable"
                     :is-playing="isCurrentContext(album.uri) && isPlaying"
-                    @click="togglePlay({ contextUri: album.uri })"
+                    @click="toggleContextPlay(album.uri)"
                 />
 
                 <IconButton

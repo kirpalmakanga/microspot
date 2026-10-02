@@ -7,12 +7,17 @@ export function useTrack(trackId: MaybeRef<string>) {
     });
 }
 
-export function useToggleSaveTrack(trackId: MaybeRef<string>) {
+export function useToggleSaveTrack() {
     const queryCache = useQueryCache();
 
     return useMutation({
-        mutation: (trackId: string) => toggleSaveTrack(toValue(trackId)),
-        onSuccess: () => {
+        mutation: async (trackId: string) => {
+            return {
+                trackId,
+                isSaved: await toggleSaveTrack(toValue(trackId))
+            };
+        },
+        onSuccess: ({ trackId }) => {
             queryCache.invalidateQueries({
                 key: ['track', toValue(trackId)]
             });
