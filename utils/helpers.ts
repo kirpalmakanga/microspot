@@ -59,9 +59,8 @@ export function omit<T extends object, K extends keyof T>(base: T, ...keys: K[])
     return base;
 }
 
-export function pickFile(accept?: string): Promise<File> {
+export function pickFile(accept?: string): Promise<File | undefined> {
     const input = document.createElement('input');
-    let isResolving = false;
     input.style.display = 'none';
     input.type = 'file';
 
@@ -69,36 +68,30 @@ export function pickFile(accept?: string): Promise<File> {
         input.accept = accept;
     }
 
-    return new Promise((resolve, reject) => {
-        function handleCleanup() {
-            setTimeout(() => {
-                if (document.body.contains(input)) {
-                    document.body.removeChild(input);
-                }
+    function cleanup() {
+        setTimeout(() => {
+            if (document.body.contains(input)) {
+                document.body.removeChild(input);
+            }
+        }, 500);
+    }
 
-                if (!isResolving) {
-                    reject(new Error('Cancelled'));
-                }
-            }, 500);
-        }
-
+    return new Promise((resolve) => {
         input.addEventListener(
             'change',
             () => {
                 if (input.files) {
-                    isResolving = true;
-
                     resolve(input.files[0]);
                 }
 
-                handleCleanup();
+                cleanup();
             },
             {
                 once: true
             }
         );
 
-        window.addEventListener('focus', handleCleanup, {
+        window.addEventListener('focus', cleanup, {
             once: true
         });
 
@@ -159,7 +152,7 @@ export function update<T extends Record<K, unknown>, K extends keyof T>(
     const targetIndex = arr.findIndex(predicate);
 
     if (targetIndex > -1) {
-        return arr.with(targetIndex, { ...arr[targetIndex], ...payload });
+        return arr.with(targetIndex, { ...arr[targetIndex], ...payload } as T);
     }
 
     return arr;

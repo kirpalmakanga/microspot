@@ -23,7 +23,9 @@ const formData = reactive<{
 async function openFilePicker() {
     const file = await pickFile('image/jpeg');
 
-    formData.cover = await getDataUrl(file);
+    if (file) {
+        formData.cover = await getDataUrl(file);
+    }
 }
 
 async function handleSubmit() {
