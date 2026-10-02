@@ -69,11 +69,7 @@ export function pickFile(accept?: string): Promise<File | undefined> {
     }
 
     function cleanup() {
-        setTimeout(() => {
-            if (document.body.contains(input)) {
-                document.body.removeChild(input);
-            }
-        }, 500);
+        setTimeout(() => input.remove(), 500);
     }
 
     return new Promise((resolve) => {
