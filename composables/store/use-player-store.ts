@@ -1,9 +1,4 @@
-import {
-    isTrackSaved,
-    setCurrentContext,
-    toggleSaveTrack,
-    type PlaybackContext
-} from '~/services/spotify-api';
+import { isTrackSaved, setCurrentContext, type PlaybackContext } from '~/services/spotify-api';
 
 interface State {
     isPlaying: boolean;
@@ -108,8 +103,7 @@ export const usePlayerStore = defineStore(
                 current_track: trackData,
                 previous_tracks: previousTracks,
                 next_tracks: nextTracks
-            },
-            context: { uri } // TODO: Handle context changes
+            }
         }: Spotify.PlaybackState) {
             if (!trackData) return;
 
