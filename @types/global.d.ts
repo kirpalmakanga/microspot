@@ -94,7 +94,7 @@ declare global {
         profilePicture: string;
     }
 
-    type TracklistType = 'playlist' | 'album' | 'search';
+    type TracklistType = 'playlist' | 'album' | 'search' | 'queue';
 
     declare namespace Spotify {
         interface Entity {
