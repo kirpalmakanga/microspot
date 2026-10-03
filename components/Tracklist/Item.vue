@@ -3,7 +3,7 @@ import type { ContextMenuItem } from '@nuxt/ui';
 
 const props = withDefaults(
     defineProps<{
-        index: number;
+        index?: number;
         id: string;
         name: string;
         images?: Images;
@@ -75,7 +75,7 @@ const menuOptions = computed<ContextMenuItem[]>(() => [
 <template>
     <UContextMenu :items="menuOptions">
         <article
-            class="flex items-center hover:bg-indigo-400 transition-colors not-last:border-b-1 border-primary-700 overflow-hidden group"
+            class="flex items-center hover:bg-indigo-400 transition-colors not-last:border-b-1 only:border-none border-primary-700 overflow-hidden group"
             :class="{
                 'bg-indigo-500': isCurrent,
                 'bg-zinc-600': !isCurrent,
@@ -92,7 +92,7 @@ const menuOptions = computed<ContextMenuItem[]>(() => [
                     name="i-mi-volume-up"
                 />
 
-                <span v-else class="group-hover:hidden size-6">
+                <span v-else-if="listType === 'album' || index" class="group-hover:hidden size-6">
                     {{ listType === 'album' ? trackNumber : index }}
                 </span>
 
