@@ -14,12 +14,12 @@ export function useToggleSaveTrack() {
         mutation: async (trackId: string) => {
             return {
                 trackId,
-                isSaved: await toggleSaveTrack(toValue(trackId))
+                isSaved: await toggleSaveTrack(trackId)
             };
         },
         onSuccess: ({ trackId }) => {
             queryCache.invalidateQueries({
-                key: ['track', toValue(trackId)]
+                key: ['track', trackId]
             });
         }
     });
