@@ -136,17 +136,17 @@ export function useAddPlaylistTrack() {
     });
 }
 
-export function useRemovePlaylistTrack(playlistId: MaybeRef<string>) {
+export function useRemovePlaylistTrack() {
     const authStore = useAuthStore();
     const queryCache = useQueryCache();
 
     return useMutation({
-        mutation: async (trackId: string) => {
-            await removePlaylistTrack(toValue(playlistId), trackId);
+        mutation: async ({ trackId, playlistId }: { trackId: string; playlistId: string }) => {
+            await removePlaylistTrack(playlistId, trackId);
 
-            return trackId;
+            return { trackId, playlistId };
         },
-        onSuccess: () => {
+        onSuccess: ({ playlistId }) => {
             queryCache.invalidateQueries({
                 key: ['playlistTracks', playlistId]
             });

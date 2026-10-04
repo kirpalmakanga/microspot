@@ -24,7 +24,7 @@ const {
 } = usePlaylistTracks(playlistId as string);
 
 const { mutate: toggleSavePlaylistTrack } = useToggleSavePlaylistTrack(playlistId as string);
-const { mutate: removePlaylistTrack } = useRemovePlaylistTrack(playlistId as string);
+const { mutate: removePlaylistTrack } = useRemovePlaylistTrack();
 
 const tracks = computed(() => playlistTracks.value?.pages.flat());
 
@@ -110,7 +110,9 @@ useAppTitle(computed(() => playlist.value?.name));
                 :context-uri="playlist.uri"
                 :items="tracks"
                 @toggle-save-track="toggleSavePlaylistTrack"
-                @delete-track="removePlaylistTrack"
+                @delete-track="
+                    (trackId) => removePlaylistTrack({ trackId, playlistId: playlistId as string })
+                "
                 @reached-bottom="hasNextPage && loadNextPage()"
             />
 
