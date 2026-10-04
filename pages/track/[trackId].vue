@@ -52,68 +52,70 @@ useAppTitle(computed(() => track.value?.name));
 
 <template>
     <section class="flex flex-col grow">
-        <Transition name="fade" mode="out-in">
-            <Loader v-if="isPending || (error && isLoading)" />
+        <template v-if="isPending || (error && isLoading)">
+            <LayoutPageHeaderLoader />
 
-            <Error v-else-if="error" @action="refetch()" />
+            <LayoutPageActionsLoader has-play-button />
+        </template>
 
-            <div v-else-if="track" class="relative flex flex-col grow">
-                <LayoutPageHeader
-                    type="Track"
-                    :cover="track.images.medium || track.images.large"
-                    :title="track.name"
+        <Error v-else-if="error" @action="refetch()" />
+
+        <div v-else-if="track" class="relative flex flex-col grow">
+            <LayoutPageHeader
+                type="Track"
+                :cover="track.images.medium || track.images.large"
+                :title="track.name"
+            >
+                <template #subtitles>
+                    <p class="flex gap-1">
+                        <span>
+                            <template v-for="({ id, name }, index) of track.artists" :key="id">
+                                <span v-if="index > 0">{{ ', ' }}</span>
+
+                                <NuxtLink
+                                    class="opacity-80 hover:opacity-100 transition-opacity hover:underline"
+                                    :to="`/artist/${id}`"
+                                >
+                                    {{ name }}
+                                </NuxtLink>
+                            </template>
+                        </span>
+
+                        <span>•</span>
+
+                        <NuxtLink
+                            class="opacity-80 hover:opacity-100 transition-opacity hover:underline"
+                            :to="`/album/${track.albumId}`"
+                        >
+                            {{ track.albumName }}
+                        </NuxtLink>
+
+                        <span>•</span>
+
+                        <span>{{ formattedReleaseDate }}</span>
+                    </p>
+                </template>
+            </LayoutPageHeader>
+
+            <div class="flex items-center gap-4 p-4">
+                <PlayButton
+                    :is-playing="isCurrentContext('', track.uri) && isPlaying"
+                    @click="toggleContextPlay('', track.uri)"
+                />
+
+                <button
+                    class="transition-transform transform hover:scale-110 hover:active:scale-90 cursor-pointer"
+                    @click="toggleSaveTrack(track.id)"
                 >
-                    <template #subtitles>
-                        <p class="flex gap-1">
-                            <span>
-                                <template v-for="({ id, name }, index) of track.artists" :key="id">
-                                    <span v-if="index > 0">{{ ', ' }}</span>
-
-                                    <NuxtLink
-                                        class="opacity-80 hover:opacity-100 transition-opacity hover:underline"
-                                        :to="`/artist/${id}`"
-                                    >
-                                        {{ name }}
-                                    </NuxtLink>
-                                </template>
-                            </span>
-
-                            <span>•</span>
-
-                            <NuxtLink
-                                class="opacity-80 hover:opacity-100 transition-opacity hover:underline"
-                                :to="`/album/${track.albumId}`"
-                            >
-                                {{ track.albumName }}
-                            </NuxtLink>
-
-                            <span>•</span>
-
-                            <span>{{ formattedReleaseDate }}</span>
-                        </p>
-                    </template>
-                </LayoutPageHeader>
-
-                <div class="flex items-center gap-4 p-4">
-                    <PlayButton
-                        :is-playing="isCurrentContext('', track.uri) && isPlaying"
-                        @click="toggleContextPlay('', track.uri)"
+                    <UIcon
+                        class="size-8"
+                        :name="track.isSaved ? 'i-mi-circle-check' : 'i-mi-circle-add'"
                     />
+                </button>
 
-                    <button
-                        class="transition-transform transform hover:scale-110 hover:active:scale-90 cursor-pointer"
-                        @click="toggleSaveTrack(track.id)"
-                    >
-                        <UIcon
-                            class="size-8"
-                            :name="track.isSaved ? 'i-mi-circle-check' : 'i-mi-circle-add'"
-                        />
-                    </button>
-
-                    <MenuButton :menu-options="menuOptions" />
-                </div>
+                <MenuButton :menu-options="menuOptions" />
             </div>
-        </Transition>
+        </div>
     </section>
 
     <PlaylistMenu
