@@ -131,6 +131,10 @@ onBeforeUnmount(destroy);
             </div>
 
             <div class="flex">
+                <PlayerQueue>
+                    <PlayerControl icon="i-mi-list" />
+                </PlayerQueue>
+
                 <PlayerDeviceSelector>
                     <PlayerControl icon="i-mi-speakers" />
                 </PlayerDeviceSelector>

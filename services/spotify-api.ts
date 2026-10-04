@@ -65,7 +65,7 @@ export async function isPlaylistSaved(playlistId: string): Promise<boolean> {
     return isSaved;
 }
 
-async function getTracksWithSavedStatus<T extends { id: string }>(tracks: T[]) {
+async function getTracksWithSavedStatus<T extends TracklistItem>(tracks: T[]) {
     const trackIds = tracks.map(({ id }) => id);
     const savedById = await areTracksSaved(trackIds);
 
@@ -94,7 +94,7 @@ export async function getTrack(trackId: string) {
     ]);
 
     return {
-        ...parsePlaylistTrackData({ track }),
+        ...parsePlaylistTrackData(track),
         isSaved
     };
 }
@@ -132,7 +132,7 @@ export async function getAlbumTracks(albumId: string, offset: number = 0) {
     if (items.length) {
         const tracks = (items as SpotifyTrack[]).map(parseTrackData);
 
-        return await getTracksWithSavedStatus(tracks);
+        return await getTracksWithSavedStatus<Track>(tracks);
     }
 
     return [];
@@ -197,9 +197,11 @@ export async function getPlaylistTracks(playlistId: string, offset: number = 0) 
     });
 
     if (items.length) {
-        const tracks = (items as SpotifyPlaylistTrack[]).map(parsePlaylistTrackData);
+        const tracks = items.map(({ track }: { track: SpotifyPlaylistTrack }) =>
+            parsePlaylistTrackData(track)
+        );
 
-        return await getTracksWithSavedStatus(tracks);
+        return await getTracksWithSavedStatus<PlaylistTrack>(tracks);
     }
 
     return [];
@@ -263,7 +265,7 @@ export async function getSavedTracks(offset: number) {
         params: { limit: ITEMS_PER_REQUEST, offset }
     });
 
-    return items.map(parsePlaylistTrackData);
+    return items.map(({ track }: { track: SpotifyPlaylistTrack }) => parsePlaylistTrackData(track));
 }
 
 export async function searchAll(query: string) {
@@ -407,4 +409,12 @@ export async function setCurrentContext(
             device_id: deviceId
         }
     });
+}
+
+export async function getPlayerQueue(): Promise<PlaylistTrack[]> {
+    const {
+        data: { queue }
+    } = await apiInstance.get('/me/player/queue');
+
+    return queue.map(parsePlaylistTrackData);
 }

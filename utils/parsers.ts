@@ -57,43 +57,39 @@ export const parseTrackData = ({
 });
 
 export interface SpotifyPlaylistTrack {
-    track: {
-        album: {
-            id: string;
-            images: SpotifyThumbnail[];
-            name: string;
-            release_date: string;
-        };
-        artists: SpotifyArtist[];
-        duration_ms: number;
+    album: {
         id: string;
-        uri: string;
+        images: SpotifyThumbnail[];
         name: string;
-        type: string;
-        is_playable: boolean;
+        release_date: string;
     };
+    artists: SpotifyArtist[];
+    duration_ms: number;
+    id: string;
+    uri: string;
+    name: string;
+    type: string;
+    is_playable: boolean;
 }
 
 export const parsePlaylistTrackData = ({
-    track: {
-        album: {
-            id: albumId,
-            images: [
-                { url: large = '' } = {},
-                { url: medium = '' } = {},
-                { url: small = '' } = {}
-            ] = [],
-            name: albumName,
-            release_date: releaseDate
-        },
-        artists,
-        duration_ms: duration,
-        id,
-        uri,
-        name,
-        type,
-        is_playable: isPlayable
-    }
+    album: {
+        id: albumId,
+        images: [
+            { url: large = '' } = {},
+            { url: medium = '' } = {},
+            { url: small = '' } = {}
+        ] = [],
+        name: albumName,
+        release_date: releaseDate
+    },
+    artists,
+    duration_ms: duration,
+    id,
+    uri,
+    name,
+    type,
+    is_playable: isPlayable
 }: SpotifyPlaylistTrack): PlaylistTrack => ({
     id,
     uri,
